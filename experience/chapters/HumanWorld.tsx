@@ -1,0 +1,585 @@
+"use client";
+
+import { useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
+import {
+  AdditiveBlending,
+  BoxGeometry,
+  CapsuleGeometry,
+  CatmullRomCurve3,
+  Color,
+  CustomBlending,
+  CylinderGeometry,
+  Group,
+  Mesh,
+  MeshBasicMaterial,
+  MeshStandardMaterial,
+  OneFactor,
+  OneMinusSrcAlphaFactor,
+  PlaneGeometry,
+  PointLight,
+  Texture,
+  RingGeometry,
+  ShaderMaterial,
+  SphereGeometry,
+  TorusGeometry,
+  Vector2,
+  Vector3,
+} from "three";
+import { galleryPhotos } from "@/content/gallery";
+import { AUTOPLAY_MS, autoplayDue, gallery, galleryActionDone, galleryStep, holdAutoplay } from "../director/gallery";
+import { story } from "../director/store";
+import { frameFragment, frameVertex } from "../shaders/chapters";
+import { glowFragment, glowVertex } from "../shaders/signal";
+import { holoOn, smoothstep } from "../world/paths";
+import { GALLERY, WINDOW } from "./layout";
+
+const N = galleryPhotos.length;
+const PHOTO_W = 1.6;
+const PHOTO_H = 2.0;
+const MARGIN = 0.34;
+
+const L1 = 1.2; // upper arm
+const L2 = 1.1; // forearm
+const HAND = 0.36; // wrist → fingertip
+const SHOULDER_Y = 0.5;
+
+/** Fixed simulation step: every spring advances identically at any frame rate. */
+const H = 1 / 240;
+
+/** QA hook (like ?webgl=0): `?slowmo=6` stretches the robot's swipe for frame-by-frame review. */
+const SLOWMO =
+  typeof window === "undefined" ? 1 : Math.max(1, Number(new URLSearchParams(window.location.search).get("slowmo")) || 1);
+
+type Layout = {
+  radius: number;
+  step: number;
+  forward: number;
+  robot: Vector3;
+  robotScale: number;
+  fadeFrom: number;
+  fadeTo: number;
+};
+const DESK: Layout = { radius: 4.8, step: 0.36, forward: 0.6, robot: new Vector3(2.5, -1.95, 1.3), robotScale: 1, fadeFrom: 1.55, fadeTo: 2.05 };
+const MOBILE: Layout = { radius: 3.4, step: 0.46, forward: 0.45, robot: new Vector3(1.35, -2.15, 1.25), robotScale: 0.8, fadeFrom: 1.05, fadeTo: 1.45 };
+
+const smooth = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+const wrap = (r: number) => {
+  let v = ((r % N) + N) % N;
+  if (v >= N / 2) v -= N;
+  return v;
+};
+
+type Spring = { x: number; v: number };
+type Action = NonNullable<(typeof gallery)["action"]>;
+const sp = (x = 0): Spring => ({ x, v: 0 });
+/** Semi-implicit spring step (stable at H for these stiffnesses). zeta < 1 overshoots. */
+function stepSpring(s: Spring, target: number, w: number, zeta: number) {
+  s.v += (-w * w * (s.x - target) - 2 * zeta * w * s.v) * H;
+  s.x += s.v * H;
+}
+
+/** Frame staging on an arc: neighbours fan out, turn in, drop and recede. */
+function frameAt(r: number, L: Layout, out: { p: Vector3; rotY: number; s: number; focus: number; vis: number }) {
+  const a = Math.abs(r);
+  const th = r * L.step;
+  const f = 1 - smooth(Math.min(a, 1));
+  out.p.set(L.radius * Math.sin(th), -0.12 * a * a + 0.05 * f, L.radius * (Math.cos(th) - 1) + L.forward * f - a * 0.12);
+  out.rotY = -th * 0.85;
+  out.s = (1 - Math.min(a, 2) * 0.11) * (1 + 0.05 * f);
+  out.focus = f;
+  out.vis = 1 - smoothstep(L.fadeFrom, L.fadeTo, a);
+  return out;
+}
+
+type Plan = {
+  curve: CatmullRomCurve3;
+  times: number[];
+  contactT: number;
+  releaseT: number;
+  hesitate: [number, number] | null;
+  contactX: number;
+  travel: number;
+  dur: number;
+};
+
+/**
+ * Meet the Human: a spatial photo gallery operated by a small articulated
+ * robot assistant. Scroll only reveals and dismisses it. Steps (manual or
+ * autoplay) are planned as one continuous hand path; the card is moved by the
+ * robot's actual fingertip while in contact, then glides on with its own
+ * momentum and a slight overshoot. Everything runs on a fixed-step clock.
+ */
+export function HumanWorld({ lowPower }: { lowPower: boolean }) {
+  const root = useRef<Group>(null);
+  const frames = useRef<(Mesh | null)[]>([]);
+  const halo = useRef<Mesh>(null);
+  const size = useThree((s) => s.size);
+  const gl = useThree((s) => s.gl);
+  const keyLight = useRef<PointLight>(null);
+  const fillLight = useRef<PointLight>(null);
+  const compact = size.width / Math.max(1, size.height) < 0.95;
+  const L = compact ? MOBILE : DESK;
+  const simple = compact || lowPower;
+
+  const turret = useRef<Group>(null);
+  const shoulder = useRef<Group>(null);
+  const elbow = useRef<Group>(null);
+  const wrist = useRef<Group>(null);
+  const head = useRef<Group>(null);
+  const fingerL = useRef<Mesh>(null);
+  const fingerR = useRef<Mesh>(null);
+  const robot = useRef<Group>(null);
+
+  const r = useMemo(() => {
+    const planeW = PHOTO_W + MARGIN * 2;
+    const planeH = PHOTO_H + MARGIN * 2;
+    const frameGeo = new PlaneGeometry(planeW, planeH);
+    const mats = galleryPhotos.map((photo) => {
+      const crop = new Vector2(1, 1);
+      const mat = new ShaderMaterial({
+        vertexShader: frameVertex,
+        fragmentShader: frameFragment,
+        uniforms: {
+          uMap: { value: null },
+          uSize: { value: new Vector2(planeW, planeH) },
+          uPhoto: { value: new Vector2(PHOTO_W / 2, PHOTO_H / 2) },
+          uCrop: { value: crop },
+          uFocus: { value: 0 },
+          uVis: { value: 0 },
+          uReveal: { value: 0 },
+          uTime: { value: 0 },
+          uEdgeA: { value: new Color(0.45, 0.88, 1.0) },
+          uEdgeB: { value: new Color(0.66, 0.5, 1.0) },
+        },
+        transparent: true,
+        depthWrite: false,
+        blending: CustomBlending,
+        blendSrc: OneFactor,
+        blendDst: OneMinusSrcAlphaFactor,
+      });
+      return { mat, crop, photo };
+    });
+
+    // Soft back-light behind the active frame (atmospheric depth, not a glow smear).
+    const haloGeo = new PlaneGeometry(4.2, 4.6);
+    const haloMat = new ShaderMaterial({
+      vertexShader: glowVertex,
+      fragmentShader: glowFragment,
+      uniforms: { uColor: { value: new Color(0.62, 0.52, 1.0) }, uIntensity: { value: 0 } },
+      transparent: true,
+      depthWrite: false,
+      blending: AdditiveBlending,
+      premultipliedAlpha: true,
+    });
+    // Projector ring beneath the gallery: where the frames are projected from.
+    const ringGeo = new RingGeometry(1.25, 1.29, 96);
+    ringGeo.rotateX(-Math.PI / 2);
+    const ringMat = new MeshBasicMaterial({ color: new Color(0.6, 0.82, 1.0), transparent: true, blending: AdditiveBlending, depthWrite: false });
+
+    // Robot: soft ceramic shell, graphite joints, a cyan lens head, two soft fingers.
+    const shell = new MeshStandardMaterial({ color: new Color("#e2e4f5"), roughness: 0.38, metalness: 0.08, transparent: true });
+    const joint = new MeshStandardMaterial({ color: new Color("#272c45"), roughness: 0.32, metalness: 0.7, transparent: true });
+    const eye = new MeshBasicMaterial({ color: new Color(0.55, 0.92, 1.0), transparent: true });
+    const glowRing = new MeshBasicMaterial({ color: new Color(1.0, 0.72, 0.6), transparent: true, blending: AdditiveBlending, depthWrite: false });
+    const geo = {
+      base: new CylinderGeometry(0.42, 0.48, 0.16, 40),
+      pad: new RingGeometry(0.55, 0.61, 64),
+      turret: new CylinderGeometry(0.22, 0.28, 0.26, 32),
+      cap: new SphereGeometry(0.15, 24, 16),
+      capSmall: new SphereGeometry(0.11, 20, 14),
+      upper: new CapsuleGeometry(0.085, L1 - 0.17, 6, 16),
+      fore: new CapsuleGeometry(0.068, L2 - 0.14, 6, 14),
+      head: new BoxGeometry(0.24, 0.2, 0.26),
+      lens: new TorusGeometry(0.06, 0.016, 10, 28),
+      pupil: new SphereGeometry(0.03, 12, 10),
+      finger: new BoxGeometry(0.04, 0.05, 0.16),
+    };
+    geo.upper.rotateX(Math.PI / 2).translate(0, 0, L1 / 2);
+    geo.fore.rotateX(Math.PI / 2).translate(0, 0, L2 / 2);
+    geo.pad.rotateX(-Math.PI / 2);
+    return { frameGeo, mats, haloGeo, haloMat, ringGeo, ringMat, shell, joint, eye, glowRing, geo };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    const created: Texture[] = [];
+    import("./galleryTextures").then(({ galleryTexture }) => {
+      if (!alive) return;
+      r.mats.forEach((m) => {
+        const t = galleryTexture(m.photo, ([x, y]) => m.crop.set(x, y));
+        m.mat.uniforms.uMap.value = t;
+        // Upload now, not on the first frame the gallery is seen.
+        if (t.image) gl.initTexture(t);
+        created.push(t);
+      });
+      // Placeholders redraw once webfonts are ready; upload that version up front too.
+      document.fonts?.ready.then(() =>
+        requestAnimationFrame(() => {
+          if (alive) created.forEach((t) => gl.initTexture(t));
+        }),
+      );
+    });
+    return () => {
+      alive = false;
+      created.forEach((t) => t.dispose());
+    };
+  }, [r, gl]);
+
+  useEffect(() => {
+    gallery.live = true;
+    gallery.pos = gallery.index;
+    gallery.autoplay.lastSettled = performance.now();
+    return () => {
+      gallery.live = false;
+      gallery.action = null;
+      holdAutoplay("offscreen", true);
+    };
+  }, []);
+
+  const sim = useRef({
+    acc: 0,
+    card: sp(0),
+    yaw: sp(-0.6),
+    e1: sp(1.0),
+    e2: sp(0.2),
+    ew: sp(0),
+    roll: sp(0),
+    look: sp(0),
+    grip: sp(0.35),
+    target: new Vector3(),
+    plan: null as Plan | null,
+    planFor: null as Action | null,
+    started: false,
+    lastCheck: 0,
+    autoEl: null as HTMLElement | null,
+  });
+
+  const tmp = useMemo(
+    () => ({
+      f: { p: new Vector3(), rotY: 0, s: 1, focus: 0, vis: 0 },
+      rest: new Vector3(),
+      tip: new Vector3(),
+      d: new Vector3(),
+      sh: new Vector3(),
+    }),
+    [],
+  );
+
+  /** Gallery-local point on the right edge of frame i, at position `pos`. */
+  const edgeOf = (i: number, pos: number, out: Vector3) => {
+    const f = frameAt(wrap(i - pos), L, { p: new Vector3(), rotY: 0, s: 1, focus: 0, vis: 0 });
+    const hw = (PHOTO_W / 2) * f.s;
+    out.set(Math.cos(f.rotY) * hw, -0.1 * f.s, -Math.sin(f.rotY) * hw).add(f.p);
+    return out;
+  };
+
+  /** One continuous hand path for a swipe, planned when the step starts. */
+  const planFor = (a: Action, rest: Vector3): Plan => {
+    const from = Math.round(a.from);
+    const E = edgeOf(from, from, new Vector3());
+    const s = L.robotScale;
+    const dir = a.dir;
+    const W = rest.clone().add(new Vector3(0.2, 0.24, 0.12).multiplyScalar(s)); // anticipation: draw back
+    const A = E.clone().add(new Vector3(0.42, 0.14, 0.58).multiplyScalar(s)); // approach
+    const A2 = A.clone().add(new Vector3(0.08, 0.05, 0.07).multiplyScalar(s)); // a beat of hesitation
+    const C = E.clone().add(new Vector3(0.05, 0, 0.13)); // contact
+    const travel = L.radius * Math.sin(L.step); // how far a card centre moves per step
+    const P = C.clone().add(new Vector3(-dir * travel * 0.62, 0.03, -0.04)); // controlled push / pull
+    const F = P.clone().add(new Vector3(-dir * 0.2, 0.16, 0.12).multiplyScalar(s)); // follow-through
+    const hes = !simple;
+    const pts = hes ? [rest.clone(), W, A, A2, C, P, F, rest.clone()] : [rest.clone(), W, A, C, P, F, rest.clone()];
+    const times = hes ? [0, 0.1, 0.32, 0.38, 0.45, 0.68, 0.78, 1] : [0, 0.1, 0.34, 0.45, 0.68, 0.78, 1];
+    return {
+      curve: new CatmullRomCurve3(pts, false, "centripetal", 0.5),
+      times,
+      contactT: hes ? 0.45 : 0.45,
+      releaseT: hes ? 0.68 : 0.68,
+      hesitate: hes ? [0.32, 0.38] : null,
+      contactX: C.x,
+      travel,
+      dur: (hes ? 1350 : 1050) * SLOWMO,
+    };
+  };
+
+  const pathAt = (p: Plan, u: number, out: Vector3) => {
+    const n = p.times.length - 1;
+    let i = 0;
+    while (i < n - 1 && u > p.times[i + 1]) i++;
+    const s = (u - p.times[i]) / (p.times[i + 1] - p.times[i]);
+    return p.curve.getPoint(Math.min(1, (i + smooth(Math.min(1, Math.max(0, s)))) / n), out);
+  };
+
+  useFrame((state, dtRaw) => {
+    const S = sim.current;
+    const tr = story.view.track;
+    const visible = tr > WINDOW.human[0] && tr < WINDOW.human[1];
+    if (root.current) root.current.visible = visible;
+    const reduced = story.reducedMotion;
+    const now = performance.now();
+    const t = state.clock.elapsedTime;
+    const dt = Math.min(dtRaw, 0.1);
+
+    // ── Autoplay: only while the held stage is on screen and nothing asks it to wait. ──
+    holdAutoplay("offscreen", !(tr > 0.97 && tr < 1.55));
+    holdAutoplay("reduced", reduced);
+    if (now - S.lastCheck > 250) {
+      S.lastCheck = now;
+      holdAutoplay("menu", !!document.querySelector("dialog[open]"));
+      holdAutoplay("hidden", document.hidden);
+      S.autoEl ??= document.querySelector<HTMLElement>(".gallery-auto");
+    }
+    if (autoplayDue(now)) galleryStep(1, "auto");
+    if (S.autoEl) {
+      const ap = gallery.autoplay;
+      const running = ap.holds.size === 0 && !gallery.action;
+      S.autoEl.style.setProperty("--p", running ? Math.min(1, (now - ap.lastSettled) / AUTOPLAY_MS).toFixed(3) : "0");
+      S.autoEl.dataset.state = running ? "running" : "waiting";
+    }
+
+    // ── Rest pose (idle breathing), folded while the stage is off. ──
+    const a = gallery.action;
+    const d = gallery.drag;
+    const sc = L.robotScale;
+    const live = reduced ? 0 : 1;
+    tmp.rest
+      .set(-0.85 + Math.sin(t * 0.5) * 0.05 * live, 1.6 + Math.sin(t * 0.8) * 0.04 * live, 0.42 + Math.sin(t * 0.37) * 0.03 * live)
+      .multiplyScalar(sc)
+      .add(L.robot);
+    const powered = smoothstep(0.72, 1.08, tr) * (1 - smoothstep(1.5, 1.75, tr));
+    tmp.d.set(0.25, 0.75, 0.25).multiplyScalar(sc).add(L.robot);
+    tmp.rest.lerp(tmp.d, 1 - powered);
+
+    let cardMode: "spring" | "held" | "drag" = "spring";
+    // Until the robot releases it, the card waits where it was: it only moves
+    // when the hand moves it.
+    let cardTarget = gallery.index;
+    let rollT = reduced ? 0 : Math.sin(t * 0.7) * 0.1 + (Math.sin(t * 0.23) > 0.93 ? 0.32 : 0);
+    let pitchT = reduced ? 0.06 : 0.08 + Math.sin(t * 0.9) * 0.05 + story.view.py * 0.12;
+    let gripT = 0.35;
+    let lookT = story.view.px * 0.25;
+
+    const robotActs = !!a && !reduced && visible && powered > 0.5;
+    if (a && robotActs) {
+      if (S.planFor !== a) {
+        S.plan = planFor(a, tmp.rest);
+        S.planFor = a;
+      }
+      const p = S.plan!;
+      const u = (performance.now() - a.start) / p.dur;
+      pathAt(p, Math.min(1, u), S.target);
+      if (u < p.releaseT) cardTarget = a.from;
+      if (u < p.times[1]) {
+        gripT = 0.5; // anticipation: it draws back and opens up
+        pitchT = 0.2;
+      } else if (p.hesitate && u >= p.hesitate[0] && u < p.hesitate[1]) {
+        const h = Math.sin(((u - p.hesitate[0]) / (p.hesitate[1] - p.hesitate[0])) * Math.PI);
+        rollT = 0.34 * h; // tilts its head, reconsiders
+        lookT = 0.25 * h;
+        gripT = 0.95;
+      } else if (u < p.contactT) {
+        gripT = 0.95;
+        rollT = 0;
+        pitchT = -0.06;
+      } else if (u < p.releaseT) {
+        gripT = 0.12; // pressed against the edge
+        rollT = -0.08; // wrist squared to the frame
+        pitchT = -0.04;
+        cardMode = "held";
+      } else {
+        gripT = 0.55;
+        pitchT = 0.14;
+      }
+      if (u >= 1) {
+        S.plan = null;
+        S.planFor = null;
+        galleryActionDone();
+      }
+    } else if (a) {
+      // Reduced motion or off-stage: no robot; the card eases over on its own.
+      if (performance.now() - a.start > 450) galleryActionDone();
+      S.target.copy(tmp.rest);
+    } else if (d.active) {
+      cardMode = "drag";
+      edgeOf(Math.round(gallery.pos), gallery.pos, S.target).add(tmp.d.set(0.06, 0, 0.16));
+      gripT = 0.15;
+      if (Math.abs(d.offset) < 0.03) S.target.copy(tmp.rest);
+    } else {
+      S.target.copy(tmp.rest);
+    }
+    if (d.release && !d.active) {
+      S.card.v = d.releaseVelocity * 0.8;
+      d.release = false;
+    }
+    if (!S.started) {
+      S.started = true;
+      S.card.x = gallery.pos;
+    }
+
+    // ── IK (pure): target → raw joint angles in the turret's plane. ──
+    const sh = tmp.sh.set(0, SHOULDER_Y * sc, 0).add(L.robot);
+    const dx = (S.target.x - sh.x) / sc;
+    const dy = (S.target.y - sh.y) / sc;
+    const dz = (S.target.z - sh.z) / sc;
+    let yawRaw = Math.atan2(dx, dz);
+    while (yawRaw - S.yaw.x > Math.PI) yawRaw -= Math.PI * 2;
+    while (yawRaw - S.yaw.x < -Math.PI) yawRaw += Math.PI * 2;
+    const horiz = Math.hypot(dx, dz) - HAND * Math.cos(pitchT);
+    const hgt = dy - HAND * Math.sin(pitchT);
+    const D = Math.min(L1 + L2 - 0.03, Math.max(0.35, Math.hypot(horiz, hgt)));
+    const phi = Math.atan2(hgt, Math.max(0.01, horiz));
+    const a1 = Math.acos(Math.min(1, Math.max(-1, (L1 * L1 + D * D - L2 * L2) / (2 * L1 * D))));
+    const a2 = Math.acos(Math.min(1, Math.max(-1, (L1 * L1 + L2 * L2 - D * D) / (2 * L1 * L2))));
+    const e1Raw = phi + a1;
+    const e2Raw = e1Raw - (Math.PI - a2);
+
+    // ── Fixed-step integration: base slowest, wrist quickest (natural lead-to-tip
+    //    follow-through), lightly underdamped so moves land with a clean overshoot. ──
+    const k = robotActs || cardMode === "drag" ? 1 : 0.6;
+    S.acc += dt;
+    let steps = 0;
+    while (S.acc >= H && steps < 48) {
+      S.acc -= H;
+      steps++;
+      stepSpring(S.yaw, yawRaw, 18 * k + 4, 0.86);
+      stepSpring(S.e1, e1Raw, 21 * k + 4, 0.85);
+      stepSpring(S.e2, e2Raw, 25 * k + 4, 0.84);
+      stepSpring(S.ew, pitchT, 26, 0.8);
+      stepSpring(S.roll, rollT, 18, 0.75);
+      stepSpring(S.look, lookT, 9, 0.8);
+      stepSpring(S.grip, gripT, 22, 0.9);
+      if (cardMode === "spring") {
+        // Glide to the committed photo with momentum and a slight overshoot.
+        if (reduced) stepSpring(S.card, cardTarget, 9, 1);
+        else stepSpring(S.card, cardTarget, 10, 0.7);
+      }
+    }
+    if (steps === 48) S.acc = 0;
+
+    // ── FK: the actual fingertip, so the card moves exactly with the hand. ──
+    const hReach = L1 * Math.cos(S.e1.x) + L2 * Math.cos(S.e2.x) + HAND * Math.cos(S.ew.x);
+    const vReach = L1 * Math.sin(S.e1.x) + L2 * Math.sin(S.e2.x) + HAND * Math.sin(S.ew.x);
+    tmp.tip.set(Math.sin(S.yaw.x) * hReach, vReach, Math.cos(S.yaw.x) * hReach).multiplyScalar(sc).add(sh);
+
+    if (cardMode === "held" && S.plan && a) {
+      const raw = a.from - (tmp.tip.x - S.plan.contactX) / S.plan.travel;
+      const lo = Math.min(a.from, a.from + a.dir * 0.78);
+      const hi = Math.max(a.from, a.from + a.dir * 0.78);
+      const next = Math.min(hi, Math.max(lo, raw));
+      S.card.v = dt > 0 ? (next - S.card.x) / dt : 0;
+      S.card.x = next;
+    } else if (cardMode === "drag") {
+      S.card.x = d.startPos + d.offset;
+      S.card.v = 0;
+    }
+    gallery.pos = S.card.x;
+
+    // Lights live outside the gated group and only fade: a light appearing or
+    // disappearing changes every lit shader's program and stalls the first frame.
+    const lightOn = visible ? smoothstep(0.55, 1.0, tr) * (1 - smoothstep(1.55, 1.85, tr)) : 0;
+    if (keyLight.current) keyLight.current.intensity = 10 * lightOn;
+    if (fillLight.current) fillLight.current.intensity = 9 * lightOn;
+
+    if (!visible || !root.current) return;
+
+    // ── Scroll-owned reveal and exit (never touches pos/index). ──
+    const presence = smoothstep(0.55, 1.0, tr) * (1 - smoothstep(1.55, 1.85, tr));
+    root.current.rotation.y = story.view.px * 0.06;
+    root.current.rotation.x = -story.view.py * 0.035;
+
+    let bestFocus = 0;
+    galleryPhotos.forEach((_, i) => {
+      const mesh = frames.current[i];
+      if (!mesh) return;
+      const rel = wrap(i - gallery.pos);
+      frameAt(rel, L, tmp.f);
+      const bob = reduced ? 0 : Math.sin(t * 0.55 + i * 1.9) * 0.035 * (1 - tmp.f.focus * 0.6);
+      mesh.position.set(tmp.f.p.x, tmp.f.p.y + bob, tmp.f.p.z);
+      mesh.rotation.set(0, tmp.f.rotY, 0);
+      mesh.scale.setScalar(tmp.f.s);
+      mesh.renderOrder = 20 - Math.round(Math.abs(rel) * 4);
+      const u2 = r.mats[i].mat.uniforms;
+      const rv = smoothstep(0.62 + i * 0.05, 0.98 + i * 0.05, tr);
+      u2.uReveal.value = rv;
+      u2.uFocus.value = tmp.f.focus;
+      u2.uVis.value = tmp.f.vis * presence * (0.35 + 0.65 * holoOn(rv, 0, 0.35, t, i + 3, reduced));
+      u2.uTime.value = t;
+      bestFocus = Math.max(bestFocus, tmp.f.focus);
+    });
+    if (halo.current) {
+      halo.current.position.set(0, 0.05, L.forward - 0.45);
+      r.haloMat.uniforms.uIntensity.value = presence * 0.28 * (0.6 + 0.4 * bestFocus);
+    }
+    r.ringMat.opacity = presence * 0.18;
+
+    // ── Robot pose. ──
+    const R = robot.current;
+    if (!R) return;
+    R.position.copy(L.robot);
+    R.scale.setScalar(sc);
+    const opacity = smoothstep(0.6, 0.85, tr) * (1 - smoothstep(1.6, 1.82, tr));
+    r.shell.opacity = r.joint.opacity = r.eye.opacity = opacity;
+    r.glowRing.opacity = opacity * 0.8;
+    if (turret.current) turret.current.rotation.y = S.yaw.x;
+    if (shoulder.current) shoulder.current.rotation.x = -S.e1.x;
+    if (elbow.current) elbow.current.rotation.x = -(S.e2.x - S.e1.x);
+    if (wrist.current) wrist.current.rotation.x = -(S.ew.x - S.e2.x);
+    if (head.current) head.current.rotation.set(0, S.look.x, S.roll.x);
+    const g = 0.025 + Math.max(0, S.grip.x) * 0.05;
+    if (fingerL.current) fingerL.current.position.x = -g;
+    if (fingerR.current) fingerR.current.position.x = g;
+  });
+
+  return (
+    <>
+    {/* Warm light for the human beat: peach key, lavender fill. Always present, faded by scroll. */}
+    <group position={GALLERY.toArray() as [number, number, number]}>
+      <pointLight ref={keyLight} color="#ffb89a" position={[-1.6, 2.4, 3.2]} intensity={0} distance={10} decay={2} />
+      <pointLight ref={fillLight} color="#b9a6ff" position={[3.4, 1.0, 2.2]} intensity={0} distance={9} decay={2} />
+    </group>
+    <group ref={root} position={GALLERY.toArray() as [number, number, number]} visible={false}>
+
+      <mesh ref={halo} geometry={r.haloGeo} material={r.haloMat} renderOrder={1} />
+      <mesh geometry={r.ringGeo} material={r.ringMat} position={[0, -1.55, 0.2]} renderOrder={1} />
+
+      {galleryPhotos.map((p, i) => (
+        <mesh
+          key={p.id}
+          ref={(el) => {
+            frames.current[i] = el;
+          }}
+          geometry={r.frameGeo}
+          material={r.mats[i].mat}
+          frustumCulled={false}
+        />
+      ))}
+
+      <group ref={robot}>
+        <mesh geometry={r.geo.pad} material={r.glowRing} position={[0, 0.01, 0]} />
+        <mesh geometry={r.geo.base} material={r.joint} position={[0, 0.08, 0]} />
+        <group ref={turret} position={[0, 0.16, 0]}>
+          <mesh geometry={r.geo.turret} material={r.shell} position={[0, 0.13, 0]} />
+          <group ref={shoulder} position={[0, SHOULDER_Y - 0.16, 0]}>
+            <mesh geometry={r.geo.cap} material={r.joint} />
+            <mesh geometry={r.geo.upper} material={r.shell} />
+            <group ref={elbow} position={[0, 0, L1]}>
+              <mesh geometry={r.geo.capSmall} material={r.joint} />
+              <mesh geometry={r.geo.fore} material={r.shell} />
+              <group ref={wrist} position={[0, 0, L2]}>
+                <mesh geometry={r.geo.capSmall} material={r.joint} scale={0.8} />
+                <group ref={head}>
+                  <mesh geometry={r.geo.head} material={r.shell} position={[0, 0.02, 0.15]} />
+                  <mesh geometry={r.geo.lens} material={r.eye} position={[0, 0.05, 0.285]} />
+                  <mesh geometry={r.geo.pupil} material={r.eye} position={[0, 0.05, 0.285]} />
+                  <mesh ref={fingerL} geometry={r.geo.finger} material={r.joint} position={[-0.05, -0.06, 0.33]} />
+                  <mesh ref={fingerR} geometry={r.geo.finger} material={r.joint} position={[0.05, -0.06, 0.33]} />
+                </group>
+              </group>
+            </group>
+          </group>
+        </group>
+      </group>
+    </group>
+    </>
+  );
+}

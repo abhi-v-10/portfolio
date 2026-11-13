@@ -1,0 +1,426 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-13T10:53:38.272075+00:00",
+  "title": "Design System: Abhishyanth Vemula — Portfolio V2",
+  "extensions": {
+    "colorMeta": {
+      "loader-black": {
+        "role": "neutral",
+        "displayName": "Loader Black",
+        "canonical": "oklch(12.7% 0.019 253.4)",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#222529",
+          "#3E4249",
+          "#5B626A",
+          "#7B838E",
+          "#9EA6AF",
+          "#C4CAD1",
+          "#EBEFF4"
+        ]
+      },
+      "space-navy": {
+        "role": "neutral",
+        "displayName": "Space Navy",
+        "canonical": "oklch(20.2% 0.038 273.5)",
+        "tonalRamp": [
+          "#0A0B0F",
+          "#22252D",
+          "#3E414F",
+          "#5B6074",
+          "#7B819A",
+          "#9EA4B9",
+          "#C4C8D9",
+          "#EBEEFA"
+        ]
+      },
+      "panel-navy": {
+        "role": "neutral",
+        "displayName": "Panel Navy",
+        "canonical": "oklch(17.0% 0.036 272.1)",
+        "tonalRamp": [
+          "#0A0B0F",
+          "#22252D",
+          "#3E414E",
+          "#5B6173",
+          "#7B8198",
+          "#9EA4B8",
+          "#C4C9D8",
+          "#EBEEF9"
+        ]
+      },
+      "core-energy": {
+        "role": "primary",
+        "displayName": "Core Energy",
+        "canonical": "oklch(85.1% 0.109 219.7)",
+        "tonalRamp": [
+          "#000E13",
+          "#002A35",
+          "#004A5B",
+          "#016C84",
+          "#1091AE",
+          "#61B2CA",
+          "#99D4E7",
+          "#CEF6FF"
+        ]
+      },
+      "ion-cyan": {
+        "role": "primary",
+        "displayName": "Ion Cyan",
+        "canonical": "oklch(82.3% 0.115 197.9)",
+        "tonalRamp": [
+          "#000F0F",
+          "#002C2E",
+          "#004D50",
+          "#007174",
+          "#00969B",
+          "#54B7BA",
+          "#92D8D9",
+          "#CAF9FA"
+        ]
+      },
+      "electric-blue": {
+        "role": "secondary",
+        "displayName": "Electric Blue",
+        "canonical": "oklch(60.0% 0.201 261.4)",
+        "tonalRamp": [
+          "#020A20",
+          "#0A224F",
+          "#173D84",
+          "#265BBD",
+          "#377AF7",
+          "#6AA3FF",
+          "#9CC9FF",
+          "#CFF0FF"
+        ]
+      },
+      "hologram-blue": {
+        "role": "secondary",
+        "displayName": "Hologram Blue",
+        "canonical": "oklch(62.4% 0.203 260.8)",
+        "tonalRamp": [
+          "#020A20",
+          "#08224F",
+          "#153D84",
+          "#235BBE",
+          "#347BF8",
+          "#68A3FF",
+          "#9BCAFF",
+          "#CFF0FF"
+        ]
+      },
+      "hologram-violet": {
+        "role": "tertiary",
+        "displayName": "Hologram Violet",
+        "canonical": "oklch(65.8% 0.197 290.3)",
+        "tonalRamp": [
+          "#0C061E",
+          "#261A4B",
+          "#44317E",
+          "#644AB4",
+          "#8565EC",
+          "#A591FF",
+          "#C8BCFF",
+          "#EDE6FF"
+        ]
+      },
+      "cosmic-violet": {
+        "role": "tertiary",
+        "displayName": "Cosmic Violet",
+        "canonical": "oklch(52.1% 0.178 287.3)",
+        "tonalRamp": [
+          "#0B071D",
+          "#241D48",
+          "#40357A",
+          "#5F4FAF",
+          "#7F6BE4",
+          "#A095F9",
+          "#C4BEFF",
+          "#EBE8FF"
+        ]
+      },
+      "nebula-pink": {
+        "role": "tertiary",
+        "displayName": "Nebula Pink",
+        "canonical": "oklch(72.9% 0.143 6.9)",
+        "tonalRamp": [
+          "#170509",
+          "#3D1620",
+          "#682A3A",
+          "#974056",
+          "#C65974",
+          "#E18699",
+          "#FBB2BF",
+          "#FFDFE8"
+        ]
+      },
+      "solar-coral": {
+        "role": "tertiary",
+        "displayName": "Solar Coral",
+        "canonical": "oklch(80.9% 0.128 56.7)",
+        "tonalRamp": [
+          "#150701",
+          "#391D05",
+          "#62350F",
+          "#8D4F1A",
+          "#BA6C2A",
+          "#D69464",
+          "#F1BD98",
+          "#FFE6CC"
+        ]
+      },
+      "warm-ivory": {
+        "role": "tertiary",
+        "displayName": "Warm Ivory",
+        "canonical": "oklch(89.9% 0.043 72.9)",
+        "tonalRamp": [
+          "#0E0A07",
+          "#2B241B",
+          "#4B4032",
+          "#6E5E4B",
+          "#927F66",
+          "#B3A28E",
+          "#D4C7B7",
+          "#F6EDE2"
+        ]
+      },
+      "soft-white": {
+        "role": "neutral",
+        "displayName": "Soft White",
+        "canonical": "oklch(97.0% 0.008 301.4)",
+        "tonalRamp": [
+          "#0B0B0C",
+          "#252527",
+          "#424144",
+          "#626064",
+          "#838186",
+          "#A6A4A8",
+          "#C9C8CC",
+          "#EFEEF0"
+        ]
+      },
+      "ink-tinted": {
+        "role": "neutral",
+        "displayName": "Ink Tinted",
+        "canonical": "oklch(91.9% 0.039 274.5)",
+        "tonalRamp": [
+          "#0A0B0F",
+          "#22252E",
+          "#3E414F",
+          "#5B6074",
+          "#7B819A",
+          "#9FA4B9",
+          "#C4C8D9",
+          "#EBEEFA"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted",
+        "canonical": "oklch(78.1% 0.046 264.3)",
+        "tonalRamp": [
+          "#090B10",
+          "#20252F",
+          "#3A4252",
+          "#566177",
+          "#75829E",
+          "#9AA5BD",
+          "#C0C9DC",
+          "#E8EFFC"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The name only; uppercase masked lines."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Chapter titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Professional descriptor line."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Tagline and chapter copy."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Identity mark, status, Index, Skip, Scroll cue."
+      },
+      "action": {
+        "displayName": "Action",
+        "purpose": "Explore button only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "seam-glow",
+        "value": "0 0 22px 2px rgb(115 223 255 / 0.55)",
+        "purpose": "Loader seam only: literal energy, not elevation."
+      },
+      {
+        "name": "edge-glow",
+        "value": "0 0 14px 1px rgb(115 223 255 / 0.45)",
+        "purpose": "Cut edges of the opening loader panels."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Arrivals: Explore reveal, progress fill, name lines (GSAP expo.out)."
+      },
+      {
+        "name": "panel-open",
+        "value": "1.4s power4.inOut",
+        "purpose": "Loader halves opening at the seam."
+      },
+      {
+        "name": "intro-dolly",
+        "value": "2.9s linear driver, eased per element",
+        "purpose": "story.intro: camera dolly, ring unfold, workspace assembly."
+      },
+      {
+        "name": "heartbeat",
+        "value": "3.2s ease-in-out infinite",
+        "purpose": "Loader core breathing; opacity-only under reduced motion."
+      },
+      {
+        "name": "state-change",
+        "value": "200ms ease",
+        "purpose": "Hover fills and border colour changes."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "portrait",
+        "value": "(max-aspect-ratio: 4/5), (max-width: 640px)"
+      },
+      {
+        "name": "min-supported",
+        "value": "320px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Explore Button",
+      "kind": "button",
+      "refersTo": "button-explore",
+      "description": "Primary action; appears only when the system is genuinely ready.",
+      "html": "<button class=\"ds-btn-explore\">Explore <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path d=\"M5 12h13M13 6.5 18.5 12 13 17.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
+      "css": ".ds-btn-explore{display:inline-flex;align-items:center;gap:.75rem;min-height:48px;padding:.85rem 1.35rem .85rem 1.6rem;font-family:Unbounded,sans-serif;font-weight:600;font-size:.78rem;letter-spacing:.24em;text-transform:uppercase;color:#EAFBFF;background:rgb(115 223 255 / .07);border:1px solid rgb(115 223 255 / .5);border-radius:2px;cursor:pointer;transition:background-color .2s ease,border-color .2s ease,transform .2s ease}.ds-btn-explore svg{transition:transform .25s cubic-bezier(.16,1,.3,1)}.ds-btn-explore:hover{background:rgb(115 223 255 / .16);border-color:#73DFFF}.ds-btn-explore:hover svg{transform:translateX(3px)}.ds-btn-explore:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}.ds-btn-explore:active{transform:scale(.98)}"
+    },
+    {
+      "name": "Index Pill",
+      "kind": "button",
+      "refersTo": "button-index",
+      "description": "Secondary navigation trigger in the top bar.",
+      "html": "<button class=\"ds-btn-index\">Index <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path d=\"M4 8h16M4 16h10\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></svg></button>",
+      "css": ".ds-btn-index{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.05rem;font-family:'Geist Mono',monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#F6F4FA;background:rgb(9 12 28 / .6);border:1px solid rgb(246 244 250 / .2);border-radius:999px;cursor:pointer;transition:border-color .2s ease,background-color .2s ease}.ds-btn-index:hover{border-color:#73DFFF;background:rgb(9 12 28 / .85)}.ds-btn-index:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}"
+    },
+    {
+      "name": "Quiet Link",
+      "kind": "button",
+      "refersTo": "link-quiet",
+      "description": "Skip intro / Close: low-emphasis mono actions.",
+      "html": "<button class=\"ds-link-quiet\">Skip intro</button>",
+      "css": ".ds-link-quiet{min-height:44px;padding:.5rem .25rem;font-family:'Geist Mono',monospace;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:#A9B8D6;background:none;border:0;cursor:pointer;text-decoration:underline;text-decoration-color:rgb(169 184 214 / .35);text-underline-offset:.4em}.ds-link-quiet:hover{color:#F6F4FA;text-decoration-color:#73DFFF}.ds-link-quiet:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}"
+    },
+    {
+      "name": "Top Bar",
+      "kind": "nav",
+      "refersTo": "button-index",
+      "description": "Identity mark left, Index pill right; transparent over the world.",
+      "html": "<header class=\"ds-topbar\"><a class=\"ds-mark\" href=\"#\">AV <span>/</span> Personal system</a><button class=\"ds-btn-index\">Index <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path d=\"M4 8h16M4 16h10\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></svg></button></header>",
+      "css": ".ds-topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;background:#03070E}.ds-mark{display:inline-flex;gap:.6em;font-family:'Geist Mono',monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#F6F4FA;text-decoration:none}.ds-mark span{color:#73DFFF}.ds-mark:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}.ds-btn-index{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.05rem;font-family:'Geist Mono',monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#F6F4FA;background:rgb(9 12 28 / .6);border:1px solid rgb(246 244 250 / .2);border-radius:999px;cursor:pointer;transition:border-color .2s ease,background-color .2s ease}.ds-btn-index:hover{border-color:#73DFFF;background:rgb(9 12 28 / .85)}.ds-btn-index:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}"
+    },
+    {
+      "name": "Index Chapter Row",
+      "kind": "custom",
+      "refersTo": "index-panel",
+      "description": "Chapter list in the Index panel; live and in-production states.",
+      "html": "<ol class=\"ds-index\"><li><a href=\"#\"><span class=\"n\">00</span><span class=\"t\">The Origin</span></a></li><li class=\"next\"><span><span class=\"n\">01</span><span class=\"t\">Curiosity</span><span class=\"tag\">In production</span></span></li></ol>",
+      "css": ".ds-index{list-style:none;margin:0;padding:1rem 1.5rem;background:#0A0E1F;width:22rem}.ds-index li>*{display:grid;grid-template-columns:2.25rem 1fr auto;align-items:baseline;padding:.95rem 0;border-bottom:1px solid rgb(246 244 250 / .08);color:#F6F4FA;text-decoration:none}.ds-index .n{font-family:'Geist Mono',monospace;font-size:.75rem;color:#73DFFF}.ds-index .t{font-family:Unbounded,sans-serif;font-weight:600;font-size:.95rem}.ds-index a:hover .t{color:#73DFFF}.ds-index a:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}.ds-index .next .t{color:#A9B8D6}.ds-index .next .n{color:#7F8BB3}.ds-index .tag{font-family:'Geist Mono',monospace;font-size:.6875rem;color:#9EA6CC}"
+    },
+    {
+      "name": "Loader Progress",
+      "kind": "custom",
+      "refersTo": "button-explore",
+      "description": "Three-segment hairline readiness bar with status readout.",
+      "html": "<div class=\"ds-prog\"><p><span>Core assets</span><span>02/03 · Scene</span></p><div class=\"bar\"><i class=\"done\"></i><i class=\"done\"></i><i class=\"active\"></i></div></div>",
+      "css": ".ds-prog{width:16rem;padding:1.5rem;background:#03070E}.ds-prog p{display:flex;justify-content:space-between;margin:0 0 .85rem;font-family:'Geist Mono',monospace;font-size:.6875rem;letter-spacing:.2em;text-transform:uppercase;color:#D6F4FF}.ds-prog p span+span{color:#8EA3C7;letter-spacing:.08em}.ds-prog .bar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.ds-prog i{position:relative;height:1px;background:rgb(115 223 255 / .18);overflow:hidden}.ds-prog i.done{background:#73DFFF}.ds-prog i.active::after{content:'';position:absolute;inset:0 auto 0 0;width:40%;background:linear-gradient(90deg,transparent,rgb(191 243 255 / .9),transparent);animation:ds-glint 1.25s ease-in-out infinite}@keyframes ds-glint{from{transform:translateX(-100%)}to{transform:translateX(250%)}}"
+    },
+    {
+      "name": "Hero Identity",
+      "kind": "custom",
+      "refersTo": "index-panel",
+      "description": "Display name, descriptor and tagline over the readability scrim.",
+      "html": "<div class=\"ds-hero\"><h1>Abhishyanth<br>Vemula</h1><p class=\"d\">Software Engineer <b>·</b> AI Developer <b>·</b> Creative Technologist</p><p class=\"t\">I build complete systems, then make them feel good to use.</p></div>",
+      "css": ".ds-hero{padding:2.5rem;background:linear-gradient(90deg,#050816,#111528 60%,#1b2350)}.ds-hero h1{margin:0;font-family:Unbounded,sans-serif;font-weight:800;text-transform:uppercase;font-size:3rem;line-height:.95;letter-spacing:-.025em;color:#F6F4FA}.ds-hero .d{margin:1.4rem 0 0;font-family:Geist,system-ui,sans-serif;font-weight:500;font-size:1.1rem;color:#DCE3FF}.ds-hero .d b{color:#73DFFF;font-weight:500}.ds-hero .t{margin:.7rem 0 0;font-family:Geist,system-ui,sans-serif;font-size:1rem;color:rgb(240 218 191 / .9);max-width:44ch}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Living Signal",
+    "overview": "The whole system is one current of light that changes form between worlds. It begins as an engineered energy heart on near-black, splits open into a colourful dimensional space, becomes the AI core of a holographic workspace, and travels on into each chapter. Every colour, surface and motion either is the signal, is lit by it, or makes room for it. When a design choice cannot say how it relates to the signal, it probably does not belong.\n\nThe mood is cinematic, precise and optimistic: title-sequence staging, engineered micro-detail, and a palette that starts nocturnal and warms as the story moves toward its close. Density is deliberately uneven: the 3D world may be rich and layered, while the DOM interface stays sparse, quiet and instrument-grade so the person's name and the work always lead. The world is original; Marvel/JARVIS influence is energy and spectacle, never copied props, reactor geometry, logos or HUD layouts. Generic SaaS layouts, glass dashboards, noisy particle fields and a lone glowing sphere on black are rejected.",
+    "keyCharacteristics": [
+      "One continuous signal of electric-blue/cyan light connects every scene.",
+      "Rich 3D world, quiet DOM: real HTML typography over a single WebGL canvas.",
+      "Depth from light and space, never from drop shadows.",
+      "Hairline, instrument-grade controls with mono labels and cyan focus.",
+      "Navy depth first; violet as a controlled highlight; warmth reserved for later chapters."
+    ],
+    "rules": [
+      {
+        "name": "The Signal Colour Rule",
+        "body": "Core Energy marks the signal and interaction (focus, selection, primary action, live data). It is never used as a large flat fill or for body text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Held Warmth Rule",
+        "body": "Pink, coral and ivory stay below a trace in the Origin hero. Warm colour is a narrative reward for later chapters, not decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tinted Ink Rule",
+        "body": "Secondary text on coloured fields is tinted from the field's hue (Ink Tinted, Ink Muted), never neutral gray.",
+        "section": "colors"
+      },
+      {
+        "name": "The Name Wins Rule",
+        "body": "Nothing on screen, in DOM or WebGL, may compete with the display name. Holographic elements sit on the far side of the frame or behind a readability scrim.",
+        "section": "typography"
+      },
+      {
+        "name": "The Honest Mono Rule",
+        "body": "Geist Mono is for status, counts and labels, not as a costume for \"technical\" prose.",
+        "section": "typography"
+      },
+      {
+        "name": "The Light, Not Shadow Rule",
+        "body": "If something needs to feel closer, move it in space or light it; never add a box-shadow. Zero-offset glows are reserved for energy (seam, core, signal).",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** keep the signal continuous: every new scene should receive the light from the previous one and hand it on.",
+      "**Do** use Core Energy (#73DFFF) for focus rings, selection, the primary action and live energy.",
+      "**Do** keep the name in real HTML at display size, with a scrim behind it whenever a scene sits beside it.",
+      "**Do** recompose layouts for portrait instead of shrinking the landscape frame.",
+      "**Do** give every holographic element an assembly state and a scroll-out state; both must reverse exactly.",
+      "**Do** ship a reduced-motion path that shows the fully composed hero without camera travel."
+    ],
+    "donts": [
+      "**Don't** use drop shadows, generic glass cards or blurred panels on the interface.",
+      "**Don't** copy Marvel/Stark props, reactor geometry, helmets, logos or HUD layouts.",
+      "**Don't** let instruments or rings cross in front of the name on landscape layouts.",
+      "**Don't** fill large areas with Core Energy or set body text in it.",
+      "**Don't** add eyebrow labels above headings or fake percentages to progress.",
+      "**Don't** use Geist Mono for prose, or Unbounded for body copy."
+    ]
+  }
+}
