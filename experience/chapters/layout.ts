@@ -9,7 +9,9 @@ const v = (x: number, y: number, z: number) => new Vector3(x, y, z);
  *   Origin (0,0,0) ─signal→ Gallery (≈ 3, 3, −11.5) → Curiosity (≈ 9, 2, −36) ─converge→ Engineering (≈ 10, 1, −64)
  *
  * Track units (story.track): 0 hero · 1 Meet the Human · 2 Curiosity ·
- * 3 Engineering · 4 outro · 4.5 end. Curiosity/Engineering worlds were authored
+ * 3 Engineering · 4 Intelligence · 5 Expression · 6 Project Universe ·
+ * 6.5–9 one project per half unit · 10 Timeline Nexus · 11.5 Next Chapter ·
+ * 12 end. Curiosity/Engineering worlds were authored
  * in Milestone 003 units (one lower); they read `track - TRACK_SHIFT`.
  */
 export const TRACK_SHIFT = 1;
@@ -33,6 +35,9 @@ export const WINDOW = {
   /** Milestone 003 units (track - TRACK_SHIFT). */
   curiosity: [0.45, 2.65] as const,
   engineering: [1.55, 9] as const,
+  /** New track units. */
+  universe: [5.55, 9.95] as const,
+  nexus: [9.0, 12.6] as const,
 };
 
 /**
@@ -61,6 +66,32 @@ export const DISCOVERIES = [
   { pos: v(8.1, 6.0, -42.0), kind: "torus" as const, scale: 1.05 },
 ];
 
+/* ───────────── Milestone 005: Project Universe ───────────── */
+
+/** One artifact per project, staged along a winding exhibition path (oldest decisions left to the reader). */
+export const ARTIFACTS = [
+  { id: "winios", pos: v(-8, 4, -100), scale: 1.25 },
+  { id: "jobseek", pos: v(-20, 5.5, -110), scale: 1 },
+  { id: "iris", pos: v(-9, 3, -120), scale: 1 },
+  { id: "eli5", pos: v(-21, 5, -130), scale: 1 },
+  { id: "qp-gen", pos: v(-10, 3.5, -140), scale: 1 },
+  { id: "scholaroid", pos: v(-22, 4, -150), scale: 1 },
+] as const;
+/** Track key of artifact i (its hold frame). */
+export const artifactTrack = (i: number) => 6.5 + i * 0.5;
+function artifactCamera(i: number) {
+  const a = ARTIFACTS[i];
+  const k = a.scale;
+  return a.pos.clone().add(v(2.2 * k, 1.5 * k, 9.2 * k));
+}
+
+/* ───────────── Milestone 006: Timeline Nexus and the closing horizon ───────────── */
+
+/** Where every timeline strand converges: the present. */
+export const NEXUS = v(-16, 7, -190);
+/** The closing light the threads rise toward. */
+export const HORIZON = v(-16, 16, -216);
+
 /**
  * Camera keyframes every half chapter (track 0 → 6.5). Index 0 is replaced at
  * runtime by the hero pose (which depends on layout and measured framing).
@@ -81,8 +112,17 @@ export const CAMERA_POS = [
   v(21.5, 6.8, -60.5), // 4.5 Intelligence hold (side view, copy left)
   v(18.5, 9.0, -75.5), // 5.0 flexing
   v(6.5, 5.6, -80.0), // 5.5 Expression hold (other side, copy right)
-  v(-1.5, 8.5, -76.0), // 6.0 outro
-  v(-5.0, 12.0, -80.0), // 6.5 end
+  // Milestone 005: the camera turns away from the expressive world toward the
+  // exhibition, then visits one artifact per half unit.
+  v(1.0, 10.0, -84.0), // 6.0 Project Universe overview
+  ...[0, 1, 2, 3, 4, 5].map((i) => artifactCamera(i)), // 6.5 … 9.0
+  // Milestone 006: Timeline Nexus, then up toward the closing horizon.
+  v(-14.0, 9.0, -162.0), // 9.5 leaving the exhibition
+  v(-5.5, 9.2, -177.0), // 10.0 Nexus hold (copy left)
+  v(-8.5, 6.4, -180.0), // 10.5 among the strands
+  v(-13.0, 8.6, -181.0), // 11.0 threads gathered
+  v(-16.0, 10.0, -182.0), // 11.5 Next Chapter: facing the horizon
+  v(-16.0, 10.8, -184.0), // 12.0 end
 ];
 export const CAMERA_TARGET = [
   v(0, 0, 0),
@@ -97,10 +137,16 @@ export const CAMERA_TARGET = [
   v(10.0, 3.4, -64.8),
   v(10.0, 3.6, -65.0),
   v(10.2, 3.6, -64.4),
-  v(10.0, 3.6, -62.0),
-  v(12.0, 4.2, -58.0),
+  v(-13.0, 4.0, -118.0), // 6.0
+  ...ARTIFACTS.map((a) => a.pos.clone()),
+  v(-16.0, 7.0, -186.0), // 9.5
+  v(-17.0, 7.0, -191.0), // 10.0
+  v(-16.0, 7.2, -190.0), // 10.5
+  v(-16.0, 9.0, -193.0), // 11.0
+  v(-16.0, 13.5, -210.0), // 11.5
+  v(-16.0, 14.5, -212.0), // 12.0
 ];
-export const TRACK_MAX = 6.5;
+export const TRACK_MAX = 12;
 
 /**
  * Lens shift per chapter, as a fraction of the viewport: positive moves the
@@ -118,7 +164,10 @@ export const LENS = [
   [4.6, 0.2, 0.2],
   [5.0, -0.22, 0.2],
   [5.95, -0.2, 0.2],
-  [6.4, 0, 0.12],
+  [6.3, 0.2, 0.2],
+  [10.9, 0.2, 0.2],
+  [11.35, 0.24, 0.16],
+  [12, 0.24, 0.16],
 ] as const;
 
 export function lensAt(track: number) {

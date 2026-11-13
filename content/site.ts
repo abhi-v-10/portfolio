@@ -119,8 +119,9 @@ export const chapters: { id: string; index: string; title: string; status: Chapt
   { id: "engineering", index: "02", title: "Engineering", status: "live" },
   { id: "intelligence", index: "03", title: "Intelligence", status: "live" },
   { id: "expression", index: "04", title: "Expression", status: "live" },
-  { id: "projects", index: "05", title: "Project Universe", status: "next" },
-  { id: "next-chapter", index: "06", title: "Next Chapter", status: "next" },
+  { id: "projects", index: "05", title: "Project Universe", status: "live" },
+  { id: "timeline", index: "06", title: "Timeline Nexus", status: "live" },
+  { id: "next", index: "07", title: "Next Chapter", status: "live" },
 ];
 
 /**
@@ -234,10 +235,21 @@ export const expression = {
   },
 };
 
-export const outro = {
-  title: "Project Universe",
-  copy: "Next: the things built, one world each, with WiniOS at the centre. That chapter is still being assembled. The work list is ready now, and so is the inbox.",
-} as const;
+/** Chapter 07, Next Chapter. Availability is the profile's own wording. */
+export const closing = {
+  title: "Next Chapter",
+  lead: "The story so far. The next part is yours to start.",
+  copy: "Open to internships, collaborations and interesting problems, especially involving AI agents, backends or 3D on the web.",
+  /** EDIT: set to a CV URL (e.g. "/cv.pdf") when supplied. */
+  cv: null as string | null,
+  cvPlaceholder: "[CV URL]",
+  /** Post-credits scene: MCU end-card convention, original line. */
+  postCredits: {
+    meta: "Post-credits scene",
+    title: "Abhishyanth Vemula will return.",
+    line: "Right after one more Hyprland config. It is always one more.",
+  },
+};
 
 export const site = {
   title: "Abhishyanth Vemula — Software Engineer, AI Developer, Creative Technologist",

@@ -40,6 +40,14 @@ export const story = {
    * world moves on one smoothed clock.
    */
   view: { scroll: 0, track: 0, px: 0, py: 0, coreScale: 1 },
+  /**
+   * Project Universe and Timeline Nexus interactions, written by DOM controls
+   * and read by the world: ELI5 explain toggle (0/1), the WiniOS bridge send
+   * (performance.now() of the last press), and the focused timeline event
+   * (-1 = none).
+   */
+  universe: { eli5: 0, bridgeAt: -1e9 },
+  nexusFocus: -1,
 };
 
 /** Imperative writer for DOM-side owners (keeps React lint rules satisfied). */

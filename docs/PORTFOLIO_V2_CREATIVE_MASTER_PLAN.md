@@ -2,7 +2,7 @@
 ## Creative bible, content source of truth, architecture, and phased implementation plan
 
 **Project:** Abhishyanth Vemula — immersive personal portfolio  
-**Status:** Approved creative direction; Milestones 001, 002, 003, 003.5, 004 and 004A (personality pass) implemented  
+**Status:** Approved creative direction; Milestones 001–004A, 005 (Project Universe), Timeline Nexus and 006 (Next Chapter + post-credits) implemented  
 **Target:** Fresh repository/folder (`portfolio-v2`), separate from archived `actual-portfolio`  
 **Primary builder:** Claude Code  
 **Last revised:** 2026-11-13
@@ -108,12 +108,13 @@ These are **continuous beats**, not disconnected web sections. Camera, signal, l
 | 02 — Engineering | Backend architecture, systems, building complete products; Nestafar experience | Organic debris organizes into modular structures and flowing data pathways | Cobalt, bright cyan, deeper blue | Verified role/date/stack; optional architecture diagrams |
 | 03 — Intelligence (Milestone 004, built) | AI agents, tool use, working applications—not AI hype | The Engineering modules fly out into a living agent network: labelled nodes trace one real request (intent, LLM, tool call via FastMCP, internal API, live data, validated result), with a walking packet and pulses on every connection | Luminous cyan, purple, soft blue on indigo | Nestafar profile facts, AI tools |
 | 04 — Expression (Milestone 004, built) | Creative design, 3D, gaming, Linux personalization, aesthetics | The same network loosens: connections widen into flowing ribbons, nodes into soft iridescent forms, plus a voxel cluster and pointer reticle for the gaming side | Violet, pink, coral, cyan, warm ivory | `[PHOTO 02]` slot in `content/site.ts` (placeholder until supplied) |
-| 05 — Project Universe | Proof of technical execution through six distinct projects | A continuous curated exhibition of original reactive artifacts; no carousel slideshow | Multi-colored, tuned per project | Screenshots/links/roles/outcomes as available |
-| 06 — Next Chapter | Availability, contact, possibility | Several energy/color paths converge into airy bright optimistic horizon | Lavender, warm ivory, coral | Contact links, `[CV URL]`, optional `[PHOTO 03]` |
+| 05 — Project Universe (Milestone 005, built) | Proof of technical execution through six distinct projects | A dark exhibition hall: the camera visits one original artifact per project (Bridge, route graph, scanned receipt, knot→loop, pages→paper, modular campus) along the reborn living signal; ELI5 and WiniOS exhibits are interactive; every exhibit opens a linkable `/work/[slug]` case study | Multi-colored, tuned per project | Screenshots/links/roles/outcomes as placeholders in `content/projects.ts` |
+| 06 — Timeline Nexus (built, placed between Project Universe and Next Chapter) | Education, leadership, learning, projects, work | Five emerald rope-strands carry real events as nodes and converge on the present; gathering turns them from cold white to green; hovering/focusing a list item lights its node | Deep jade, emerald, cold white | `content/timeline.ts`; school, intermediate, B.Tech start year and WiniOS year are placeholders |
+| 07 — Next Chapter (Milestone 006, built) | Availability, contact, possibility | Four coloured paths rise from the nexus to a warm dawn horizon; then a post-credits end card | Lavender, warm ivory, coral | Contact links, `[CV URL]` (`closing.cv`) |
 
 **Scroll direction:** A single narrative stream; neither the camera nor signal must be literally onscreen the entire time. Transition via match cuts, transforming elements, controlled occlusion and spatial staging. Limit pinned empty scroll; leave editorial reading beats. Do not measure chapters in wheel clicks; normalize against document scroll distance and test wheel/trackpad/touch/keyboard.
 
-### Future chapter concept — “Timeline Nexus” (approved note, 2026-11-13; NOT YET SCHEDULED, do not build)
+### Timeline Nexus (approved note 2026-11-13; built in the Milestone 005–006 run)
 
 **Meaning:** Education, projects, experience and growth shown as one connected timeline network rather than a list. Each strand is a real, source-controlled event (NIAT B.Tech, NIAT Student General Council and the April 2026 Best Team Member Award, Nestafar internship Jan–Mar 2026, the six projects, INSPIRA'25, the NxtWave UI/UX workshop). Strands branch where work diverged and re-join where one thing led to another; growth reads as the network thickening over time.
 
@@ -121,7 +122,7 @@ These are **continuous beats**, not disconnected web sections. Camera, signal, l
 
 **Original treatment:** luminous emerald/jade time-strands (new chapter accent, e.g. a green around `#3FE0A0`–`#7CF5C4`, tuned against the existing palette) that twist like ropes, braid, branch and converge on a central point the visitor scrolls toward. Nodes on the strands open accessible HTML detail (date, role, one verified line). Under §6: no Loki/TVA marks, no Temporal Loom machine, no throne, no copied tree silhouette or character imagery; the structure must be original geometry. Reduced motion and no-WebGL get a readable vertical timeline with the same facts.
 
-**Placement:** to be decided at a later milestone (candidate: between Project Universe and Next Chapter, or as the Project Universe navigator). Never fabricate dates, roles or outcomes for strands; use visible placeholders.
+**Placement (built):** between Project Universe and Next Chapter, as Chapter 06. Its one MCU line is Loki's "I am burdened with glorious purpose." Never fabricate dates, roles or outcomes for strands; use visible placeholders.
 
 **Future reference ideas (not built):** Timeline Nexus keeps Loki's glorious-purpose feeling and could close on one attributed Loki or He Who Remains line about time, chosen then. Project Universe could carry one line on the WiniOS world (for example a Tony Stark "built it in a cave" style nod in original microcopy rather than a quote) and an interaction easter egg for a project that has a real story behind it. Keep the one-line-per-chapter budget.
 

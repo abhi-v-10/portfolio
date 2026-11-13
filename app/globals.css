@@ -165,8 +165,7 @@ html.cursor-visible .cursor-ring {
     radial-gradient(80% 70% at 30% 70%, rgb(103 80 200 / 0.7), transparent 75%),
     linear-gradient(180deg, #221c4f, #2c2463);
 }
-.experience[data-chapter="engineering"] .world-fallback::after,
-.experience[data-chapter="next"] .world-fallback::after {
+.experience[data-chapter="engineering"] .world-fallback::after {
   opacity: 1;
   background:
     repeating-linear-gradient(0deg, rgb(52 120 246 / 0.1) 0 1px, transparent 1px 48px),
@@ -1105,6 +1104,498 @@ html.cursor-visible .cursor-ring {
   color: #ffd6c2;
 }
 
+/* ───────────────────────── Chapter 05: Project Universe (Milestone 005) ───────────────────────── */
+/* One exhibit per artifact. Long gaps between exhibits are the camera's travel. */
+.chapter--projects {
+  padding-block: 76svh 40svh;
+}
+.chapter--projects .chapter-block + .chapter-block {
+  margin-top: 72svh;
+}
+.exhibit-jump {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.1rem;
+}
+.exhibit-jump a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-tinted);
+  text-decoration: underline;
+  text-decoration-color: rgb(220 227 255 / 0.25);
+  text-underline-offset: 0.4em;
+}
+.exhibit-jump a:hover {
+  color: var(--soft-white);
+  text-decoration-color: var(--core-energy);
+}
+.exhibit {
+  --accent: var(--core-energy);
+}
+.exhibit-meta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.exhibit-meta span:first-child {
+  color: var(--ink-muted);
+}
+.exhibit-flag {
+  padding: 0.15rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 999px;
+  font-size: 0.625rem;
+}
+.exhibit-title {
+  margin: 0.6rem 0 0;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 1rem + 4vw, 3.75rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--soft-white);
+}
+.exhibit[data-featured] .exhibit-title {
+  font-size: clamp(2.4rem, 1rem + 5.5vw, 4.75rem);
+}
+.exhibit-idea {
+  margin: 1.25rem 0 0;
+  max-width: 58ch;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--ink-tinted);
+  text-wrap: pretty;
+}
+.exhibit-stack {
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--accent) 70%, white);
+}
+.exhibit-stack li + li::before {
+  content: "·";
+  margin-right: 1rem;
+  color: var(--ink-muted);
+}
+.exhibit-status {
+  margin: 0.9rem 0 0;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+.exhibit-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+}
+.exhibit .action--primary {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.exhibit .action--primary:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.exhibit-try[aria-pressed="true"] {
+  color: var(--accent);
+}
+.exhibit-note {
+  margin: 1rem 0 0;
+  font-size: 0.9375rem;
+  font-style: italic;
+  color: var(--ink-tinted);
+}
+
+/* ───────────────────────── Chapter 06: Timeline Nexus (Milestone 006) ───────────────────────── */
+.chapter--timeline {
+  padding-block: 70svh 24svh;
+  --emerald: #7cf5c4;
+}
+.chapter--timeline .chapter-lead {
+  color: #dffbef;
+}
+.chapter--timeline .chapter-block::before {
+  background: radial-gradient(closest-side, rgb(3 16 14 / 0.7), rgb(3 16 14 / 0.34) 62%, transparent);
+}
+.chapter--timeline .timeline-block {
+  margin-top: 36svh;
+}
+.strand-key {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #b9e9d6;
+}
+.strand-key li::before,
+.timeline-item::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.5rem;
+  rotate: 45deg;
+  border: 1px solid var(--strand, var(--emerald));
+}
+[data-strand="education"] { --strand: #dff6ff; }
+[data-strand="leadership"] { --strand: #ffd98a; }
+[data-strand="learning"] { --strand: #c9b8ff; }
+[data-strand="projects"] { --strand: #7cf5c4; }
+[data-strand="work"] { --strand: #73dfff; }
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.1rem 8.5rem minmax(0, 1fr);
+  column-gap: 0.5rem;
+  row-gap: 0.15rem;
+  align-items: baseline;
+  padding: 0.85rem 0.5rem;
+  border-top: 1px solid rgb(124 245 196 / 0.14);
+  border-radius: 2px;
+  outline-offset: 2px;
+  transition: background-color 0.2s ease;
+}
+.timeline-item::before {
+  grid-row: 1 / span 2;
+  margin: 0.35rem 0 0;
+}
+.timeline-item:hover,
+.timeline-item:focus-visible {
+  background: rgb(124 245 196 / 0.07);
+}
+.timeline-date {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--strand, var(--emerald));
+  font-variant-numeric: tabular-nums;
+}
+.timeline-title {
+  font-weight: 600;
+  color: var(--soft-white);
+}
+.timeline-line {
+  grid-column: 3;
+  font-size: 0.9375rem;
+  color: var(--ink-tinted);
+}
+.timeline-item[data-placeholder] .timeline-title,
+.timeline-item[data-placeholder] .timeline-line {
+  font-style: italic;
+  color: var(--ink-muted);
+}
+.movie-line--nexus {
+  border-left-color: rgb(124 245 196 / 0.6);
+}
+
+/* ───────────────────────── Chapter 07: Next Chapter + post-credits (Milestone 006) ───────────────────────── */
+.closing {
+  position: relative;
+  overflow-x: clip;
+  min-height: 150svh;
+  padding: 56svh var(--gutter) 0;
+}
+.closing-card {
+  max-width: 36rem;
+}
+.closing-card::before {
+  background: radial-gradient(closest-side, rgb(30 22 48 / 0.6), rgb(30 22 48 / 0.28) 62%, transparent);
+}
+.closing-title {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.5rem, 1rem + 6vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  color: var(--soft-white);
+}
+.closing-lead {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.15rem, 0.9rem + 1vw, 1.5rem);
+  line-height: 1.3;
+  color: #ffe2cf;
+  text-wrap: balance;
+}
+.closing-copy {
+  margin: 1rem 0 0;
+  max-width: 52ch;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: #efe8fb;
+}
+.closing-actions {
+  margin-top: 1.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+}
+.closing-actions .action--primary {
+  text-transform: none;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+.closing-links {
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+}
+.closing-links a,
+.closing-links span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--soft-white);
+  text-decoration: underline;
+  text-decoration-color: rgb(255 214 194 / 0.4);
+  text-underline-offset: 0.45em;
+}
+.closing-links a:hover {
+  text-decoration-color: #ffd6c2;
+}
+.placeholder-inline {
+  font-style: italic;
+  color: var(--ink-muted) !important;
+  text-decoration: none !important;
+}
+/* Post-credits: after a full screen of quiet, a centred end card. */
+.post-credits {
+  margin-top: 70svh;
+  padding: 0 0 18svh;
+  text-align: center;
+}
+.post-credits-meta {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #d9cfee;
+}
+.post-credits-title {
+  margin: 0.9rem 0 0;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.25rem, 0.9rem + 1.6vw, 2rem);
+  letter-spacing: -0.01em;
+  color: var(--soft-white);
+}
+.post-credits-line {
+  margin: 0.6rem 0 0;
+  font-size: 0.9375rem;
+  color: #e6def5;
+}
+
+/* No-WebGL colour story for the new chapters. */
+.experience[data-chapter="projects"] .world-fallback::after {
+  opacity: 1;
+  background:
+    radial-gradient(40% 35% at 75% 40%, rgb(115 223 255 / 0.16), transparent 70%),
+    radial-gradient(35% 30% at 65% 75%, rgb(255 170 106 / 0.12), transparent 70%),
+    linear-gradient(180deg, #0a0c22, #121433);
+}
+.experience[data-chapter="timeline"] .world-fallback::after {
+  opacity: 1;
+  background:
+    radial-gradient(50% 45% at 72% 45%, rgb(124 245 196 / 0.2), transparent 70%),
+    linear-gradient(180deg, #04120f, #0b2420);
+}
+.experience[data-chapter="next"] .world-fallback::after {
+  opacity: 1;
+  background:
+    radial-gradient(70% 45% at 50% 22%, rgb(240 218 191 / 0.4), transparent 70%),
+    radial-gradient(60% 40% at 70% 40%, rgb(255 170 106 / 0.22), transparent 70%),
+    linear-gradient(180deg, #4a3b63, #2a2240 70%);
+}
+
+/* ───────────────────────── Case studies (/work/[slug]) ───────────────────────── */
+.case {
+  --accent: var(--core-energy);
+  min-height: 100svh;
+  padding: 0 var(--gutter) 6rem;
+  background:
+    radial-gradient(60% 40% at 85% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    linear-gradient(180deg, #0b0f22, var(--space-navy));
+}
+.case-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 1.25rem;
+}
+.case-mark,
+.case-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--soft-white);
+}
+.case-mark span {
+  color: var(--core-energy);
+}
+.case-back {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  text-underline-offset: 0.45em;
+}
+.case-main {
+  max-width: 46rem;
+  margin: 8svh auto 0;
+}
+.case-meta {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.case-title {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.75rem, 1.5rem + 6vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  color: var(--soft-white);
+}
+.case-idea {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 600;
+  font-size: clamp(1.1rem, 0.95rem + 0.8vw, 1.45rem);
+  line-height: 1.35;
+  color: var(--soft-white);
+  text-wrap: balance;
+}
+.case-stack {
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.case-stack li {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 999px;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, var(--accent) 65%, white);
+}
+.case-summary {
+  margin: 2rem 0 0;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--ink-tinted);
+}
+.case-section {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(220 227 255 / 0.12);
+}
+.case-section h2 {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.case-section p,
+.case-section li {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--ink-tinted);
+}
+.case-section ul {
+  margin: 1rem 0 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.6rem;
+}
+.case-links,
+.case-pending ul {
+  list-style: none;
+  padding-left: 0 !important;
+}
+.case-links a {
+  color: var(--soft-white);
+}
+.case-next {
+  margin-top: 4rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.case-next a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  color: var(--soft-white);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 50%, transparent);
+  text-underline-offset: 0.45em;
+}
+.case-next span {
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
 /* ───────────────────────── Top bar & index ───────────────────────── */
 .topbar {
   position: fixed;
@@ -1761,6 +2252,32 @@ html.cursor-visible .cursor-ring {
   .chapter-block + .chapter-block {
     margin-top: 45svh;
   }
+  .chapter--projects {
+    padding-block: 64svh 30svh;
+  }
+  .chapter--projects .chapter-block + .chapter-block {
+    margin-top: 62svh;
+  }
+  .chapter--timeline {
+    padding-block: 62svh 20svh;
+  }
+  .chapter--timeline .timeline-block {
+    margin-top: 28svh;
+  }
+  .timeline-item {
+    grid-template-columns: 1.1rem minmax(0, 1fr);
+  }
+  .timeline-title,
+  .timeline-line {
+    grid-column: 2;
+  }
+  .closing {
+    padding-top: 48svh;
+  }
+  .post-credits {
+    margin-top: 55svh;
+  }
+
   /* Portrait: the world sits in the upper frame; copy owns the lower frame. */
   .chapter-block::before {
     inset: -3rem -2rem;

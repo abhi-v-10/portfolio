@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { chapters, contact, experience, projects } from "@/content/site";
 import { onIndexOpen, openIndex, type IndexSection } from "./indexEvents";
@@ -72,7 +73,9 @@ export function TopBar({ inert }: { inert?: boolean }) {
               {projects.map((p) => (
                 <li key={p.id} className="work-item" data-featured={p.featured || undefined}>
                   <div className="work-row">
-                    <h3 className="work-name">{p.name}</h3>
+                    <h3 className="work-name">
+                      <Link href={`/work/${p.id}`}>{p.name}</Link>
+                    </h3>
                     <span className="work-meta">{p.featured ? "Featured" : p.year}</span>
                   </div>
                   <p className="work-line">{p.line}</p>
@@ -135,9 +138,9 @@ export function TopBar({ inert }: { inert?: boolean }) {
                 </li>
               ))}
             </ol>
-            <p className="index-upcoming">
-              Next: {upcoming.map((c) => c.title).join(", ")}.
-            </p>
+            {upcoming.length > 0 && (
+              <p className="index-upcoming">Next: {upcoming.map((c) => c.title).join(", ")}.</p>
+            )}
           </section>
         </div>
       </dialog>

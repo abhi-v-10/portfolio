@@ -252,7 +252,7 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
   useFrame((state) => {
     const tr = story.view.track;
     const net = smoothstep(MORPH.network[0] + 0.12, MORPH.network[1] + 0.05, tr);
-    const visible = tr > MORPH.network[0] && tr < 9;
+    const visible = tr > MORPH.network[0] && tr < 6.9;
     if (root.current) root.current.visible = visible;
     if (!visible || !blobs.current) return;
     const reduced = story.reducedMotion;

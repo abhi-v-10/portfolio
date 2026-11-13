@@ -21,7 +21,7 @@ export function Backdrop() {
       new ShaderMaterial({
         vertexShader: backdropVertex,
         fragmentShader: backdropFragment,
-        uniforms: { uTime: { value: 0 }, uIntro: { value: 0 }, uScroll: { value: 0 }, uTrack: { value: 0 }, uHuman: { value: 0 }, uIntel: { value: 0 }, uExpr: { value: 0 } },
+        uniforms: { uTime: { value: 0 }, uIntro: { value: 0 }, uScroll: { value: 0 }, uTrack: { value: 0 }, uHuman: { value: 0 }, uIntel: { value: 0 }, uExpr: { value: 0 }, uProj: { value: 0 }, uNexus: { value: 0 }, uDawn: { value: 0 } },
         side: BackSide,
         depthWrite: false,
         depthTest: false,
@@ -45,7 +45,10 @@ export function Backdrop() {
       return k * k * (3 - 2 * k);
     };
     u.uIntel.value = ss(3.7, 4.25, tr) * (1 - ss(4.7, 5.2, tr));
-    u.uExpr.value = ss(4.6, 5.25, tr);
+    u.uExpr.value = ss(4.6, 5.25, tr) * (1 - ss(5.9, 6.35, tr));
+    u.uProj.value = ss(5.9, 6.35, tr) * (1 - ss(9.3, 9.9, tr));
+    u.uNexus.value = ss(9.3, 9.95, tr) * (1 - ss(10.9, 11.5, tr));
+    u.uDawn.value = ss(10.9, 11.6, tr);
     u.uHuman.value = Math.min(1, Math.max(0, (tr - 0.45) / 0.45)) * (1 - Math.min(1, Math.max(0, (tr - 1.5) / 0.55)));
     // Keep the sky centred on the viewer: it reads as infinitely far.
     ref.current?.position.copy(camera.position);

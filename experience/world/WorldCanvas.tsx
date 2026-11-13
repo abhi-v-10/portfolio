@@ -17,6 +17,8 @@ import { Atmosphere, ChapterGate } from "../chapters/Atmosphere";
 import { CuriosityWorld } from "../chapters/CuriosityWorld";
 import { HumanWorld } from "../chapters/HumanWorld";
 import { NetworkWorld } from "../chapters/NetworkWorld";
+import { NexusWorld } from "../chapters/NexusWorld";
+import { UniverseWorld } from "../chapters/UniverseWorld";
 import { EngineeringWorld } from "../chapters/EngineeringWorld";
 import { WINDOW } from "../chapters/layout";
 
@@ -88,6 +90,8 @@ export default function WorldCanvas({ lowPower }: { lowPower: boolean }) {
       <CuriosityWorld lowPower={lowPower} />
       <EngineeringWorld />
       <NetworkWorld lowPower={lowPower} />
+      <UniverseWorld lowPower={lowPower} />
+      <NexusWorld lowPower={lowPower} />
       <Signal segments={lowPower ? 360 : 640} />
       <QualityController />
       <ReadySignal />

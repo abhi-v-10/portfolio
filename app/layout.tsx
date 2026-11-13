@@ -27,7 +27,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             loader so the server-rendered hero and links stay usable. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `setTimeout(function(){if(!window.__originBooted){document.documentElement.classList.add("boot-failed");document.documentElement.classList.remove("is-locked")}},12000)`,
+            __html: `if(location.pathname!=="/")document.documentElement.classList.remove("is-locked");setTimeout(function(){if(!window.__originBooted){document.documentElement.classList.add("boot-failed");document.documentElement.classList.remove("is-locked")}},12000)`,
           }}
         />
         <noscript>

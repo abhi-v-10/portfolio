@@ -36,7 +36,12 @@ function reducedHold(track: number) {
   if (track < 3.95) return 3.6;
   if (track < 4.85) return 4.5;
   if (track < 5.9) return 5.5;
-  return 6.5;
+  if (track < 6.25) return 6.0;
+  // Project Universe: hold on the nearest artifact.
+  if (track < 9.25) return Math.min(9, Math.max(6.5, Math.round(track * 2) / 2));
+  if (track < 10.75) return 10.0;
+  if (track < 11.25) return 11.0;
+  return 11.5;
 }
 
 export function CameraDirector() {

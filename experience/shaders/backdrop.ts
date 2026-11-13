@@ -21,6 +21,9 @@ export const backdropFragment = /* glsl */ `
   uniform float uHuman;
   uniform float uIntel;
   uniform float uExpr;
+  uniform float uProj;
+  uniform float uNexus;
+  uniform float uDawn;
   varying vec3 vDir;
 
   float hash(vec3 p) {
@@ -124,6 +127,25 @@ export const backdropFragment = /* glsl */ `
     expr = mix(expr, coral * 0.5, horizon * smoothstep(0.4, 0.8, w) * 0.7);
     expr += ivory * horizon * 0.12 + cyan * wisp * 0.12;
     col = mix(col, expr, uExpr * 0.85);
+
+    // Project Universe: a dark exhibition hall so each artifact carries its own
+    // light; a faint cool horizon and slow violet depth.
+    vec3 hall = mix(abyss * 1.3, navy * 1.6, horizon);
+    hall += violet * 0.16 * smoothstep(0.45, 0.85, n) + cobalt * 0.08 * smoothstep(0.6, 0.9, w);
+    col = mix(col, hall, uProj * 0.92);
+
+    // Timeline Nexus: deep jade night with emerald currents.
+    vec3 jade = vec3(0.10, 0.62, 0.45);
+    vec3 nexus = mix(vec3(0.015, 0.05, 0.045), jade * 0.22, smoothstep(0.35, 0.85, n));
+    nexus += vec3(0.49, 0.96, 0.77) * wisp * 0.12 + jade * horizon * 0.08;
+    col = mix(col, nexus, uNexus * 0.9);
+
+    // Next Chapter: an airy dawn. Lavender sky, warm ivory and coral at the horizon.
+    vec3 lav = vec3(0.56, 0.50, 0.80);
+    vec3 dawn = mix(lav * 0.62, vec3(0.94, 0.85, 0.75) * 0.8, smoothstep(0.35, -0.15, d.y) * 0.8);
+    dawn = mix(dawn, coral * 0.75, horizon * smoothstep(0.45, 0.85, w) * 0.45);
+    dawn += vec3(1.0, 0.95, 0.88) * exp(-pow((d.y - 0.12) * 4.0, 2.0)) * 0.12;
+    col = mix(col, dawn, uDawn * 0.88);
 
     // Intro: the world starts in the loader's darkness and blooms open.
     col = mix(vec3(0.012, 0.027, 0.055), col, smoothstep(0.0, 0.85, uIntro));

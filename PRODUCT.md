@@ -38,7 +38,7 @@ A full-system builder: Abhishyanth builds complete, working systems end to end (
 
 - Built with Next.js (App Router), TypeScript, React Three Fiber/Three.js and GSAP; one persistent WebGL canvas; native document scrolling.
 - **Deploy target: Vercel.** Domain is undecided.
-- Built one milestone at a time (001–007, see master plan §10); Milestones 001 (The Origin), 002 (hero workspace), 003 (Curiosity → Engineering), 003.5 (Meet the Human, robot-operated photo gallery) and 004 (Intelligence → Expression) are implemented; later chapters are not. A future "Timeline Nexus" chapter is documented in the master plan but unscheduled.
+- Built one milestone at a time (001–007, see master plan §10); Milestones 001 (The Origin), 002 (hero workspace), 003 (Curiosity → Engineering), 003.5 (Meet the Human), 004 (Intelligence → Expression), 004A (personality pass), 005 (Project Universe with /work case studies), Timeline Nexus and 006 (Next Chapter and post-credits) are implemented. Milestone 007 is the production pass.
 - Must perform on mobile: quality tiers, capped resolution, reduced-motion route and a static no-WebGL fallback are required, not optional.
 - Undecided: final hero tagline (current line is a draft pending approval), CV link, domain, analytics/privacy approach.
 

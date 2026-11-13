@@ -6,7 +6,9 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Hero } from "@/components/hero/Hero";
-import { Curiosity, Engineering, Expression, Intelligence, Outro } from "@/components/chapters/Chapters";
+import { Curiosity, Engineering, Expression, Intelligence } from "@/components/chapters/Chapters";
+import { Closing, ProjectUniverse, TimelineNexus } from "@/components/chapters/Universe";
+import { projectStories } from "@/content/projects";
 import { Human } from "@/components/human/Human";
 import { TRACK_MAX } from "@/experience/chapters/layout";
 import { EnergyCore } from "@/components/loader/EnergyCore";
@@ -153,7 +155,16 @@ export function Experience() {
   const finish = () => {
     setStage("entered");
     document.documentElement.classList.remove("is-locked");
-    requestAnimationFrame(() => titleRef.current?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => {
+      // Deep links (e.g. /#projects from a case study) land after the entrance.
+      const hash = window.location.hash;
+      const target = hash.length > 1 ? document.querySelector<HTMLElement>(hash) : null;
+      if (target) {
+        target.scrollIntoView();
+        target.querySelector<HTMLElement>("h2")?.setAttribute("tabindex", "-1");
+        target.querySelector<HTMLElement>("h2")?.focus({ preventScroll: true });
+      } else titleRef.current?.focus({ preventScroll: true });
+    });
   };
 
   const showHeroInstantly = () => {
@@ -248,7 +259,12 @@ export function Experience() {
           // of each transformation arrives with its heading.
           [top("#intelligence-title") - window.innerHeight * 0.3, 4],
           [top("#expression-title") - window.innerHeight * 0.3, 5],
-          [top("#next"), 6],
+          // Project Universe: overview on its title, then one artifact per
+          // half unit, each arriving with its exhibit title.
+          [top("#projects-title") - window.innerHeight * 0.3, 6],
+          ...projectStories.map((p, i) => [top(`#project-${p.id}-title`) - window.innerHeight * 0.3, 6.5 + i * 0.5] as [number, number]),
+          [top("#timeline-title") - window.innerHeight * 0.3, 10],
+          [top("#next-title") - window.innerHeight * 0.3, 11.5],
           [end, TRACK_MAX],
         ];
       };
@@ -273,7 +289,7 @@ export function Experience() {
         rootRef.current?.style.setProperty("--hero-scrim", (1 - 0.7 * relax).toFixed(3));
         rootRef.current?.toggleAttribute("data-past-hero", story.track > 0.6);
         // Coarse chapter for CSS-only layers (the no-WebGL fallback colour story).
-        const chapter = story.track < 0.6 ? "origin" : story.track < 1.8 ? "human" : story.track < 2.85 ? "curiosity" : story.track < 3.85 ? "engineering" : story.track < 4.7 ? "intelligence" : story.track < 5.85 ? "expression" : "next";
+        const chapter = story.track < 0.6 ? "origin" : story.track < 1.8 ? "human" : story.track < 2.85 ? "curiosity" : story.track < 3.85 ? "engineering" : story.track < 4.7 ? "intelligence" : story.track < 5.85 ? "expression" : story.track < 9.6 ? "projects" : story.track < 11.05 ? "timeline" : "next";
         if (rootRef.current && rootRef.current.dataset.chapter !== chapter) rootRef.current.dataset.chapter = chapter;
       };
       ScrollTrigger.create({
@@ -355,7 +371,9 @@ export function Experience() {
         <Engineering />
         <Intelligence />
         <Expression />
-        <Outro />
+        <ProjectUniverse />
+        <TimelineNexus />
+        <Closing />
       </main>
 
       {!entered && (
