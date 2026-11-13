@@ -2,7 +2,7 @@
 ## Creative bible, content source of truth, architecture, and phased implementation plan
 
 **Project:** Abhishyanth Vemula — immersive personal portfolio  
-**Status:** Approved creative direction; Milestones 001–004A, 005 (Project Universe), Timeline Nexus and 006 (Next Chapter + post-credits) implemented  
+**Status:** Approved creative direction; All milestones implemented (001–007, including 004A and Timeline Nexus). Portfolio V2 is feature-complete; remaining work is supplying the visible placeholders and deploying  
 **Target:** Fresh repository/folder (`portfolio-v2`), separate from archived `actual-portfolio`  
 **Primary builder:** Claude Code  
 **Last revised:** 2026-11-13
@@ -304,7 +304,7 @@ Avoid experimental/lab routes in the initial production app. If a visual proof i
 | **004: Intelligence → Expression** | AI network world, playful/colorful creative world, personal photo placeholders, skills and personality | Show cohesive narrative rather than disconnected 3D tricks |
 | **005: Project Universe** | Six project artifacts, featured WiniOS, readable expandable/linkable case studies | Verify factual copy and navigation without 3D |
 | **006: Closing + Optional Easter Egg** | Optimistic contact scene, social links, skip/direct-access navigation, optional post-credits interaction | Full narrative closes meaningfully |
-| **007: Final production pass** | Device QA, image assets, performance, reduced motion, accessibility, SEO, fallback, analytics/privacy if chosen, deployment | Launch readiness |
+| **007: Final production pass** | Device QA, image assets, performance, reduced motion, accessibility, SEO, fallback, analytics/privacy if chosen, deployment | Launch readiness. Built: skip links (projects, contact), Person JSON-LD, metadataBase via `NEXT_PUBLIC_SITE_URL`, sitemap, robots, generated OG image, per-case-study metadata, themed 404, README with deploy steps. No analytics (none chosen). Real-hardware frame-pacing measurement still to do on device |
 
 **Every milestone:** Implement actual code, inspect at desktop/tablet/390/320, validate behavior, run lint/typecheck/build, present concise findings and visual proof. Don't ask to implement several future milestones at once.
 

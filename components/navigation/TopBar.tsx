@@ -28,6 +28,13 @@ export function TopBar({ inert }: { inert?: boolean }) {
 
   return (
     <header className="topbar hero-chrome" inert={inert}>
+      {/* Recruiter shortcuts: skip the film, straight to the work or the inbox. */}
+      <a href="#projects" className="skip-link">
+        Skip to projects
+      </a>
+      <a href="#next" className="skip-link">
+        Skip to contact
+      </a>
       <a href="#origin" className="topbar-mark" aria-label="Abhishyanth Vemula, back to top">
         <span>AV</span>
         <span className="topbar-mark-sep" aria-hidden>/</span>

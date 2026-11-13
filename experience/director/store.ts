@@ -7,9 +7,9 @@
  *  - intro    : LoaderDirector entrance timeline (0 → 1). Never touched by scroll.
  *  - scroll   : StoryDirector (0 → 1): the hero's own exit, scrolled distance
  *               over 1.5 viewports. Hero elements are tuned against it.
- *  - track    : StoryDirector, chapter units from document position:
- *               0 hero · 1 Curiosity arrives · 2 Engineering arrives ·
- *               3 outro arrives · 3.5 document end. Piecewise linear between
+ *  - track    : StoryDirector, chapter units from document position (see
+ *               experience/chapters/layout.ts): 0 hero … 6 Project Universe …
+ *               10 Timeline Nexus · 11.5 Next Chapter · 12 document end. Piecewise linear between
  *               measured section tops, so it is exact and reversible.
  *  - pointer  : pointer listener (desktop fine pointers only).
  *  - pulse    : LoaderDirector Explore pulse (0 → 1 → 0).

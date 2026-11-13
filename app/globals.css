@@ -396,44 +396,6 @@ html.cursor-visible .cursor-ring {
   to { transform: translateY(44px); }
 }
 
-.threshold {
-  position: relative;
-  overflow-x: clip;
-  min-height: 150svh;
-  display: grid;
-  align-items: end;
-  padding: 0 var(--gutter) 34svh;
-}
-.threshold-card {
-  justify-self: end;
-  max-width: 26rem;
-}
-.threshold-title {
-  margin: 0;
-  font-family: var(--font-display), sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.75rem, 1rem + 3vw, 3.25rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: var(--soft-white);
-}
-.threshold-title,
-.threshold-copy {
-  text-shadow: 0 1px 18px rgb(17 21 40 / 0.65);
-}
-.threshold-copy {
-  margin: 1rem 0 0;
-  color: #e3defa;
-  font-size: 1.0625rem;
-  text-wrap: pretty;
-}
-.threshold-actions {
-  margin-top: 1.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
-  align-items: center;
-}
 .action {
   display: inline-flex;
   align-items: center;
@@ -1596,6 +1558,27 @@ html.cursor-visible .cursor-ring {
   text-transform: uppercase;
 }
 
+/* Skip links: invisible until focused, then a clear pill at the top left. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 60;
+  padding: 0.7rem 1rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--soft-white);
+  background: var(--panel);
+  border: 1px solid var(--core-energy);
+  border-radius: 999px;
+  transform: translateY(-200%);
+}
+.skip-link:focus-visible {
+  transform: none;
+}
+
 /* ───────────────────────── Top bar & index ───────────────────────── */
 .topbar {
   position: fixed;
@@ -2178,9 +2161,6 @@ html.cursor-visible .cursor-ring {
     left: 50%;
     top: 30%;
     translate: -50% -50%;
-  }
-  .threshold-card {
-    justify-self: start;
   }
   .chapter--curiosity {
     padding-block: 40svh 45svh;

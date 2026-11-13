@@ -252,6 +252,9 @@ export const closing = {
 };
 
 export const site = {
+  /** EDIT: the production origin, used for canonical URLs, the sitemap and OG. */
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  name: "Abhishyanth Vemula",
   title: "Abhishyanth Vemula — Software Engineer, AI Developer, Creative Technologist",
   description:
     "Portfolio of Abhishyanth Vemula: backend systems, AI agents and creative 3D web, told as one continuous story.",

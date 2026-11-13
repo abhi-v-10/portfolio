@@ -37,7 +37,7 @@ function useClientValue<T>(get: () => T, server: T) {
  * LoaderDirector + StoryDirector.
  *  - Loader readiness is real: hydration, document fonts, compiled WebGL scene.
  *  - The entrance timeline owns: loader layers, hero line/reveal elements, story.intro.
- *  - ScrollTrigger owns: story.scroll, hero content wrapper, scroll-cue wrapper, threshold card.
+ *  - ScrollTrigger owns: story.scroll, hero content wrapper, scroll-cue wrapper and the per-line chapter copy timelines.
  */
 export function Experience() {
   const rootRef = useRef<HTMLDivElement>(null);

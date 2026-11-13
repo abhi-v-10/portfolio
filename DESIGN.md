@@ -237,6 +237,11 @@ Deep jade night. Five rope strands (two or three twisted plies each) start far f
 ### Next Chapter and post-credits (Chapter 07)
 The air brightens to a lavender dawn with ivory and coral at the horizon; four coloured paths rise from the nexus toward a warm sun placed right of the copy by the lens. Copy: display title (800), peach lead, availability line, the email as the primary action, See the work, then LinkedIn, GitHub, Instagram and the `[CV URL]` placeholder. After a quiet screen, a centred post-credits end card: "Abhishyanth Vemula will return." plus one Linux line.
 
+### Production layer (Milestone 007)
+- **Skip links:** "Skip to projects" and "Skip to contact" sit first in the top bar, invisible until focused, then a Panel Navy pill with a Core Energy border.
+- **404:** the case-study layout with one multiverse line ("This branch does not exist.") and two ways back.
+- **Social card:** generated at `/opengraph-image` from the hero's navy-to-violet field, the four-word identity in Core Energy and the name in the display weight.
+
 ### Personality Layer (Milestone 004A)
 Fandom is a personal layer, never the identity. Rules and the full list live in the master plan §6.1–6.2. Later chapters add: Project Universe's "No cave, no box of scraps" WiniOS aside (Tony Stark nod, original wording), the Timeline Nexus Loki line, and the post-credits end card.
 - **Movie line (component):** `figure.movie-line`: a lead-in sentence in Abhishyanth's voice (body, muted), the quote in the display face (600, 1.05–1.3rem, soft white), and a mono uppercase attribution with character and film. A 1px Core Energy rule on the left at 45%, no card or background. Intelligence's variant warms the rule to gold to match the Result node. One per chapter at most: Engineering (Steve Rogers) and Intelligence (J.A.R.V.I.S.) only.
