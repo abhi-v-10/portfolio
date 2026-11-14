@@ -14,8 +14,8 @@
   --loader-black: #03070e;
   --core-energy: #73dfff;
 
-  --ink-tinted: #dadde5; /* secondary copy: neutral, so each chapter brings its own colour */
-  --ink-muted: #9ba3b4;
+  --ink-tinted: #dce3ff; /* secondary copy on cobalt/violet fields */
+  --ink-muted: #a9b8d6;
   --hairline: rgb(246 244 250 / 0.14);
   --panel: #0a0e1f;
 
@@ -686,7 +686,7 @@ html.cursor-visible .cursor-ring {
   inset: -5rem -6rem;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(closest-side, rgb(5 6 9 / 0.62), rgb(5 6 9 / 0.3) 62%, transparent);
+  background: radial-gradient(closest-side, rgb(6 8 24 / 0.66), rgb(6 8 24 / 0.32) 62%, transparent);
 }
 .chapter-block--end {
   margin-left: auto;
@@ -3369,4 +3369,110 @@ html[data-case] .topbar {
   .case-layer[data-leaving] {
     animation-duration: 0.2s;
   }
+}
+
+/* ───────────────────────── Corrective pass (2026-11-15): readouts without boxes ─────────────────────────
+   Technical information stays, presented as typography and meaningful line
+   work instead of bordered chips, ruled tables and HUD rows. */
+
+/* Nestafar: the agent chain as a sentence of steps joined by the signal. */
+.flow-step {
+  padding: 0.2rem 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
+  letter-spacing: 0;
+  text-transform: none;
+  color: #eafaff;
+}
+
+/* Engineering identity: label over text, no ruled table. */
+.spec-list {
+  gap: 1.15rem;
+}
+.spec-row {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.2rem;
+  padding: 0 0 0 1rem;
+  border-top: 0;
+  border-left: 1px solid rgb(115 223 255 / 0.35);
+}
+.spec-row dt {
+  padding-top: 0;
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #bfefff;
+}
+
+/* Intelligence: the request travels down one signal line, node by node. */
+.request-flow li {
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  gap: 0.15rem 1rem;
+  padding: 0 0 1.05rem;
+  border-top: 0;
+}
+.request-flow li::before {
+  content: "";
+  grid-row: 1 / span 2;
+  justify-self: center;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: 0.45rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 18%, var(--core-energy) 38%, rgb(185 166 255 / 0.9) 75%);
+  box-shadow: 0 0 12px rgb(115 223 255 / 0.55);
+}
+.request-flow li::after {
+  content: "";
+  position: absolute;
+  left: calc(0.625rem - 0.5px);
+  top: 1.25rem;
+  bottom: -0.15rem;
+  width: 1px;
+  background: linear-gradient(180deg, rgb(115 223 255 / 0.6), rgb(185 166 255 / 0.25));
+}
+.request-flow li:last-child::after {
+  display: none;
+}
+.request-step {
+  grid-column: 2;
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #eafaff;
+}
+.request-detail {
+  grid-column: 2;
+}
+
+/* Curiosity: the questions, asked aloud, drifting in an asymmetric column. */
+.probe-list {
+  gap: 0.6rem;
+}
+.probe-list li {
+  padding: 0;
+  border-top: 0;
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.1rem, 0.98rem + 0.45vw, 1.35rem);
+  line-height: 1.3;
+}
+.probe-list li::before {
+  display: none;
+}
+.probe-list li:nth-child(2) {
+  margin-left: 1.5rem;
+}
+.probe-list li:nth-child(3) {
+  margin-left: 0.6rem;
+}
+.probe-list li:nth-child(4) {
+  margin-left: 2.2rem;
 }

@@ -72,20 +72,45 @@ export const terrainFragment = /* glsl */ `
 
 export const moduleVertex = /* glsl */ `
   attribute float aGlow;
+  attribute float aShape;
   varying vec3 vLocal;
   varying vec3 vN;
   varying vec3 vWorld;
   varying float vGlow;
+  varying float vShape;
+  const float PI = 3.14159265;
+  // Unit square → unit disc (area-preserving enough for a smooth rim).
+  vec2 toDisc(vec2 p) {
+    return vec2(p.x * sqrt(max(0.0, 1.0 - p.y * p.y * 0.5)), p.y * sqrt(max(0.0, 1.0 - p.x * p.x * 0.5)));
+  }
   void main() {
     vLocal = position;
     vGlow = aGlow;
-    vec4 p = vec4(position, 1.0);
+    vShape = aShape;
+    vec3 pos = position;
+    vec3 nrm = normal;
+    if (aShape < 2.5) {
+      vec2 q = toDisc(position.xz * 2.0);
+      float ang = atan(q.y, q.x);
+      if (aShape > 1.5) {
+        // Hexagonal prism: pull the disc onto a hexagon with flat sides.
+        float seg = PI / 3.0;
+        float a = mod(ang + seg * 0.5, seg) - seg * 0.5;
+        q *= cos(seg * 0.5) / cos(a);
+        float faceAng = ang - a;
+        if (abs(normal.y) < 0.5) nrm = vec3(cos(faceAng), 0.0, sin(faceAng));
+      } else if (abs(normal.y) < 0.5) {
+        nrm = vec3(cos(ang), 0.0, sin(ang));
+      }
+      pos.xz = q * 0.5;
+    }
+    vec4 p = vec4(pos, 1.0);
     mat3 nm = mat3(modelMatrix);
     #ifdef USE_INSTANCING
       p = instanceMatrix * p;
       nm = nm * mat3(instanceMatrix);
     #endif
-    vN = normalize(nm * normal);
+    vN = normalize(nm * nrm);
     vec4 w = modelMatrix * p;
     vWorld = w.xyz;
     gl_Position = projectionMatrix * viewMatrix * w;
@@ -105,16 +130,19 @@ export const moduleFragment = /* glsl */ `
   varying vec3 vN;
   varying vec3 vWorld;
   varying float vGlow;
+  varying float vShape;
 
   void main() {
-    // Machined modules (2026-11-14 overhaul): matte anodised slate under a warm
-    // key and a cool fill, a tight specular, and a fine bevel that catches the
-    // light. The accent edge (uEdge) is reserved for active modules (aGlow),
-    // so light means something instead of outlining every box.
+    // Machined modules in the chapter's own colour (corrective pass): cobalt
+    // satin under a warm key and cool fill, a tight specular, a cyan fresnel
+    // and a thin catch-light on rims only (no box outlines). The accent edge
+    // marks active modules.
     vec3 a = abs(vLocal) * 2.0;
     vec3 fw = max(fwidth(vLocal) * 2.0, vec3(1e-4));
     vec3 e = smoothstep(1.0 - fw * 2.2, 1.0 - fw * 0.4, a);
-    float edge = max(max(e.x * e.y, e.y * e.z), e.x * e.z);
+    float side = max(e.x, e.z);
+    // Rims: where a cap meets the wall. Slabs (shape 3) keep their box edges.
+    float edge = vShape > 2.5 ? max(max(e.x * e.y, e.y * e.z), e.x * e.z) : e.y * side;
     vec3 n = normalize(vN);
     vec3 v = normalize(cameraPosition - vWorld);
     vec3 key = normalize(vec3(0.45, 0.9, 0.55));
@@ -122,16 +150,14 @@ export const moduleFragment = /* glsl */ `
     float dk = max(dot(n, key), 0.0);
     float df = max(dot(n, fill), 0.0);
     vec3 h = normalize(key + v);
-    float spec = pow(max(dot(n, h), 0.0), 48.0);
-    float rim = pow(1.0 - max(dot(n, v), 0.0), 4.0);
-    // Faces: slightly lighter on top, as if lit from a studio softbox above.
+    float spec = pow(max(dot(n, h), 0.0), 40.0);
+    float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0);
     float top = smoothstep(0.6, 0.9, n.y);
-    vec3 col = uFace * (0.35 + 0.95 * dk) + vec3(0.30, 0.36, 0.46) * uFace * df * 0.9;
-    col += vec3(1.0, 0.95, 0.88) * spec * 0.22 + uFace * top * 0.18;
-    col += vec3(0.62, 0.68, 0.78) * rim * 0.08;
-    // Bevel: a thin, neutral catch-light on every edge; accent only when active.
-    col += vec3(0.78, 0.8, 0.84) * edge * (0.18 + 0.22 * dk);
-    col += uEdge * edge * vGlow * 1.5 + uEdge * vGlow * 0.06;
+    vec3 col = uFace * (0.45 + 1.1 * dk) + vec3(0.45, 0.35, 0.95) * uFace * df * 1.2;
+    col += vec3(1.0, 0.95, 0.88) * spec * 0.28 + uFace * top * 0.35;
+    col += uEdge * rim * 0.22;
+    col += mix(vec3(0.75, 0.85, 1.0), uEdge, 0.5) * edge * (0.25 + 0.3 * dk);
+    col += uEdge * edge * vGlow * 1.6 + uEdge * vGlow * 0.1;
     float fog = smoothstep(uFogNear, uFogFar, distance(cameraPosition, vWorld));
     col = mix(col, uFogColor, fog);
     gl_FragColor = vec4(col, uOpacity);

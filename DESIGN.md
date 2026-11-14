@@ -94,20 +94,22 @@ components:
 
 # Design System: Abhishyanth Vemula — Portfolio V2
 
-## Art direction (overhaul, 2026-11-14)
+## Art direction (corrected 2026-11-15)
 
-**What made it feel generated, and what replaced it.** The audit found one navy-to-violet field behind almost every chapter, the same luminous cyan outline on every object (wire boxes, floor grids, HUD rings, gallery brackets), floating modules with no surface, one wide display face for titles, leads and buttons alike, uppercase tracked mono on every control, and blue-tinted greys that pulled every chapter back to the same navy. The fixes:
+The 2026-11-14 overhaul misread "less AI-generated" as "darker and more neutral". That is reverted: each chapter keeps its original colour identity and atmosphere (navy and holographic cyan for the hero, violet haze for Curiosity, cobalt for Engineering, indigo with cyan and violet currents for Intelligence, the violet-navy exhibition hall for Project Universe, jade for Timeline, the dawn for the close). Backdrop, fog, ink tokens and readability veils are back to their pre-overhaul values.
 
-1. **One universe, distinct rooms.** Hero keeps the holographic workspace (it is JARVIS-adjacent and earns it). Meet the Human is a warm graphite studio; Curiosity keeps its violet haze; Engineering and Nestafar are a slate drafting room; Intelligence is ink with a deep teal current; Project Universe is a near-neutral charcoal gallery where each artifact brings its own colour; Timeline is jade; Next Chapter is the dawn; the credits are black. Backdrop and fog are tuned per room (`experience/shaders/backdrop.ts`, `Atmosphere.tsx`).
-2. **Surfaces before outlines.** Engineering modules are machined, matte anodised slate under a warm key and cool fill, with a neutral bevel catch-light; the accent edge only marks active modules. Device bodies (WiniOS laptop and phone, plinths) are satin aluminium and graphite with a camera-relative studio key, broad and tight speculars and a neutral fresnel; the accent survives only as a grazing rim. Floors are sparse surveyed lines with a light pool, no scanning sweeps.
-3. **Neutral ink.** Secondary copy is neutral (`--ink-tinted #dadde5`, `--ink-muted #9ba3b4`) so colour belongs to the chapter, not the text. Readability veils are neutral black.
-4. **An editorial voice.** Newsreader italic for leads and personal lines; Unbounded stays for names and titles; mono only for labels. Chapter numbers sit after a short drawn rule.
-5. **Fewer, deliberate controls.** Sentence-case actions, one solid primary per group, quiet underlined text links, no outlined boxes.
-6. **Rendering.** DPR follows the screen up to 2× on capable desktops (1.5× on low-power), stepping down a tier (2 → 1.5 → 1.25 → 1) only after a measured 45 fps miss, never back up. Canvas screen textures are supersampled (2× on high-density desktops, 1.5× otherwise, 1× on coarse pointers) with 8× anisotropy; rounded device geometry uses smoother curves and bevels. No post-processing was added.
+**What actually read as generated, and what replaced it:**
 
-**Project Universe stops.** Between the universe establishing shot and the last exhibit, the page settles on each project's showcase framing (GSAP ScrollTrigger snap, directional, after scroll end, 0.45–0.95 s ease). Stops and the 3D track share one transform-free measurement (offsetTop chain), so text, CTA and artifact compose together. Outside that range the story scrolls freely; reduced motion disables snapping.
+1. **Identical floating cuboids.** Engineering's modules are now a system sculpture shaped by role: tiers are discs, data stores are drums, services are hexagonal prisms (hexagonal architecture), clients are slim slabs. They are reshaped per instance in the vertex shader, so the assembly, the Nestafar framing and the morph into Intelligence nodes are unchanged. Material: cobalt satin under a warm key and a violet fill, with a tight specular, a cyan fresnel and a catch-light on rims only. No box outlines; the accent marks active modules.
+2. **Decorative grids.** The Engineering floor grid is retired; the routed floor traces, which carry the signal to the structure, stay.
+3. **Bordered chips, ruled tables and HUD rows.** Nestafar's agent chain is a sentence of serif-italic steps joined by the drawn signal; Engineering's identity table is label-over-text with a single cyan hairline; Intelligence's request walk-through runs down one glowing signal line, node by node; Curiosity's questions are asked aloud in serif italic, in a staggered column. All information is kept.
+4. **Outline rectangles standing in for objects.** IRIS's structured record is a physical jade card the extracted fields land on.
 
-**Index lock.** Opening the Index adds `html.has-index` (overflow hidden on the root, so scrollY never changes); the panel scrolls on its own with contained overscroll; closing (button, Escape, backdrop, link) releases synchronously so links navigate from the unlocked page.
+**Kept from the overhaul:** the editorial serif (Newsreader italic) for leads and personal lines, sentence-case actions, satin device bodies with smoother bevels, supersampled screen textures, DPR tiers, the Index scroll lock and centred credits.
+
+**Project Universe stops (gesture gate).** Not snapping. Scrolling is native and manual; nothing moves on its own. When the visitor's own input is about to cross a stop (the establishing shot or an exhibit's showcase framing), the page settles exactly there and the rest of that gesture, including trackpad or touch momentum, is consumed. Only a new gesture continues: a wheel pause longer than max(220 ms, 2.5 frames), a new touch, a new key press, or a reversal. PageDown/PageUp/Space move one stop per press. Mid-touch, the root overflow lock is held until the finger lifts (touchmove stops being cancelable once a scroll starts) and briefly after, to swallow the fling. Programmatic movement (Index and anchor links, history, case-study return, Home/End, any single jump over two viewports) bypasses it. Off under reduced motion and while the Index or a case study is open. Code: `experience/director/projectGate.ts`.
+
+**Index lock.** Opening the Index adds `html.has-index` (overflow hidden on the root, so scrollY never changes); the panel scrolls on its own with contained overscroll; closing releases synchronously so links navigate from the unlocked page.
 
 ## Overview
 

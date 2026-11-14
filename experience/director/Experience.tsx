@@ -3,6 +3,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { installProjectGate } from "./projectGate";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Hero } from "@/components/hero/Hero";
@@ -369,65 +370,22 @@ export function Experience() {
         },
       });
 
-      // Project Universe stops (2026-11-14): only between the universe
-      // establishing shot and the last exhibit, the page settles on each
-      // project's showcase framing (the same measured positions the 3D track
-      // uses, so title, copy, CTA and artifact compose together). Directional
-      // and native: it acts after scrolling ends, never on the wheel itself, so
-      // touchpads, touch, keys and anchors keep working, and outside this range
-      // the story scrolls freely. Reduced motion: no snapping.
+      // Project Universe stops (corrective pass 2026-11-15): manual scrolling
+      // with deliberate stops, not snapping. See projectGate.ts. The stops are
+      // the establishing shot and each exhibit's showcase framing, measured
+      // like the 3D track anchors so text, actions and artifact compose.
+      // Reduced motion: no gate, plain native scrolling.
       if (!reduced) {
-        let stops: number[] = [];
-        // Focus that just moved (Tab) may have scrolled the page; older focus
-        // (e.g. restored after a case study) must not steer later scrolling.
-        let focusAt = 0;
-        const onFocusIn = () => (focusAt = Date.now());
-        document.addEventListener("focusin", onFocusIn);
-        cleanups.push(() => document.removeEventListener("focusin", onFocusIn));
         const measureStops = () => {
           const vh = window.innerHeight;
-          const at = (sel: string, k: number) => {
-            const el = document.querySelector<HTMLElement>(sel);
-            return el ? layoutTop(el) - vh * k : 0;
-          };
-          stops = [at("#projects-title", 0.3), ...projectStories.map((p) => exhibitStop(p.id))];
+          const title = document.querySelector<HTMLElement>("#projects-title");
+          return [title ? layoutTop(title) - vh * 0.3 : 0, ...projectStories.map((p) => exhibitStop(p.id))].map(Math.round);
         };
-        measureStops();
-        ScrollTrigger.create({
-          trigger: "#projects",
-          start: () => (measureStops(), stops[0]),
-          end: () => stops[stops.length - 1],
-          snap: {
-            snapTo: (progress: number, self?: ScrollTrigger) => {
-              if (!self || stops.length < 2) return progress;
-              // Never move the page under an open case study or the Index.
-              const root = document.documentElement;
-              if (root.classList.contains("has-case") || root.hasAttribute("data-case") || root.classList.contains("has-index")) return progress;
-              if (Date.now() - Number(root.dataset.caseReturn ?? 0) < 2500) return progress;
-              const span = stops[stops.length - 1] - stops[0];
-              const pts = stops.map((y) => (y - stops[0]) / span);
-              // Keyboard focus moved the page: settle on the focused exhibit,
-              // not the next one, so the focused control stays in view.
-              const active = document.activeElement as HTMLElement | null;
-              const recent = Date.now() - focusAt < 1500;
-              const exhibit = recent && active?.matches(":focus-visible") ? active.closest<HTMLElement>("[id^='project-']") : null;
-              if (exhibit) {
-                const i = projectStories.findIndex((p) => `project-${p.id}` === exhibit.id);
-                if (i >= 0) return pts[i + 1];
-              }
-              const dir = self.direction;
-              const eps = 6 / span; // within a few pixels counts as resting on a stop
-              // Next stop in the scroll direction; rest if already on one.
-              const on = pts.find((v) => Math.abs(v - progress) < eps);
-              if (on !== undefined) return on;
-              if (dir > 0) return pts.find((v) => v > progress) ?? 1;
-              return [...pts].reverse().find((v) => v < progress) ?? 0;
-            },
-            duration: { min: 0.45, max: 0.95 },
-            delay: 0.06,
-            ease: "power2.inOut",
-            inertia: false,
-          },
+        const gate = installProjectGate(measureStops);
+        ScrollTrigger.addEventListener("refresh", gate.refresh);
+        cleanups.push(() => {
+          ScrollTrigger.removeEventListener("refresh", gate.refresh);
+          gate.destroy();
         });
       }
 

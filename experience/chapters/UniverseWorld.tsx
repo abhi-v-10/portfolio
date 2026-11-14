@@ -4,14 +4,12 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo } from "react";
 import {
   AdditiveBlending,
-  BoxGeometry,
   BufferGeometry,
   CanvasTexture,
   CatmullRomCurve3,
   Color,
   CylinderGeometry,
   DoubleSide,
-  EdgesGeometry,
   ExtrudeGeometry,
   Float32BufferAttribute,
   Group,
@@ -343,11 +341,11 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
       return m;
     });
     const rowUv = [RECEIPT_ROWS.vendor, RECEIPT_ROWS.date, RECEIPT_ROWS.items, RECEIPT_ROWS.tax, RECEIPT_ROWS.total];
-    const recordMat = lines("#8ff0d0", "#bfffe9");
-    const recordGeo = new EdgesGeometry(new BoxGeometry(1.3, 1.62, 0.01));
-    recordGeo.setAttribute("aLit", new Float32BufferAttribute(new Float32Array(recordGeo.attributes.position.count).fill(1), 1));
-    const record = new LineSegments(recordGeo, recordMat);
-    record.position.set(1.15, 0.12, 0.3);
+    // The structured record is a physical card the fields land on (corrective
+    // pass), not an outline rectangle: satin jade body, fields drawn on top.
+    const recordMat = body("#0d2a25", "#8ff0d0");
+    const record = new Mesh(roundedSlab(1.3, 1.62, 0.05, 0.1), recordMat);
+    record.position.set(1.15, 0.12, 0.2);
     const verified = mkPanel(2, verifiedChip(), 1.1, 0.223, "#8ff0d0", 0);
     verified.position.set(1.15, -0.95, 0.35);
     ir.add(receipt, record, verified);

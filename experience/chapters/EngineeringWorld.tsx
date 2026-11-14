@@ -134,9 +134,16 @@ export function EngineeringWorld() {
 
   const r = useMemo(() => {
     const n = MODULES.length;
-    const box = new BoxGeometry(1, 1, 1);
+    // One subdivided unit box, reshaped per instance in the vertex shader
+    // (corrective pass 2026-11-15): tiers are discs, data stores are drums,
+    // services are hexagonal prisms (hexagonal architecture), clients stay
+    // slim slabs. Same instances, so the assembly and the Intelligence morph
+    // are untouched.
+    const box = new BoxGeometry(1, 1, 1, 24, 1, 24);
     const glow = new InstancedBufferAttribute(new Float32Array(n), 1);
     box.setAttribute("aGlow", glow);
+    const shapeOf = (i: number) => (i < 3 ? 0 : i < 6 ? 1 : i < 12 ? 2 : 3);
+    box.setAttribute("aShape", new InstancedBufferAttribute(new Float32Array(MODULES.map((_, i) => shapeOf(i))), 1));
     const moduleMat = new ShaderMaterial({
       vertexShader: moduleVertex,
       fragmentShader: moduleFragment,
@@ -144,7 +151,7 @@ export function EngineeringWorld() {
         uOpacity: { value: 1 },
         uTime: { value: 0 },
         // Raw (unencoded) values: this shader writes straight to the screen.
-        uFace: { value: new Color(0.13, 0.15, 0.19) },
+        uFace: { value: new Color(0.09, 0.16, 0.36) },
         uEdge: { value: new Color(0.42, 0.86, 1.0) },
         uFogColor: { value: new Color("#0a1433") },
         uFogNear: { value: 16 },
@@ -308,7 +315,8 @@ export function EngineeringWorld() {
     r.traceMat.uniforms.uReveal.value = smoothstep(1.75, 2.3, tr);
     r.traceMat.uniforms.uTime.value = t;
     r.traceMat.uniforms.uIntensity.value = presence * 0.9 * keep;
-    r.gridMat.uniforms.uIntensity.value = presence * 0.5 * (1 - smoothstep(0.3, 1, morph) * 0.55) * (1 - flexing);
+    // The decorative floor grid is retired; the routed traces carry the meaning.
+    r.gridMat.uniforms.uIntensity.value = 0;
     r.gridMat.uniforms.uTime.value = t;
 
     LABEL_AT.forEach((mi, k) => {
