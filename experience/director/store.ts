@@ -46,7 +46,17 @@ export const story = {
    * (performance.now() of the last press), and the focused timeline event
    * (-1 = none).
    */
-  universe: { eli5: 0, bridgeAt: -1e9 },
+  universe: {
+    eli5: 0,
+    bridgeAt: -1e9,
+    /** 1: PC → iPhone, -1: iPhone → PC (alternates per send). */
+    bridgeDir: 1,
+    /** Sends so far; alternates the packet between text and image. */
+    bridgeCount: 0,
+    /** Case-study transition: artifact index in focus (-1 none) and amount (0 → 1). */
+    caseFocus: -1,
+    caseAmt: 0,
+  },
   nexusFocus: -1,
 };
 

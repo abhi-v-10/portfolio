@@ -13,7 +13,7 @@ import { EvidenceButton } from "@/components/evidence/EvidenceButton";
 /** One exhibit: copy beside its artifact, plus the case-study door. */
 function Exhibit({ p, index }: { p: ProjectStory; index: number }) {
   const [explained, setExplained] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [sent, setSent] = useState<0 | 1 | -1>(0);
   const titleId = `project-${p.id}-title`;
 
   const toggleEli5 = () => {
@@ -21,9 +21,13 @@ function Exhibit({ p, index }: { p: ProjectStory; index: number }) {
     setExplained(next);
     story.universe.eli5 = next ? 1 : 0;
   };
+  // Alternate direction each press: PC → iPhone, then iPhone → PC.
   const send = () => {
+    const dir = sent === 1 ? -1 : 1;
+    story.universe.bridgeDir = dir;
+    story.universe.bridgeCount += 1;
     story.universe.bridgeAt = performance.now();
-    setSent(true);
+    setSent(dir);
   };
 
   return (
@@ -62,13 +66,13 @@ function Exhibit({ p, index }: { p: ProjectStory; index: number }) {
         )}
         {p.id === "winios" && (
           <button type="button" className="action exhibit-try" onClick={send}>
-            {universe.bridge.button}
+            {sent === 1 ? universe.bridge.toPc : universe.bridge.toPhone}
           </button>
         )}
       </div>
       {p.id === "winios" && (
         <p className="exhibit-note rv" aria-live="polite">
-          {sent ? universe.bridge.done : universe.aside}
+          {sent === 1 ? universe.bridge.doneToPhone : sent === -1 ? universe.bridge.doneToPc : universe.aside}
         </p>
       )}
     </article>

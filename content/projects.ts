@@ -47,7 +47,7 @@ export const projectStories: ProjectStory[] = [
     summary:
       "Copy on the PC, paste on the phone, and the other way round, without a cloud relay. A native Rust agent watches the Windows clipboard, serves it over HTTPS on the private network only, and iPhone Shortcuts send and receive through it.",
     artifact:
-      "Two device-worlds, a wide desktop slab and a tall phone slab, joined by an arched current. Packets cross in both directions through a ring that stands for the TLS boundary.",
+      "A laptop showing the WiniOS settings and a phone showing Shortcuts, joined by an arched, sealed current through a TLS ring. Sending a packet lights the source screen, carries a sealed clipboard card (text or image) across the bridge, and the other device shows it as received.",
     accent: "#73dfff",
     featured: true,
     status: "Private beta (0.1.x)",
@@ -96,7 +96,8 @@ export const projectStories: ProjectStory[] = [
     stack: ["React", "TypeScript", "Django REST Framework", "FastAPI"],
     summary:
       "Discover openings, manage applications and message recruiters in one place, with SeekBot giving career guidance: résumé review, job matching and skill-gap checks.",
-    artifact: "A graph of opportunity routes. One route lights up node by node until it reaches a match.",
+    artifact:
+      "A candidate profile card with skills, four job openings, and matching lines that sweep the openings before settling on the best fit, which turns into an applied match. SeekBot, a small agent orb, answers with the best fit and a skill gap. All data is a fictional sample.",
     accent: "#ffc861",
     sections: [
       {
@@ -124,7 +125,8 @@ export const projectStories: ProjectStory[] = [
     stack: ["Python", "Flask", "Tesseract OCR", "OpenCV"],
     summary:
       "Photos, scans and PDFs of invoices and receipts go in; vendor, date, line items, tax and total come out, the arithmetic is checked, and spending shows up in a dashboard.",
-    artifact: "A floating receipt with a scan line passing over it. As the line passes, fields lift off the page as structured blocks.",
+    artifact:
+      "A sample receipt (fictional Demo Mart data) passes under an OCR scan line. Vendor, date, items, tax and total lift off the page into a structured record, and a final chip confirms the arithmetic checks out.",
     accent: "#8ff0d0",
     sections: [
       {
@@ -150,7 +152,8 @@ export const projectStories: ProjectStory[] = [
     stack: ["JavaScript", "Chrome Extension", "OpenAI", "FastAPI"],
     summary:
       "Select confusing text or snip part of the screen, pick a persona and a format, and get it explained simply.",
-    artifact: "A tangled knot of light. Explain it, and the knot relaxes into one clean loop.",
+    artifact:
+      "A tangled knot of light above a block of dense technical text. Explain it, and the knot relaxes into one clean loop while the text becomes one plain sentence.",
     accent: "#f17e98",
     sections: [
       {
@@ -174,7 +177,8 @@ export const projectStories: ProjectStory[] = [
     stack: ["Django", "Next.js", "PostgreSQL + pgvector", "OpenAI"],
     summary:
       "A teacher picks a textbook chapter, the marks, sections and question mix; a CBSE-compliant paper streams into an editor to finalise and export.",
-    artifact: "Layered chapter pages lift and reassemble into the sections of a paper.",
+    artifact:
+      "Three chapter cards, one selected; question modules with their marks flow into a sample question paper that builds section by section, A to D, as you arrive.",
     accent: "#9db8ff",
     sections: [
       {
@@ -199,7 +203,8 @@ export const projectStories: ProjectStory[] = [
     stack: ["Django", "Python", "PostgreSQL", "Jazzmin", "Google OAuth2"],
     summary:
       "One school system, four dashboards: Admin, Teacher, Student and Parent. Classes, attendance, messaging, exams and announcements, each seen from the role that needs it.",
-    artifact: "A small modular campus: a hub with four role modules around it, linked by moving pulses.",
+    artifact:
+      "A small campus: a school building on a round plinth with Admin, Teacher, Student and Parent dashboards around it, linked by arcs that carry information to and from the school and between roles.",
     accent: "#ffaa6a",
     sections: [
       {
@@ -231,7 +236,9 @@ export const universe = {
     simple: "You highlight words that confuse you. It tells you what they mean, in plain words.",
   },
   bridge: {
-    button: "Send a packet across",
-    done: "Crossed: encrypted, authenticated, private network only.",
+    toPhone: "Send PC → iPhone",
+    toPc: "Send iPhone → PC",
+    doneToPhone: "Delivered to the iPhone: encrypted, authenticated, private network only.",
+    doneToPc: "Delivered to the PC: same sealed route, the other way.",
   },
 } as const;

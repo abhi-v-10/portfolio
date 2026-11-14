@@ -17,6 +17,12 @@ export type GalleryPhoto = {
   tone: "lavender" | "cyan" | "peach" | "violet";
 };
 
+/**
+ * Supplied by Abhishyanth on 2026-11-14 (casual photos, by design). Originals
+ * stay outside the repo; these are 4:5 crops (1200×1500 WebP) so every frame
+ * matches the gallery's cover-fit 4:5 slot. Captions describe only what each
+ * photo shows.
+ */
 export const galleryPhotos: GalleryPhoto[] = [
   {
     id: "photo-01",
@@ -28,26 +34,34 @@ export const galleryPhotos: GalleryPhoto[] = [
   },
   {
     id: "photo-02",
-    src: null,
-    title: "Photo 02 · At the desk",
-    caption: "Workspace, behind the scenes. Placeholder, photo to be supplied.",
-    alt: "Placeholder for a workspace photo",
+    src: "/photos/garden-cafe.webp",
+    title: "Photo 02 · Garden table",
+    caption: "A slow afternoon under the palms. Rare, but it happens.",
+    alt: "Abhishyanth seated at a table in a leafy garden café, wearing an olive polo shirt and a black smartwatch.",
     tone: "cyan",
   },
   {
     id: "photo-03",
-    src: null,
-    title: "Photo 03 · Off the clock",
-    caption: "Gaming, setups, the creative side. Placeholder, photo to be supplied.",
-    alt: "Placeholder for a lifestyle or gaming photo",
+    src: "/photos/floral-backdrop.webp",
+    title: "Photo 03 · Festive fit",
+    caption: "Kurta on, flowers behind, looking anywhere but the camera.",
+    alt: "Abhishyanth in a light green silk kurta standing in front of a wall of greenery and hanging white and pink flowers.",
     tone: "peach",
   },
   {
     id: "photo-04",
-    src: null,
-    title: "Photo 04 · Out there",
-    caption: "Events, council, people. Placeholder, photo to be supplied.",
-    alt: "Placeholder for an event or team photo",
+    src: "/photos/festival-lights.webp",
+    title: "Photo 04 · Under the lights",
+    caption: "Festival night, colour streaks overhead, checking the time like there's a deadline.",
+    alt: "Abhishyanth in a black kurta and scarf on a green-carpeted ground at night, checking a wristwatch under coloured light beams.",
     tone: "violet",
+  },
+  {
+    id: "photo-05",
+    src: "/photos/beach-night.webp",
+    title: "Photo 05 · Night tide",
+    caption: "Beach at night, framing the shot from the other side of the lens for once.",
+    alt: "Abhishyanth on a beach at night, photographing the waves with a phone held up in both hands.",
+    tone: "cyan",
   },
 ];

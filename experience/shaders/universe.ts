@@ -144,3 +144,54 @@ export const strandFragment = /* glsl */ `
     gl_FragColor = vec4(col * a, a);
   }
 `;
+
+/**
+ * Refinement pass (2026-11-14): textured surfaces for the Project Universe.
+ * A panel crossfades between two canvas textures (device states, dense →
+ * simple text), can be revealed top-down (the QP-Gen paper), carries an OCR
+ * scan line (IRIS) and a soft activation glow. Normal blending, so screens and
+ * paper read as objects, not light.
+ */
+export const panelFragment = /* glsl */ `
+  precision highp float;
+  uniform sampler2D uTexA;
+  uniform sampler2D uTexB;
+  uniform float uMix;
+  uniform float uIntensity;
+  uniform float uGlow;
+  uniform vec3 uGlowColor;
+  uniform float uReveal;
+  uniform float uScan;
+  varying vec2 vUv;
+  void main() {
+    vec4 a = texture2D(uTexA, vUv);
+    vec4 b = texture2D(uTexB, vUv);
+    vec4 c = mix(a, b, uMix);
+    float shown = 1.0 - smoothstep(uReveal - 0.04, uReveal, 1.0 - vUv.y);
+    c.a *= shown;
+    float scanning = step(-0.5, uScan);
+    float line = scanning * exp(-pow((vUv.y - uScan) * 110.0, 2.0));
+    float read = scanning * smoothstep(uScan - 0.004, uScan + 0.004, vUv.y);
+    vec3 col = c.rgb * (1.0 + uGlow * 0.25) + uGlowColor * (uGlow * 0.18 + read * 0.1) * c.a;
+    col = mix(col, uGlowColor, line * 0.85);
+    float alpha = max(c.a, line * 0.9 * shown);
+    gl_FragColor = vec4(col, alpha * uIntensity);
+  }
+`;
+
+/** Device bodies and plinths: dark satin with a coloured rim and a faint top light. */
+export const bodyFragment = /* glsl */ `
+  precision highp float;
+  uniform vec3 uBase;
+  uniform vec3 uRim;
+  uniform float uIntensity;
+  varying vec3 vN;
+  varying vec3 vV;
+  void main() {
+    vec3 n = normalize(vN);
+    float rim = pow(1.0 - abs(dot(n, normalize(vV))), 3.0);
+    float top = clamp(n.y * 0.5 + 0.5, 0.0, 1.0);
+    vec3 col = uBase * (0.65 + 0.55 * top) + uRim * rim * 0.85;
+    gl_FragColor = vec4(col, uIntensity);
+  }
+`;

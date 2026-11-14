@@ -26,8 +26,8 @@ Note: the brief lists different filenames (`nestafar-internship.pdf`, …); the 
 - [x] 9 Assets organised in `public/evidence/` (optimised derivatives) and originals for download
 
 ### Pass B — Project Universe artifacts (`UniverseWorld.tsx`, `shaders/universe.ts`)
-- [ ] WiniOS laptop + phone, secure bridge, two-way send
-- [ ] JobSeek ecosystem, IRIS receipt + OCR, ELI5 dense→simple text, QP-Gen exam paper, Scholaroid four-role campus
+- [x] WiniOS laptop + phone, secure bridge, two-way send
+- [x] JobSeek ecosystem, IRIS receipt + OCR, ELI5 dense→simple text, QP-Gen exam paper, Scholaroid four-role campus
 
 ### Pass C — case studies
 - [ ] Intercepted route modal (`app/@modal/(.)work/[slug]`), standalone page kept
@@ -48,7 +48,7 @@ Note: the brief lists different filenames (`nestafar-internship.pdf`, …); the 
 
 ## Gallery photos (user message 2026-11-14)
 - [x] `IMG_4562 (2).HEIC` (go-karting) decoded with ffmpeg, cropped to the 4:5 gallery frame: `public/photos/go-karting.webp` (slot 01)
-- [ ] Four more photos (festival lights, beach at night, garden café, floral backdrop) were pasted inline only; waiting for the files in `assets/incoming/photos/`
+- [x] Four more photos supplied by path (garden café, floral backdrop, festival lights, beach at night), cropped 4:5 into `public/photos/`; gallery now has five photos
 
 ## Next action
-Pass B (Project Universe artifacts), WiniOS first.
+Pass C (case-study overlay via intercepted route, transitions, loader-replay fix).

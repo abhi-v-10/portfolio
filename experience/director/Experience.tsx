@@ -262,7 +262,9 @@ export function Experience() {
           // Project Universe: overview on its title, then one artifact per
           // half unit, each arriving with its exhibit title.
           [top("#projects-title") - window.innerHeight * 0.3, 6],
-          ...projectStories.map((p, i) => [top(`#project-${p.id}-title`) - window.innerHeight * 0.3, 6.5 + i * 0.5] as [number, number]),
+          // Portrait screens hold each exhibit title lower (50%), so the artifact
+          // owns the top half of the screen instead of sitting behind the copy.
+          ...projectStories.map((p, i) => [top(`#project-${p.id}-title`) - window.innerHeight * (window.innerWidth / window.innerHeight < 0.8 ? 0.5 : 0.3), 6.5 + i * 0.5] as [number, number]),
           [top("#timeline-title") - window.innerHeight * 0.3, 10],
           [top("#next-title") - window.innerHeight * 0.3, 11.5],
           [end, TRACK_MAX],
