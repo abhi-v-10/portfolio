@@ -56,9 +56,10 @@ QA hooks: `?webgl=0` forces the no-WebGL route; `?slowmo=N` slows the gallery ro
 | Gallery photos (five supplied, 4:5 WebP 1200×1500) | `content/gallery.ts` (files in `public/photos/`) |
 | Certificates and award photos | `content/evidence.ts` (display files in `public/evidence/`, originals in `public/evidence/original/`) |
 | Project screenshots (Screens block in each case study) | `content/screens.ts` (files in `public/projects/<id>/`, from `assets/project-photos/`) |
-| Project links | `content/projects.ts` → `links` (a Links section appears once one is set) |
+| Project links (repo, live, WiniOS installer) | `content/projects.ts` → `links` (shown as actions in the exhibit and the case-study hero) |
+| CV (one-page PDF) | edit `docs/resume/resume.html`, then `node docs/resume/build.mjs <portfolio URL>` (needs `playwright-core`; writes `public/Abhishyanth-Vemula-Resume.pdf`) |
 | Timeline events and evidence | `content/timeline.ts` |
-| Hero CGPA 9.3 (confirm before launch) | `content/site.ts` → `highlights.cgpa` |
+| Hero CGPA | `content/site.ts` → `highlights.cgpa` |
 
 ## Still to supply (personal information and photos)
 
@@ -70,8 +71,6 @@ These are not shown on the site until supplied. Nothing is invented in their pla
 | The origin of your curiosity (Curiosity chapter) | `content/site.ts` → `curiosity.anecdotePlaceholder` (render it in `components/chapters/Chapters.tsx`) |
 | Per project: your role, key decisions and lessons | `content/projects.ts` (add a `sections` entry) |
 | Optional: more WiniOS and ELI5 screens (each has one) | `public/projects/<id>/n.webp` + `n-thumb.webp`, captions in `content/screens.ts` |
-| Per project: repository / live links | `content/projects.ts` → `links` |
-| Confirm: hero CGPA 9.3, the J.A.R.V.I.S. line wording | `content/site.ts` |
 | Optional: more gallery photos (4:5, at least 1200×1500) | `public/photos/` + `content/gallery.ts` |
 
 The Nestafar certificate PDF (`public/evidence/original/`) is linked as proof of the internship and its dates; the site describes the role as AI backend development, as confirmed by Abhishyanth.
