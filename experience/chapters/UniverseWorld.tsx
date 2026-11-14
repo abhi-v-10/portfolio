@@ -156,7 +156,7 @@ function roundedSlab(w: number, h: number, d: number, r: number) {
   s.quadraticCurveTo(x, y + h, x, y + h - r);
   s.lineTo(x, y + r);
   s.quadraticCurveTo(x, y, x + r, y);
-  const g = new ExtrudeGeometry(s, { depth: d, bevelEnabled: true, bevelThickness: d * 0.25, bevelSize: d * 0.25, bevelSegments: 3, curveSegments: 6 });
+  const g = new ExtrudeGeometry(s, { depth: d, bevelEnabled: true, bevelThickness: d * 0.25, bevelSize: d * 0.25, bevelSegments: 5, curveSegments: 14 }); // smoother corners and bevels (overhaul)
   g.translate(0, 0, -d / 2);
   return g;
 }
@@ -216,8 +216,8 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
 
     /* ── 0 · WiniOS, The Bridge: a laptop and a phone joined by a private, sealed current. ── */
     const w = groups[0];
-    const deviceBody = body("#141a2e", "#73dfff");
-    const phoneBody = body("#18142c", "#b9a6ff");
+    const deviceBody = body("#2a2d34", "#73dfff"); // space-grey aluminium
+    const phoneBody = body("#1f2026", "#b9a6ff"); // graphite
     add(0, deviceBody);
     add(0, phoneBody);
     // Laptop: base with keyboard, hinged lid with the WiniOS settings on screen.

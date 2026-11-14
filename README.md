@@ -67,8 +67,6 @@ These are not shown on the site until supplied. Nothing is invented in their pla
 
 | Item | Where it goes once supplied |
 |---|---|
-| A personal anecdote for Meet the Human, in your own words | `content/site.ts` → `human.anecdotePlaceholder` (render it in `components/human/Human.tsx`) |
-| The origin of your curiosity (Curiosity chapter) | `content/site.ts` → `curiosity.anecdotePlaceholder` (render it in `components/chapters/Chapters.tsx`) |
 | Per project: your role, key decisions and lessons | `content/projects.ts` (add a `sections` entry) |
 | Optional: more WiniOS and ELI5 screens (each has one) | `public/projects/<id>/n.webp` + `n-thumb.webp`, captions in `content/screens.ts` |
 | Optional: more gallery photos (4:5, at least 1200×1500) | `public/photos/` + `content/gallery.ts` |

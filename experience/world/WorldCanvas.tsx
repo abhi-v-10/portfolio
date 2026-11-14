@@ -23,27 +23,33 @@ import { EngineeringWorld } from "../chapters/EngineeringWorld";
 import { WINDOW } from "../chapters/layout";
 
 /**
- * QualityController: starts from a device-sensible DPR cap, then measures real
- * frame times once the entrance has settled and steps resolution down once if
- * the device cannot hold frame pacing. No user-agent sniffing.
+ * QualityController (tiers, 2026-11-14): starts at the device's native
+ * resolution up to 2x on capable desktops, then measures real frame times in
+ * rolling windows once the entrance has settled. If a window cannot hold
+ * ~45 fps it steps down one tier (2 → 1.5 → 1.25 → 1); it never steps back
+ * up, so the image does not pump. No user-agent sniffing.
  */
+const TIERS = [2, 1.5, 1.25, 1];
 function QualityController() {
   const setDpr = useThree((s) => s.setDpr);
   const dpr = useThree((s) => s.viewport.dpr);
-  const samples = useRef({ n: 0, total: 0, done: false });
+  const st = useRef({ n: 0, total: 0, settled: 0 });
   useFrame((_, dt) => {
-    const st = samples.current;
-    if (st.done || story.intro < 1) return;
-    st.n += 1;
-    if (st.n < 20) return; // skip warm-up frames
-    st.total += dt;
-    if (st.n >= 140) {
-      st.done = true;
-      const avg = st.total / (st.n - 20);
-      if (avg > 1 / 42 && dpr > 1) {
-        setDpr(Math.max(1, dpr - 0.5));
-        story.quality = 0;
-      }
+    const w = st.current;
+    if (story.intro < 1 || w.settled >= 3) return;
+    w.n += 1;
+    if (w.n < 20) return; // skip warm-up frames after each change
+    w.total += Math.min(dt, 0.1);
+    if (w.n < 140) return;
+    const avg = w.total / (w.n - 20);
+    w.n = 0;
+    w.total = 0;
+    if (avg > 1 / 45 && dpr > 1) {
+      const next = TIERS.find((t) => t < dpr - 0.01) ?? 1;
+      setDpr(next);
+      if (next <= 1.25) story.quality = 0;
+    } else {
+      w.settled += 1; // three good windows in a row: stop measuring
     }
   });
   return null;
@@ -57,7 +63,9 @@ function CoreRig({ children }: { children: ReactNode }) {
 }
 
 export default function WorldCanvas({ lowPower }: { lowPower: boolean }) {
-  const maxDpr = lowPower ? 1.5 : 1.75;
+  // Sharp on high-density desktops without rendering above what the screen shows.
+  const native = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
+  const maxDpr = Math.min(native, lowPower ? 1.5 : 2);
   return (
     <Canvas
       className="world-canvas"

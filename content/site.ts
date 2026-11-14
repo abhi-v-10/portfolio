@@ -144,20 +144,23 @@ export const human = {
     { term: "Tinkers", detail: "Hyprland, KDE, GlazeWM, an HP Omen tuned past stock" },
     { term: "Rewatches", detail: "The MCU, for the lines. A few are hidden further down." },
   ],
-  anecdotePlaceholder: "[PERSONAL ANECDOTE] A moment that says who you are, in your words (to be supplied).",
+  /** Abhishyanth's own one-liner (supplied 2026-11-14). */
+  aside: "One more PC tweak. Famous last words.",
 } as const;
 
 /**
  * Milestone 003 chapter copy. Every claim traces to the profile document
- * (approach, interests, technical focus, Nestafar experience). The personal
- * origin anecdote is not documented, so it stays a visible placeholder.
+ * (approach, interests, technical focus, Nestafar experience); the origin
+ * line is Abhishyanth's own.
  */
 export const curiosity = {
   lead: "Not one framework. The whole system.",
   body: [
     "I learn by building, and I want to know how the complete thing fits together: the front end, the APIs behind it, the database, authentication, the AI services and the deployment that ships it.",
-    "The same instinct runs off the clock: hopping Linux distros, tuning a laptop for performance, chasing a slow system down to its root cause, and trying every new developer and AI tool the week it lands.",
   ],
+  /** How it started, in Abhishyanth's words (supplied 2026-11-14). */
+  origin:
+    "Gaming, experimenting with my PC and trying new software eventually pulled me into programming. I wanted to know what made it all work.",
   questions: [
     "How does this request actually get here?",
     "Where does the data live, and who can touch it?",
@@ -166,7 +169,6 @@ export const curiosity = {
   ],
   /** Doctor Strange nod (Infinity War's 14,000,605 futures), as microcopy, not a quote. */
   aside: "Six branches explored here. Doctor Strange checked 14,000,605. Still counts.",
-  anecdotePlaceholder: "Origin anecdote: how the curiosity started, in Abhishyanth's words (to be supplied).",
 } as const;
 
 export const engineering = {

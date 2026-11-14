@@ -89,14 +89,17 @@ export function GlitchRoles() {
     };
     window.addEventListener("keydown", onKey);
 
-    // Touch screens cannot hover either: decode on its own after a beat.
+    // Decode on its own after a beat, everywhere (2026-11-14): a visitor who
+    // never hovers still reads the roles. Hover screens get a longer beat so
+    // the pointer can find it first.
+    const hoverable = window.matchMedia("(hover: hover)").matches;
     let touchTimer = 0;
     let io: IntersectionObserver | null = null;
     let mo: MutationObserver | null = null;
-    if (!window.matchMedia("(hover: hover)").matches) {
+    {
       io = new IntersectionObserver(([entry]) => {
         if (entry.isIntersecting) {
-          touchTimer = window.setTimeout(decodeAll, 2600);
+          touchTimer = window.setTimeout(decodeAll, hoverable ? 3600 : 2600);
           io?.disconnect();
         }
       });

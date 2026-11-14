@@ -94,6 +94,21 @@ components:
 
 # Design System: Abhishyanth Vemula — Portfolio V2
 
+## Art direction (overhaul, 2026-11-14)
+
+**What made it feel generated, and what replaced it.** The audit found one navy-to-violet field behind almost every chapter, the same luminous cyan outline on every object (wire boxes, floor grids, HUD rings, gallery brackets), floating modules with no surface, one wide display face for titles, leads and buttons alike, uppercase tracked mono on every control, and blue-tinted greys that pulled every chapter back to the same navy. The fixes:
+
+1. **One universe, distinct rooms.** Hero keeps the holographic workspace (it is JARVIS-adjacent and earns it). Meet the Human is a warm graphite studio; Curiosity keeps its violet haze; Engineering and Nestafar are a slate drafting room; Intelligence is ink with a deep teal current; Project Universe is a near-neutral charcoal gallery where each artifact brings its own colour; Timeline is jade; Next Chapter is the dawn; the credits are black. Backdrop and fog are tuned per room (`experience/shaders/backdrop.ts`, `Atmosphere.tsx`).
+2. **Surfaces before outlines.** Engineering modules are machined, matte anodised slate under a warm key and cool fill, with a neutral bevel catch-light; the accent edge only marks active modules. Device bodies (WiniOS laptop and phone, plinths) are satin aluminium and graphite with a camera-relative studio key, broad and tight speculars and a neutral fresnel; the accent survives only as a grazing rim. Floors are sparse surveyed lines with a light pool, no scanning sweeps.
+3. **Neutral ink.** Secondary copy is neutral (`--ink-tinted #dadde5`, `--ink-muted #9ba3b4`) so colour belongs to the chapter, not the text. Readability veils are neutral black.
+4. **An editorial voice.** Newsreader italic for leads and personal lines; Unbounded stays for names and titles; mono only for labels. Chapter numbers sit after a short drawn rule.
+5. **Fewer, deliberate controls.** Sentence-case actions, one solid primary per group, quiet underlined text links, no outlined boxes.
+6. **Rendering.** DPR follows the screen up to 2× on capable desktops (1.5× on low-power), stepping down a tier (2 → 1.5 → 1.25 → 1) only after a measured 45 fps miss, never back up. Canvas screen textures are supersampled (2× on high-density desktops, 1.5× otherwise, 1× on coarse pointers) with 8× anisotropy; rounded device geometry uses smoother curves and bevels. No post-processing was added.
+
+**Project Universe stops.** Between the universe establishing shot and the last exhibit, the page settles on each project's showcase framing (GSAP ScrollTrigger snap, directional, after scroll end, 0.45–0.95 s ease). Stops and the 3D track share one transform-free measurement (offsetTop chain), so text, CTA and artifact compose together. Outside that range the story scrolls freely; reduced motion disables snapping.
+
+**Index lock.** Opening the Index adds `html.has-index` (overflow hidden on the root, so scrollY never changes); the panel scrolls on its own with contained overscroll; closing (button, Escape, backdrop, link) releases synchronously so links navigate from the unlocked page.
+
 ## Overview
 
 **Creative North Star: "The Living Signal"**
@@ -144,6 +159,7 @@ A night-sky foundation lit from within by cyan energy, with violet held back as 
 ## Typography
 
 **Display Font:** Unbounded (with sans-serif)
+**Editorial Font:** Newsreader, italic (with Georgia, serif)
 **Body Font:** Geist (with system-ui, sans-serif)
 **Label/Mono Font:** Geist Mono (with monospace)
 
@@ -155,7 +171,9 @@ A night-sky foundation lit from within by cyan energy, with violet held back as 
 - **Title** (700 Unbounded, clamp(1rem, 0.62rem + 1.25vw, 1.6rem), 1.02, uppercase): the identity stack (DEVELOPER. ENGINEER. CREATOR. GAMER.), four masked lines with Core Energy full stops, set beside the tagline. Each word arrives as corrupted signal (re-rolling glyphs, chromatic slices) and decodes left to right on hover, tap, first Tab, or automatically on touch screens; screen readers and reduced motion always get the plain words.
 - **Body** (400, 1rem–1.125rem, 1.5): tagline and chapter copy; tagline capped at 30ch beside the identity stack.
 - **Label** (400, 0.6875–0.75rem, 0.2em tracking, uppercase): identity mark, status words, Index, Skip intro, Scroll cue.
-- **Action** (600 Unbounded, 0.75–0.78rem, 0.22–0.24em, uppercase): Explore and the threshold's primary action.
+- **Action** (600 Unbounded, 0.75–0.78rem, 0.22–0.24em, uppercase): Explore and the threshold's primary action only.
+- **Editorial lead** (Newsreader italic 400, clamp(1.45rem, 1.05rem + 1.35vw, 2.15rem), 1.16): chapter leads, the closing lead and personal asides. The serif is the human voice against the engineered display face.
+- **Interface action** (Geist 500–600, 0.9375rem, sentence case): every button and text link after the threshold. Primary is a solid soft-white pill with near-black text; secondary actions are text links with a 1px drawn underline; a download is an accent-tinted pill.
 
 ### Named Rules
 **The Name Wins Rule.** Nothing on screen, in DOM or WebGL, may compete with the display name. Holographic elements sit on the far side of the frame or behind a readability scrim. On wide layouts the camera measures the copy's right edge and frames the core so its outer ring stays clear of it.
@@ -248,7 +266,7 @@ A native modal `<dialog>`: backdrop blurs to 86% night, the frame rises 14px and
 ### Next Chapter and end card (Chapter 06, refined 2026-11-14)
 - **Environment:** a dimensional dawn rather than a white-out: deep indigo above, lavender air, a gold-coral horizon band with a crisp light line, warm haze below. The light source has form: a gold halo (0.42 intensity) with a smaller ivory heart, three gateway arcs (lavender, gold, coral) that grow in as the visitor arrives, a horizon band and warm motes rising from the converged threads. Four coloured paths still rise from the nexus.
 - **Copy:** display title (800), peach lead, availability line, the email as the primary action, See the work, "Stay for the post-credits scene ↓", then LinkedIn, GitHub and Instagram (a CV link appears once supplied).
-- **End card:** a full-viewport section after a short gap. When 55% visible: the section dims to near-black and `story.finale` lowers the sky (−88%) and withdraws the paths; at 1.4s the meta line "Thank you for exploring my universe" fades in over 1.8s; from 2.8s "Abhishyanth Vemula will return." condenses letter by letter, left to right, out of drifting dust (a snap in reverse): each letter drifts in from the right with a fixed pseudo-random offset, 10px blur → 0, 1.7s each, 0.075s apart, while a cloud of box-shadow specks converges into it and fades. No clip-path, so the title glow is never boxed. The Hyprland punchline follows at 5.6s; Replay and Back to the beginning at 6.9s. The heading keeps an `aria-label`; the letter spans are `aria-hidden`. The title is one line from 760px up (`nowrap`, 3.4vw, capped at 4.6rem) and wraps on phones without overflow. Scrolling away resets it. Reduced motion shows the card without choreography.
+- **End card:** a full-viewport section after a short gap. When 55% visible: the section dims to near-black and `story.finale` lowers the sky (−88%) and withdraws the paths; at 1.4s the meta line "Thank you for exploring my universe" fades in over 1.8s; from 2.8s "Abhishyanth Vemula will return." condenses letter by letter, left to right, out of drifting dust (a snap in reverse): each letter drifts in from the right with a fixed pseudo-random offset, 10px blur → 0, 1.7s each, 0.075s apart, while a cloud of box-shadow specks converges into it and fades. No clip-path, so the title glow is never boxed. The Hyprland punchline follows at 5.6s; Replay and Back to the beginning at 6.9s. The heading keeps an `aria-label`; the letter spans are `aria-hidden`. The section is full-bleed from the viewport (`width: 100vw; margin-left: calc(50% - 50vw)`) and its stack is a centred flex column, so every line sits on the viewport centre at any width; the title is one line from 760px up (`nowrap`, 3.3vw, capped at 5.2rem) and wraps on phones without overflow. Scrolling away resets it. Reduced motion shows the card without choreography.
 
 ### Production layer (Milestone 007)
 - **Skip links:** "Skip to projects" and "Skip to contact" sit first in the top bar, invisible until focused, then a Panel Navy pill with a Core Energy border.

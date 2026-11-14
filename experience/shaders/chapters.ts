@@ -107,21 +107,31 @@ export const moduleFragment = /* glsl */ `
   varying float vGlow;
 
   void main() {
-    // Box-local coordinates run -0.5..0.5; an edge is where two of them reach a face.
+    // Machined modules (2026-11-14 overhaul): matte anodised slate under a warm
+    // key and a cool fill, a tight specular, and a fine bevel that catches the
+    // light. The accent edge (uEdge) is reserved for active modules (aGlow),
+    // so light means something instead of outlining every box.
     vec3 a = abs(vLocal) * 2.0;
     vec3 fw = max(fwidth(vLocal) * 2.0, vec3(1e-4));
     vec3 e = smoothstep(1.0 - fw * 2.2, 1.0 - fw * 0.4, a);
     float edge = max(max(e.x * e.y, e.y * e.z), e.x * e.z);
     vec3 n = normalize(vN);
-    float lam = 0.28 + 0.72 * max(dot(n, normalize(vec3(0.35, 0.85, 0.45))), 0.0);
     vec3 v = normalize(cameraPosition - vWorld);
-    float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0);
-    // Top faces carry a fine engineering grid.
+    vec3 key = normalize(vec3(0.45, 0.9, 0.55));
+    vec3 fill = normalize(vec3(-0.7, 0.25, 0.4));
+    float dk = max(dot(n, key), 0.0);
+    float df = max(dot(n, fill), 0.0);
+    vec3 h = normalize(key + v);
+    float spec = pow(max(dot(n, h), 0.0), 48.0);
+    float rim = pow(1.0 - max(dot(n, v), 0.0), 4.0);
+    // Faces: slightly lighter on top, as if lit from a studio softbox above.
     float top = smoothstep(0.6, 0.9, n.y);
-    vec2 g = abs(fract(vLocal.xz * 6.0) - 0.5);
-    float grid = (1.0 - smoothstep(0.0, fwidth(vLocal.x) * 9.0, min(g.x, g.y))) * top * 0.25;
-    vec3 col = uFace * lam + uEdge * (edge * (0.9 + vGlow * 1.6) + rim * 0.25 + grid);
-    col += uEdge * vGlow * 0.12;
+    vec3 col = uFace * (0.35 + 0.95 * dk) + vec3(0.30, 0.36, 0.46) * uFace * df * 0.9;
+    col += vec3(1.0, 0.95, 0.88) * spec * 0.22 + uFace * top * 0.18;
+    col += vec3(0.62, 0.68, 0.78) * rim * 0.08;
+    // Bevel: a thin, neutral catch-light on every edge; accent only when active.
+    col += vec3(0.78, 0.8, 0.84) * edge * (0.18 + 0.22 * dk);
+    col += uEdge * edge * vGlow * 1.5 + uEdge * vGlow * 0.06;
     float fog = smoothstep(uFogNear, uFogFar, distance(cameraPosition, vWorld));
     col = mix(col, uFogColor, fog);
     gl_FragColor = vec4(col, uOpacity);
@@ -160,13 +170,14 @@ export const floorGridFragment = /* glsl */ `
   varying vec3 vWorld;
   float gl1(float x, float n, float w) { float f = fract(x * n); float d = min(f, 1.0 - f) / n; return 1.0 - smoothstep(w, w + fwidth(x) * 1.5, d); }
   void main() {
+    // A quiet surveyed floor: sparse major lines that die off fast, and a soft
+    // pool of light where the structure stands. No scanning sweep.
     vec2 p = vWorld.xz - uCentre.xz;
-    float minor = max(gl1(p.x, 2.0, 0.006), gl1(p.y, 2.0, 0.006));
-    float major = max(gl1(p.x, 0.25, 0.018), gl1(p.y, 0.25, 0.018));
+    float major = max(gl1(p.x, 0.25, 0.012), gl1(p.y, 0.25, 0.012));
     float r = length(p);
-    float fade = exp(-r * 0.075);
-    float scan = exp(-pow((p.y + 16.0 - mod(uTime * 3.0, 32.0)) * 1.2, 2.0));
-    vec3 col = uColor * (minor * 0.3 + major * 0.75) * fade + uAccent * major * scan * fade * 0.8;
+    float fade = exp(-r * 0.13);
+    float pool = exp(-r * r * 0.012);
+    vec3 col = uColor * major * fade * 0.38 + uAccent * pool * 0.05;
     gl_FragColor = vec4(col * uIntensity, 1.0);
   }
 `;

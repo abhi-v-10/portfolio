@@ -179,7 +179,13 @@ export const panelFragment = /* glsl */ `
   }
 `;
 
-/** Device bodies and plinths: dark satin with a coloured rim and a faint top light. */
+/**
+ * Device bodies and plinths (overhaul 2026-11-14): anodised satin under a
+ * camera-relative studio key, so laptops, phones and plinths read as objects
+ * with a surface, not glowing outlines. A broad soft highlight plus a tight
+ * specular, a neutral fresnel, and the accent only as a thin rim at grazing
+ * angles.
+ */
 export const bodyFragment = /* glsl */ `
   precision highp float;
   uniform vec3 uBase;
@@ -189,9 +195,18 @@ export const bodyFragment = /* glsl */ `
   varying vec3 vV;
   void main() {
     vec3 n = normalize(vN);
-    float rim = pow(1.0 - abs(dot(n, normalize(vV))), 3.0);
-    float top = clamp(n.y * 0.5 + 0.5, 0.0, 1.0);
-    vec3 col = uBase * (0.65 + 0.55 * top) + uRim * rim * 0.85;
+    vec3 v = normalize(vV);
+    vec3 key = normalize(vec3(-0.35, 0.75, 0.55));
+    vec3 fill = normalize(vec3(0.8, -0.1, 0.5));
+    float dk = max(dot(n, key), 0.0);
+    float df = max(dot(n, fill), 0.0);
+    vec3 h = normalize(key + v);
+    float nh = max(dot(n, h), 0.0);
+    float sheen = pow(nh, 14.0) * 0.22 + pow(nh, 90.0) * 0.55;
+    float fres = pow(1.0 - max(dot(n, v), 0.0), 4.0);
+    vec3 col = uBase * (0.42 + 0.9 * dk + 0.25 * df);
+    col += vec3(1.0, 0.97, 0.92) * sheen * (0.35 + 0.65 * length(uBase) * 2.0);
+    col += mix(vec3(0.7, 0.74, 0.82), uRim, 0.55) * fres * 0.35;
     gl_FragColor = vec4(col, uIntensity);
   }
 `;

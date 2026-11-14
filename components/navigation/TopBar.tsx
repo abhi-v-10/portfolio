@@ -9,11 +9,28 @@ import { caseNav } from "@/components/case/caseNav";
 export function TopBar({ inert }: { inert?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
 
+  // Background scroll lock while the Index is open (2026-11-14). overflow on
+  // <html> keeps scrollY exactly where it was (no position:fixed shuffle), and
+  // wheel, touch, keys and trackpads cannot move the page; the panel scrolls
+  // on its own with overscroll contained. Released synchronously on close so
+  // an Index link navigates from the unlocked page.
+  const unlock = () => document.documentElement.classList.remove("has-index");
+  useEffect(() => {
+    const d = dialog.current;
+    if (!d) return;
+    d.addEventListener("close", unlock);
+    return () => {
+      d.removeEventListener("close", unlock);
+      unlock();
+    };
+  }, []);
+
   useEffect(
     () =>
       onIndexOpen((section) => {
         const d = dialog.current;
         if (!d) return;
+        document.documentElement.classList.add("has-index");
         if (!d.open) d.showModal();
         const heading = d.querySelector<HTMLElement>(`#index-${section}`);
         heading?.scrollIntoView({ block: "start" });
@@ -22,7 +39,10 @@ export function TopBar({ inert }: { inert?: boolean }) {
     [],
   );
 
-  const close = () => dialog.current?.close();
+  const close = () => {
+    unlock();
+    dialog.current?.close();
+  };
   const open = (s: IndexSection) => () => openIndex(s);
   const live = chapters.filter((c) => c.status === "live");
   const upcoming = chapters.filter((c) => c.status !== "live");

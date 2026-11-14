@@ -48,6 +48,9 @@ export function CaseOverlay({ id, children }: { id: string; children: React.Reac
     () => () => {
       const html = document.documentElement;
       html.classList.remove("has-case");
+      // The page is being put back exactly where it was: Project Universe
+      // stops must not re-settle it (read by the snap in Experience.tsx).
+      html.dataset.caseReturn = String(Date.now());
       const home = document.querySelector<HTMLElement>(".experience");
       if (home) home.inert = false;
       // Switching to the next case remounts the layer: only reverse when none remains.

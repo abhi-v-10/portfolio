@@ -93,11 +93,14 @@ export const backdropFragment = /* glsl */ `
 
     // Meet the Human: warmer and softer than the hero. Lavender field, pale cyan
     // high light, a touch of peach low on the horizon.
-    vec3 lavender = vec3(0.70, 0.62, 0.92);
+    // Overhaul (2026-11-14): a warm graphite studio rather than another navy
+    // field. Umber depth, a soft key from the left like a window, no wisps.
+    vec3 graphite = vec3(0.075, 0.068, 0.072);
+    vec3 umber = vec3(0.30, 0.22, 0.19);
     vec3 peach = vec3(1.0, 0.74, 0.62);
-    vec3 human = mix(navy * 1.8, lavender * 0.42, smoothstep(0.25, 0.8, n));
-    human += vec3(0.62, 0.86, 0.95) * wisp * 0.14;
-    human += peach * horizon * smoothstep(-0.4, 0.6, -d.x) * smoothstep(0.3, 0.8, w) * 0.2;
+    vec3 human = mix(graphite, umber * 0.62, smoothstep(0.3, 0.85, n) * 0.6 + horizon * 0.25);
+    human += peach * horizon * smoothstep(-0.2, 0.8, -d.x) * smoothstep(0.3, 0.8, w) * 0.12;
+    human += vec3(0.55, 0.6, 0.7) * smoothstep(0.2, 0.9, d.y) * 0.035;
     col = mix(col, human, uHuman * 0.82);
 
     // Curiosity: the world drifts into a violet / pale-mist dimension, hazier and lighter.
@@ -109,16 +112,20 @@ export const backdropFragment = /* glsl */ `
     // Engineering: deep, clear blue with a cobalt horizon and faint survey lines:
     // the sky itself becomes measured.
     float eng = smoothstep(1.9, 2.6, uTrack);
-    vec3 deep = mix(abyss * 1.4, cobalt * 0.22, horizon);
-    deep += cobalt * 0.28 * smoothstep(0.55, 0.85, w) * (0.4 + 0.6 * horizon);
-    float elev = asin(clamp(d.y, -1.0, 1.0));
-    float survey = 1.0 - smoothstep(0.0, 0.004, abs(fract(elev * 9.0) - 0.5) - 0.497);
-    deep += cyan * survey * 0.035 * (1.0 - abs(d.y));
+    // Overhaul: cool slate and steel, a drafting room at night. Desaturated,
+    // with a pale horizon; colour is left to the work.
+    vec3 slate = vec3(0.055, 0.068, 0.085);
+    vec3 steel = vec3(0.24, 0.29, 0.36);
+    vec3 deep = mix(slate, steel * 0.55, horizon * 0.8);
+    deep += steel * 0.12 * smoothstep(0.55, 0.85, w) * (0.3 + 0.7 * horizon);
     col = mix(col, deep, eng * 0.9);
 
     // Intelligence: indigo depth with luminous cyan and purple currents.
-    vec3 intel = mix(abyss * 1.6, violet * 0.34, smoothstep(0.35, 0.8, n));
-    intel += cyan * smoothstep(0.6, 0.9, w) * 0.16 + violet * wisp * 0.22;
+    // Overhaul: ink with a deep teal current; violet only as a trace.
+    vec3 ink = vec3(0.018, 0.035, 0.045);
+    vec3 teal = vec3(0.07, 0.30, 0.34);
+    vec3 intel = mix(ink, teal * 0.55, smoothstep(0.4, 0.85, n));
+    intel += cyan * smoothstep(0.7, 0.95, w) * 0.06 + violet * wisp * 0.06;
     col = mix(col, intel, uIntel * 0.9);
 
     // Transition into Project Universe: warm, lighter and more fluid. Violet field, pink and coral
@@ -131,8 +138,12 @@ export const backdropFragment = /* glsl */ `
 
     // Project Universe: a dark exhibition hall so each artifact carries its own
     // light; a faint cool horizon and slow violet depth.
-    vec3 hall = mix(abyss * 1.3, navy * 1.6, horizon);
-    hall += violet * 0.16 * smoothstep(0.45, 0.85, n) + cobalt * 0.08 * smoothstep(0.6, 0.9, w);
+    // Overhaul: a near-neutral charcoal gallery. A soft top light and a pale
+    // floor horizon; each artifact brings its own colour.
+    vec3 charcoal = vec3(0.038, 0.040, 0.050);
+    vec3 hall = mix(charcoal, vec3(0.13, 0.135, 0.16), horizon * 0.7);
+    hall += vec3(0.20, 0.20, 0.24) * smoothstep(0.35, 1.0, d.y) * 0.25;
+    hall += violet * 0.035 * smoothstep(0.55, 0.9, n);
     col = mix(col, hall, uProj * 0.92);
 
     // Timeline Nexus: deep jade night with emerald currents.

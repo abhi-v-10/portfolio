@@ -15,7 +15,7 @@ import { CanvasTexture, LinearFilter, LinearMipmapLinearFilter, NoColorSpace } f
 type Draw = (ctx: CanvasRenderingContext2D, w: number, h: number, f: Fonts) => void;
 type Fonts = { sans: string; mono: string; display: string };
 
-const registry: { tex: CanvasTexture; draw: Draw; ctx: CanvasRenderingContext2D }[] = [];
+const registry: { tex: CanvasTexture; draw: Draw; ctx: CanvasRenderingContext2D; w: number; h: number; k: number }[] = [];
 
 function fonts(): Fonts {
   const cs = getComputedStyle(document.documentElement);
@@ -23,18 +23,33 @@ function fonts(): Fonts {
   return { sans: v("--font-sans", "system-ui, sans-serif"), mono: v("--font-mono", "ui-monospace, monospace"), display: v("--font-display", "system-ui, sans-serif") };
 }
 
+/**
+ * Supersampling (overhaul 2026-11-14): surfaces are drawn at k× their logical
+ * size so screen text stays crisp on high-density desktops, where the camera
+ * often frames a screen larger than its 1:1 texel size. Coarse-pointer
+ * (phone/tablet) devices keep 1× to protect memory.
+ */
+function superSample() {
+  if (typeof window === "undefined") return 1;
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  if (coarse) return 1;
+  return (window.devicePixelRatio || 1) >= 1.5 ? 2 : 1.5;
+}
+
 function make(w: number, h: number, draw: Draw) {
+  const k = superSample();
   const c = document.createElement("canvas");
-  c.width = w;
-  c.height = h;
+  c.width = Math.round(w * k);
+  c.height = Math.round(h * k);
   const ctx = c.getContext("2d")!;
+  ctx.setTransform(k, 0, 0, k, 0, 0);
   draw(ctx, w, h, fonts());
   const tex = new CanvasTexture(c);
   tex.colorSpace = NoColorSpace;
   tex.minFilter = LinearMipmapLinearFilter;
   tex.magFilter = LinearFilter;
-  tex.anisotropy = 4;
-  registry.push({ tex, draw, ctx });
+  tex.anisotropy = 8;
+  registry.push({ tex, draw, ctx, w, h, k });
   return tex;
 }
 
@@ -43,9 +58,11 @@ export function redrawWhenFontsReady() {
   if (typeof document === "undefined") return;
   document.fonts.ready.then(() => {
     const f = fonts();
-    registry.forEach(({ tex, draw, ctx }) => {
+    registry.forEach(({ tex, draw, ctx, w, h, k }) => {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      draw(ctx, ctx.canvas.width, ctx.canvas.height, f);
+      ctx.setTransform(k, 0, 0, k, 0, 0);
+      draw(ctx, w, h, f);
       tex.needsUpdate = true;
     });
   });

@@ -16,7 +16,7 @@ export function Curiosity() {
       </div>
       {/* Deeper: unfolds as the branches find their discoveries. */}
       <div className="chapter-block chapter-block--start chapter-deeper">
-        <p className="chapter-copy rv">{curiosity.body[1]}</p>
+        <p className="chapter-origin rv">{curiosity.origin}</p>
         <ul className="probe-list rv" aria-label="Questions that start it">
           {curiosity.questions.map((q) => (
             <li key={q}>{q}</li>

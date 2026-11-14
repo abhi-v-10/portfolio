@@ -98,6 +98,7 @@ export function Human({ webgl }: { webgl: boolean }) {
               </div>
             ))}
           </dl>
+          <p className="human-aside hv">{human.aside}</p>
         </div>
 
         <div

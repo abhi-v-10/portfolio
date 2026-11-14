@@ -20,6 +20,37 @@ import { caseNav } from "@/components/case/caseNav";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
+/** Document top of an element from layout (offsetTop chain), ignoring CSS transforms. */
+function layoutTop(el: HTMLElement) {
+  let y = 0;
+  let n: HTMLElement | null = el;
+  while (n) {
+    y += n.offsetTop;
+    n = n.offsetParent as HTMLElement | null;
+  }
+  return y;
+}
+
+/**
+ * Showcase position of one exhibit: its title at 30% of the viewport (50% on
+ * portrait screens, where the artifact owns the top half), lowered just enough
+ * that the exhibit's actions are on screen, never so far that the title leaves.
+ * Shared by the 3D track anchors and the Project Universe stops.
+ */
+function exhibitStop(id: string) {
+  const vh = window.innerHeight;
+  const title = document.querySelector<HTMLElement>(`#project-${id}-title`);
+  if (!title) return 0;
+  const tTop = layoutTop(title);
+  let y = tTop - vh * (window.innerWidth / vh < 0.8 ? 0.5 : 0.3);
+  const actions = document.querySelector<HTMLElement>(`#project-${id} .exhibit-actions`);
+  if (actions) {
+    const need = layoutTop(actions) + actions.offsetHeight - vh + 24;
+    y = Math.max(y, Math.min(need, tTop - 72));
+  }
+  return y;
+}
+
 const WorldCanvas = dynamic(() => import("@/experience/world/WorldCanvas"), { ssr: false });
 
 /** Normal presentation time for the intro on fast loads (master plan §2.1). */
@@ -263,17 +294,20 @@ export function Experience() {
     () => {
       if (stage !== "entered") return;
       const reduced = story.reducedMotion;
+      const cleanups: (() => void)[] = [];
       // Chapter anchors: measured section tops → track units. Piecewise linear,
       // so any scroll position maps to exactly one state in both directions.
       let anchors: [number, number][] = [[0, 0]];
       const measure = () => {
+        // Layout positions, not transformed boxes: reveal timelines move the
+        // titles, so getBoundingClientRect would shift with scroll state.
         const top = (sel: string) => {
-          const el = document.querySelector(sel);
-          return el ? el.getBoundingClientRect().top + window.scrollY : 0;
+          const el = document.querySelector<HTMLElement>(sel);
+          return el ? layoutTop(el) : 0;
         };
         const bottom = (sel: string) => {
-          const el = document.querySelector(sel);
-          return el ? el.getBoundingClientRect().bottom + window.scrollY : 0;
+          const el = document.querySelector<HTMLElement>(sel);
+          return el ? layoutTop(el) + el.offsetHeight : 0;
         };
         const end = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
         anchors = [
@@ -294,7 +328,7 @@ export function Experience() {
           [top("#projects-title") - window.innerHeight * 0.3, 6],
           // Portrait screens hold each exhibit title lower (50%), so the artifact
           // owns the top half of the screen instead of sitting behind the copy.
-          ...projectStories.map((p, i) => [top(`#project-${p.id}-title`) - window.innerHeight * (window.innerWidth / window.innerHeight < 0.8 ? 0.5 : 0.3), 6.5 + i * 0.5] as [number, number]),
+          ...projectStories.map((p, i) => [exhibitStop(p.id), 6.5 + i * 0.5] as [number, number]),
           [top("#timeline-title") - window.innerHeight * 0.3, 10],
           [top("#next-title") - window.innerHeight * 0.3, 11.5],
           [end, TRACK_MAX],
@@ -334,6 +368,68 @@ export function Experience() {
           write();
         },
       });
+
+      // Project Universe stops (2026-11-14): only between the universe
+      // establishing shot and the last exhibit, the page settles on each
+      // project's showcase framing (the same measured positions the 3D track
+      // uses, so title, copy, CTA and artifact compose together). Directional
+      // and native: it acts after scrolling ends, never on the wheel itself, so
+      // touchpads, touch, keys and anchors keep working, and outside this range
+      // the story scrolls freely. Reduced motion: no snapping.
+      if (!reduced) {
+        let stops: number[] = [];
+        // Focus that just moved (Tab) may have scrolled the page; older focus
+        // (e.g. restored after a case study) must not steer later scrolling.
+        let focusAt = 0;
+        const onFocusIn = () => (focusAt = Date.now());
+        document.addEventListener("focusin", onFocusIn);
+        cleanups.push(() => document.removeEventListener("focusin", onFocusIn));
+        const measureStops = () => {
+          const vh = window.innerHeight;
+          const at = (sel: string, k: number) => {
+            const el = document.querySelector<HTMLElement>(sel);
+            return el ? layoutTop(el) - vh * k : 0;
+          };
+          stops = [at("#projects-title", 0.3), ...projectStories.map((p) => exhibitStop(p.id))];
+        };
+        measureStops();
+        ScrollTrigger.create({
+          trigger: "#projects",
+          start: () => (measureStops(), stops[0]),
+          end: () => stops[stops.length - 1],
+          snap: {
+            snapTo: (progress: number, self?: ScrollTrigger) => {
+              if (!self || stops.length < 2) return progress;
+              // Never move the page under an open case study or the Index.
+              const root = document.documentElement;
+              if (root.classList.contains("has-case") || root.hasAttribute("data-case") || root.classList.contains("has-index")) return progress;
+              if (Date.now() - Number(root.dataset.caseReturn ?? 0) < 2500) return progress;
+              const span = stops[stops.length - 1] - stops[0];
+              const pts = stops.map((y) => (y - stops[0]) / span);
+              // Keyboard focus moved the page: settle on the focused exhibit,
+              // not the next one, so the focused control stays in view.
+              const active = document.activeElement as HTMLElement | null;
+              const recent = Date.now() - focusAt < 1500;
+              const exhibit = recent && active?.matches(":focus-visible") ? active.closest<HTMLElement>("[id^='project-']") : null;
+              if (exhibit) {
+                const i = projectStories.findIndex((p) => `project-${p.id}` === exhibit.id);
+                if (i >= 0) return pts[i + 1];
+              }
+              const dir = self.direction;
+              const eps = 6 / span; // within a few pixels counts as resting on a stop
+              // Next stop in the scroll direction; rest if already on one.
+              const on = pts.find((v) => Math.abs(v - progress) < eps);
+              if (on !== undefined) return on;
+              if (dir > 0) return pts.find((v) => v > progress) ?? 1;
+              return [...pts].reverse().find((v) => v < progress) ?? 0;
+            },
+            duration: { min: 0.45, max: 0.95 },
+            delay: 0.06,
+            ease: "power2.inOut",
+            inertia: false,
+          },
+        });
+      }
 
       // Meet the Human: one timeline for the whole held stage (enter, hold, leave
       // just before the sticky stage releases). The gallery's own motion is not
@@ -376,6 +472,7 @@ export function Experience() {
         { autoAlpha: 1 },
         { autoAlpha: 0, ease: "none", scrollTrigger: { trigger: "#origin", start: "top top", end: "18% top", scrub: true } },
       );
+      return () => cleanups.forEach((f) => f());
     },
     { dependencies: [stage], scope: rootRef },
   );

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Unbounded } from "next/font/google";
+import { Geist, Geist_Mono, Newsreader, Unbounded } from "next/font/google";
 import { contact, site } from "@/content/site";
 import { EvidenceViewer } from "@/components/evidence/EvidenceViewer";
 import "./globals.css";
@@ -7,6 +7,8 @@ import "./globals.css";
 const display = Unbounded({ subsets: ["latin"], variable: "--font-display", display: "swap" });
 const sans = Geist({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
+// Editorial voice for chapter leads and pull lines: a text serif against the wide display face.
+const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display: "swap", style: ["normal", "italic"], weight: ["400", "500"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -39,7 +41,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children, modal }: Readonly<{ children: React.ReactNode; modal: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable} is-locked`}>
+    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable} ${serif.variable} is-locked`}>
       <body>
         {/* Watchdog: if the app bundle never boots (blocked/failed JS), release the
             loader so the server-rendered hero and links stay usable. */}

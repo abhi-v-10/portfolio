@@ -144,7 +144,7 @@ export function EngineeringWorld() {
         uOpacity: { value: 1 },
         uTime: { value: 0 },
         // Raw (unencoded) values: this shader writes straight to the screen.
-        uFace: { value: new Color(0.07, 0.13, 0.3) },
+        uFace: { value: new Color(0.13, 0.15, 0.19) },
         uEdge: { value: new Color(0.42, 0.86, 1.0) },
         uFogColor: { value: new Color("#0a1433") },
         uFogNear: { value: 16 },
@@ -196,7 +196,7 @@ export function EngineeringWorld() {
     const gridGeo = new PlaneGeometry(60, 60);
     const gridMat = additive(
       floorGridFragment,
-      { uIntensity: { value: 0 }, uTime: { value: 0 }, uCentre: { value: new Vector3(E.x, 0, E.z) }, uColor: { value: HOLO_BLUE.clone() }, uAccent: { value: HOLO_CYAN.clone() } },
+      { uIntensity: { value: 0 }, uTime: { value: 0 }, uCentre: { value: new Vector3(E.x, 0, E.z) }, uColor: { value: new Color(0.46, 0.52, 0.62) }, uAccent: { value: new Color(0.9, 0.86, 0.78) } },
       holoVertex,
     );
 
@@ -207,7 +207,7 @@ export function EngineeringWorld() {
         new ShaderMaterial({
           vertexShader: labelVertex,
           fragmentShader: labelFragment,
-          uniforms: { uText: { value: createLabelTexture(MODULES[i].label!, aniso) }, uColor: { value: new Color(0.62, 0.92, 1.0) }, uIntensity: { value: 0 } },
+          uniforms: { uText: { value: createLabelTexture(MODULES[i].label!, aniso) }, uColor: { value: new Color(0.9, 0.91, 0.94) }, uIntensity: { value: 0 } },
           transparent: true,
           depthWrite: false,
           depthTest: false,
