@@ -261,15 +261,33 @@ function PostCredits() {
     <section ref={ref} id="post-credits" className="credits" data-state={state} aria-labelledby="credits-title">
       <div className="credits-inner">
         <p className="credits-meta">{closing.postCredits.meta}</p>
-        <h2 id="credits-title" className="credits-title">
-          {closing.postCredits.title.split(" ").map((w, i, all) => (
-            <Fragment key={i}>
-              <span className="credits-word" style={{ "--w": i } as React.CSSProperties}>
-                {w}
-              </span>
-              {i < all.length - 1 && " "}
-            </Fragment>
-          ))}
+        <h2 id="credits-title" className="credits-title" aria-label={closing.postCredits.title}>
+          {(() => {
+            // Letters gather out of drifting dust, left to right. Each letter
+            // gets a fixed pseudo-random drift so the scene replays identically.
+            let n = 0;
+            return closing.postCredits.title.split(" ").map((w, i, all) => (
+              <Fragment key={i}>
+                <span className="credits-word" aria-hidden>
+                  {[...w].map((ch) => {
+                    const k = n++;
+                    const h = Math.sin(k * 12.9898 + 4.1) * 43758.5453;
+                    const r = h - Math.floor(h);
+                    return (
+                      <span
+                        key={k}
+                        className="credits-char"
+                        style={{ "--c": k, "--dx": (0.5 + r * 0.7).toFixed(2), "--dy": (r * 2 - 1).toFixed(2), "--rot": `${Math.round(r * 360)}deg` } as React.CSSProperties}
+                      >
+                        <span className="credits-glyph">{ch}</span>
+                      </span>
+                    );
+                  })}
+                </span>
+                {i < all.length - 1 && " "}
+              </Fragment>
+            ));
+          })()}
         </h2>
         <p className="credits-line">{closing.postCredits.line}</p>
         <div className="credits-after">

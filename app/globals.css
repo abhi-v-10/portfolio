@@ -1375,6 +1375,7 @@ html.cursor-visible .cursor-ring {
    settling in, and the punchline follows late and small. */
 .credits {
   position: relative;
+  overflow-x: clip;
   min-height: 100svh;
   margin: 34svh calc(var(--gutter) * -1) 0;
   display: grid;
@@ -1414,8 +1415,44 @@ html.cursor-visible .cursor-ring {
 }
 .credits-word {
   display: inline-block;
-  /* Room for the mask so descenders and tracking never clip at rest. */
-  padding-block: 0.08em;
+  white-space: nowrap;
+}
+.credits-char,
+.credits-glyph {
+  position: relative;
+  display: inline-block;
+}
+/* Dust: a loose cloud of specks that drifts in from the right and settles
+   into each letter as it condenses. Box-shadow specks, one element per letter. */
+.credits-char::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.07em;
+  height: 0.07em;
+  border-radius: 50%;
+  background: rgb(255 230 204 / 0.95);
+  box-shadow:
+    -0.32em -0.28em 0 0.01em rgb(255 226 196 / 0.85),
+    0.24em -0.36em 0 0.02em rgb(230 222 245 / 0.75),
+    0.38em 0.12em 0 0.01em rgb(255 214 170 / 0.9),
+    -0.18em 0.34em 0 0.02em rgb(230 222 245 / 0.7),
+    0.08em 0.42em 0 0 rgb(255 226 196 / 0.8),
+    -0.42em 0.06em 0 0.01em rgb(255 214 170 / 0.7),
+    0.52em -0.08em 0 0.02em rgb(230 222 245 / 0.6),
+    -0.06em -0.48em 0 0 rgb(255 226 196 / 0.7),
+    0.3em 0.3em 0 0.01em rgb(255 214 170 / 0.6),
+    0.66em 0.22em 0 0 rgb(230 222 245 / 0.5),
+    -0.26em -0.06em 0 0.02em rgb(255 226 196 / 0.55),
+    0.14em -0.18em 0 0 rgb(255 214 170 / 0.65),
+    0.82em -0.3em 0 0 rgb(230 222 245 / 0.4),
+    -0.5em 0.4em 0 0.01em rgb(255 214 170 / 0.45),
+    0.44em 0.48em 0 0 rgb(255 226 196 / 0.45),
+    0.96em 0.08em 0 0.01em rgb(230 222 245 / 0.35);
+  filter: drop-shadow(0 0 0.06em rgb(255 214 170 / 0.8));
+  opacity: 0;
+  pointer-events: none;
 }
 @media (min-width: 760px) {
   .credits-title {
@@ -1439,7 +1476,7 @@ html.cursor-visible .cursor-ring {
 /* Choreography (only when motion is allowed and the scene is playing). */
 @media (prefers-reduced-motion: no-preference) {
   .credits .credits-meta,
-  .credits .credits-word,
+  .credits .credits-glyph,
   .credits .credits-line,
   .credits .credits-after {
     opacity: 0;
@@ -1447,17 +1484,22 @@ html.cursor-visible .cursor-ring {
   .credits[data-state="playing"] .credits-meta {
     animation: credits-fade 1.8s ease 1.4s both;
   }
-  /* Each word rises through a mask, slowly, one after another. */
-  .credits[data-state="playing"] .credits-word {
-    animation: credits-word 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
-    animation-delay: calc(3.2s + var(--w) * 0.42s);
+  /* Letter by letter, left to right: each one condenses out of drifting dust
+     (a snap played in reverse). */
+  .credits[data-state="playing"] .credits-glyph {
+    animation: credits-char 1.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(2.8s + var(--c) * 0.075s);
   }
-  /* The joke lands last, after the title has settled. */
+  .credits[data-state="playing"] .credits-char::after {
+    animation: credits-dust 2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(2.8s + var(--c) * 0.075s);
+  }
+  /* The joke follows soon after the last letter settles. */
   .credits[data-state="playing"] .credits-line {
-    animation: credits-fade 1.6s ease 7.6s both;
+    animation: credits-fade 1.4s ease 5.6s both;
   }
   .credits[data-state="playing"] .credits-after {
-    animation: credits-fade 1.2s ease 9.4s both;
+    animation: credits-fade 1.2s ease 6.9s both;
   }
 }
 @keyframes credits-fade {
@@ -1470,21 +1512,36 @@ html.cursor-visible .cursor-ring {
     transform: none;
   }
 }
-@keyframes credits-word {
+@keyframes credits-char {
   from {
     opacity: 0;
-    clip-path: inset(0 0 100% 0);
-    transform: translateY(0.45em);
-    filter: blur(6px);
+    transform: translate(calc(var(--dx) * 0.9em), calc(var(--dy) * 0.35em)) rotate(calc(var(--dy) * 8deg));
+    filter: blur(10px);
   }
-  40% {
-    opacity: 1;
+  45% {
+    opacity: 0.55;
+    filter: blur(3px);
   }
   to {
     opacity: 1;
-    clip-path: inset(0 0 0 0);
     transform: none;
-    filter: blur(0);
+    filter: none;
+  }
+}
+@keyframes credits-dust {
+  from {
+    opacity: 0;
+    transform: translate(calc(var(--dx) * 1.4em), calc(var(--dy) * 0.6em)) rotate(var(--rot)) scale(2.4);
+  }
+  25% {
+    opacity: 0.95;
+  }
+  70% {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg) scale(0.6);
   }
 }
 .credits-cue span {

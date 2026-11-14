@@ -72,6 +72,6 @@ All passes complete. Remaining items are user-supplied material (see "Open place
 - Scrollbars hidden site-wide (`scrollbar-width: none` + `::-webkit-scrollbar`); scrolling unchanged. `scrollbar-gutter` removed.
 - Expression removed: DOM, content, CSS, scroll anchor, Index entry, Expression words, voxel cluster, reticle and their shaders. Intelligence now hands over at track 4.75 (its section bottom), and the network's warm loosening plays as the transition into Project Universe (track 6). Chapters renumbered: Project Universe 04, Timeline Nexus 05, Next Chapter 06.
 - Project Universe: establishing shot with zero artifacts; each artifact materialises and deconstructs in its own interval (see DESIGN.md), real `visible = false` gating, per-artifact work skipped when hidden.
-- End card: "Thank you for exploring my universe", one-line title from 760px, slow masked word reveal, Hyprland line last.
+- End card: "Thank you for exploring my universe", one-line title from 760px, letter-by-letter dust reveal left to right (2026-11-14 revision), Hyprland line follows sooner.
 - Raw placeholders removed from the public page (anecdotes, CV, case-study role/screenshots/links); list moved to README "Still to supply".
 - Verified (production build, SwiftShader): 1440, 820, 390 and 320 wide; reduced motion; no-WebGL. No console errors, no horizontal overflow, no raw `[PLACEHOLDER]` text, case study opens and returns to the exact scroll position, rapid forward/reverse scrolling restores the same IRIS frame.
