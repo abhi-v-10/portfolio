@@ -169,6 +169,10 @@ export function CameraDirector() {
     tmp.pos.copy(tmp.a).lerp(tmp.heroPos, intro);
     tmp.target.copy(tmp.b).lerp(tmp.heroTarget, intro);
 
+    // Case-study opening: push in toward the chosen artifact (eased, reversible).
+    const ca = story.universe.caseAmt;
+    if (ca > 0) tmp.pos.lerp(tmp.target, 0.24 * easeInOutCubic(ca));
+
     // Pointer parallax scales in with the intro so the split stays perfectly still.
     tmp.pos.x += sm.current.px * 0.45 * intro;
     tmp.pos.y += sm.current.py * 0.28 * intro;
@@ -178,8 +182,10 @@ export function CameraDirector() {
 
     // Lens shift leaves room for each chapter's copy without turning the camera.
     const lens = lensAt(sm.current.track);
-    const lx = lens.x * layout;
-    const ly = lens.y * (1 - layout);
+    // Case study open: the artifact moves up and right, clear of the case title.
+    const cl = easeInOutCubic(story.universe.caseAmt);
+    const lx = (lens.x + 0.1 * cl) * layout;
+    const ly = lens.y * (1 - layout) + cl * (0.14 * layout - 0.08 * (1 - layout));
     if (Math.abs(lx) > 1e-4 || Math.abs(ly) > 1e-4) {
       camera.setViewOffset(size.width, size.height, -lx * size.width, ly * size.height, size.width, size.height);
       lensOn.current = true;

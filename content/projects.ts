@@ -30,6 +30,11 @@ export type ProjectStory = {
   featured?: boolean;
   status?: string;
   sections: CaseSection[];
+  /**
+   * How the parts connect, drawn as the case study's architecture strip.
+   * Only components and relations stated in the sources are used.
+   */
+  flow: { step: string; detail: string }[];
   /** EDIT: add real URLs when supplied (null renders a placeholder). */
   links: { repo: string | null; live: string | null };
   /** Visible placeholders for material that has not been supplied. */
@@ -84,6 +89,12 @@ export const projectStories: ProjectStory[] = [
         body: "Private beta. The Windows clipboard core and HTTPS layer are covered by the project's own tests; verified real-device iPhone performance is not claimed here.",
       },
     ],
+    flow: [
+      { step: "iPhone Shortcuts", detail: "Send and Receive shortcuts" },
+      { step: "HTTPS + Bearer", detail: "Rustls, TLS 1.2/1.3, private network only" },
+      { step: "Axum API", detail: "Authenticated text and image endpoints on Tokio" },
+      { step: "Win32 clipboard", detail: "One message-loop thread, WM_CLIPBOARDUPDATE" },
+    ],
     links: { repo: null, live: null },
     placeholders: ["[SCREENSHOTS / RECORDING]", "[ROLE]", "[REPOSITORY OR DOWNLOAD LINK]"],
   },
@@ -113,6 +124,12 @@ export const projectStories: ProjectStory[] = [
         body: "A React and TypeScript front end over a Django REST Framework API, with FastAPI alongside it.",
       },
     ],
+    flow: [
+      { step: "React + TypeScript", detail: "Discovery, applications, messaging" },
+      { step: "Django REST Framework", detail: "The application API" },
+      { step: "FastAPI", detail: "Runs alongside the main API" },
+      { step: "SeekBot AI", detail: "Résumé review, job matching, skill gaps" },
+    ],
     links: { repo: null, live: null },
     placeholders: ["[PROJECT SCREENSHOTS]", "[ROLE]", "[LINKS]", "[MEASURED RESULTS]"],
   },
@@ -140,6 +157,13 @@ export const projectStories: ProjectStory[] = [
       },
       { heading: "Stack", body: "Python and Flask, with Tesseract OCR for recognition and OpenCV for image work." },
     ],
+    flow: [
+      { step: "Photo, scan or PDF", detail: "Invoices and receipts" },
+      { step: "OpenCV", detail: "Image work before recognition" },
+      { step: "Tesseract OCR", detail: "Text from the document" },
+      { step: "Extract + check", detail: "Vendor, date, items, tax, total; arithmetic verified" },
+      { step: "Flask dashboard", detail: "Spending at a glance" },
+    ],
     links: { repo: null, live: null },
     placeholders: ["[SCREENSHOTS]", "[ROLE]", "[LINKS]"],
   },
@@ -164,6 +188,12 @@ export const projectStories: ProjectStory[] = [
         ],
       },
       { heading: "Stack", body: "A JavaScript Chrome extension talking to a FastAPI service that calls OpenAI." },
+    ],
+    flow: [
+      { step: "Chrome extension", detail: "Selected text or a screen snip" },
+      { step: "FastAPI", detail: "The explanation service" },
+      { step: "OpenAI", detail: "Persona and format applied" },
+      { step: "Plain explanation", detail: "Back in the page" },
     ],
     links: { repo: null, live: null },
     placeholders: ["[SCREENSHOTS]", "[ROLE]", "[LINKS]"],
@@ -191,6 +221,12 @@ export const projectStories: ProjectStory[] = [
       },
       { heading: "Stack", body: "Django and Next.js, PostgreSQL with pgvector, and OpenAI." },
     ],
+    flow: [
+      { step: "Teacher's choice", detail: "Chapter, marks, sections, question mix" },
+      { step: "Django", detail: "With PostgreSQL + pgvector" },
+      { step: "OpenAI", detail: "Generates the CBSE-compliant paper" },
+      { step: "Next.js editor", detail: "Streams in, finalise and export" },
+    ],
     links: { repo: null, live: null },
     placeholders: ["[SCREENSHOTS]", "[ROLE]", "[LINKS]"],
   },
@@ -215,6 +251,12 @@ export const projectStories: ProjectStory[] = [
         ],
       },
       { heading: "Stack", body: "Django and Python on PostgreSQL, the Jazzmin admin theme and Google OAuth2 sign-in." },
+    ],
+    flow: [
+      { step: "Google OAuth2", detail: "Sign-in" },
+      { step: "Django", detail: "Role-based app, Jazzmin admin" },
+      { step: "PostgreSQL", detail: "Classes, attendance, exams, messages" },
+      { step: "Four dashboards", detail: "Admin, Teacher, Student, Parent" },
     ],
     links: { repo: null, live: null },
     placeholders: ["[SCREENSHOTS]", "[ROLE]", "[LINKS]"],

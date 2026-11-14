@@ -16,6 +16,7 @@ import { Loader, type LoaderPhase, type LoaderSteps } from "@/components/loader/
 import { TopBar } from "@/components/navigation/TopBar";
 import { Cursor } from "@/components/cursor/Cursor";
 import { hasWebGL, onSceneReady, setStory, story } from "./store";
+import { caseNav } from "@/components/case/caseNav";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -153,16 +154,24 @@ export function Experience() {
   useEffect(() => () => void timeline.current?.kill(), []);
 
   const finish = () => {
+    caseNav.booted = true;
+    caseNav.returning = false;
     setStage("entered");
     document.documentElement.classList.remove("is-locked");
     requestAnimationFrame(() => {
-      // Deep links (e.g. /#projects from a case study) land after the entrance.
+      // Deep links (e.g. /#project-winios from a case study) land after the entrance.
       const hash = window.location.hash;
-      const target = hash.length > 1 ? document.querySelector<HTMLElement>(hash) : null;
+      const target = hash.length > 1 ? document.getElementById(decodeURIComponent(hash.slice(1))) : null;
       if (target) {
-        target.scrollIntoView();
-        target.querySelector<HTMLElement>("h2")?.setAttribute("tabindex", "-1");
-        target.querySelector<HTMLElement>("h2")?.focus({ preventScroll: true });
+        const heading = target.querySelector<HTMLElement>("h2, h3");
+        if (target.classList.contains("exhibit") && heading) {
+          // Exhibits: land on the artifact's hold frame (title at its anchor line).
+          const frac = window.innerWidth / window.innerHeight < 0.8 ? 0.5 : 0.3;
+          window.scrollTo(0, heading.getBoundingClientRect().top + window.scrollY - window.innerHeight * frac);
+        } else target.scrollIntoView();
+        heading?.setAttribute("tabindex", "-1");
+        // After React has released the story from `inert`.
+        window.setTimeout(() => heading?.focus({ preventScroll: true }), 80);
       } else titleRef.current?.focus({ preventScroll: true });
     });
   };
@@ -233,6 +242,21 @@ export function Experience() {
       .to(loaderRef.current, { autoAlpha: 0, duration: 0.3, ease: "power1.out" })
       .call(finish);
   };
+
+  // Internal return (the loader already played in this document, or the visitor
+  // came back from a standalone case study): never replay the loader.
+  const skipped = useRef(false);
+  useEffect(() => {
+    if (skipped.current || stage !== "pre" || !hydrated) return;
+    if (!caseNav.booted && !caseNav.returning) return;
+    const id = requestAnimationFrame(() => {
+      skipped.current = true;
+      setStory({ intro: 1, build: 1, pulse: 0 });
+      showHeroInstantly();
+      finish();
+    });
+    return () => cancelAnimationFrame(id);
+  }, [hydrated, stage]);
 
   // StoryDirector: the single, document-position-based scroll owner.
   useGSAP(

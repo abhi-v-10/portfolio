@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { chapters, contact, experience, projects } from "@/content/site";
 import { onIndexOpen, openIndex, type IndexSection } from "./indexEvents";
+import { caseNav } from "@/components/case/caseNav";
 
 export function TopBar({ inert }: { inert?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -81,7 +82,16 @@ export function TopBar({ inert }: { inert?: boolean }) {
                 <li key={p.id} className="work-item" data-featured={p.featured || undefined}>
                   <div className="work-row">
                     <h3 className="work-name">
-                      <Link href={`/work/${p.id}`}>{p.name}</Link>
+                      <Link
+                        href={`/work/${p.id}`}
+                        scroll={false}
+                        onClick={() => {
+                          caseNav.opener = document.querySelector<HTMLElement>(".topbar-link");
+                          close();
+                        }}
+                      >
+                        {p.name}
+                      </Link>
                     </h3>
                     <span className="work-meta">{p.featured ? "Featured" : p.year}</span>
                   </div>

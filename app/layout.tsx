@@ -37,7 +37,7 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({ children, modal }: Readonly<{ children: React.ReactNode; modal: React.ReactNode }>) {
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable} is-locked`}>
       <body>
@@ -53,6 +53,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <style>{`.loader{display:none!important}html.is-locked{overflow:auto!important}`}</style>
         </noscript>
         {children}
+        {modal}
         <EvidenceViewer />
       </body>
     </html>

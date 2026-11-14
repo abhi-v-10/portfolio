@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { playCaseOpen } from "@/components/case/caseNav";
 import { projectStories, universe, type ProjectStory } from "@/content/projects";
 import { nexus, strands, timeline } from "@/content/timeline";
 import { closing, contact } from "@/content/site";
@@ -15,6 +17,14 @@ function Exhibit({ p, index }: { p: ProjectStory; index: number }) {
   const [explained, setExplained] = useState(false);
   const [sent, setSent] = useState<0 | 1 | -1>(0);
   const titleId = `project-${p.id}-title`;
+  const router = useRouter();
+  // Opening choreography first (artifact anchors, universe recedes), then the
+  // intercepted route. Modified clicks keep normal link behaviour.
+  const openCase = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    playCaseOpen(p.id, e.currentTarget, () => router.push(`/work/${p.id}`, { scroll: false }));
+  };
 
   const toggleEli5 = () => {
     const next = !explained;
@@ -56,7 +66,7 @@ function Exhibit({ p, index }: { p: ProjectStory; index: number }) {
       {p.status && <p className="exhibit-status rv">{p.status}</p>}
       <p className="sr-only">Artifact: {p.artifact}</p>
       <div className="exhibit-actions rv">
-        <Link className="action action--primary" href={`/work/${p.id}`}>
+        <Link className="action action--primary" href={`/work/${p.id}`} scroll={false} onClick={openCase}>
           View case study
         </Link>
         {p.id === "eli5" && (
@@ -92,7 +102,7 @@ export function ProjectUniverse() {
         <p className="chapter-copy rv">{universe.body}</p>
         <nav className="exhibit-jump rv" aria-label="Case studies">
           {projectStories.map((p) => (
-            <Link key={p.id} href={`/work/${p.id}`}>
+            <Link key={p.id} href={`/work/${p.id}`} scroll={false}>
               {p.name}
             </Link>
           ))}
