@@ -53,6 +53,7 @@ export const projects: Project[] = [
   {
     id: "winios",
     name: "WiniOS",
+    year: "2026",
     line: "A private bridge between a Windows PC and an iPhone: text and image clipboard over authenticated HTTPS.",
     stack: ["Rust", "Win32", "Axum", "Rustls", "iOS Shortcuts"],
     featured: true,
@@ -94,11 +95,17 @@ export const projects: Project[] = [
   },
 ];
 
+/**
+ * Nestafar. The official certificate (public/evidence/original) names a
+ * three-month internship in Flutter Development, Jan–Mar 2026, issued
+ * April 10, 2026. The profile documents AI/backend contributions during that
+ * internship. The two are kept distinct: no new job title is asserted.
+ */
 export const experience = {
-  role: "AI Backend Engineer Intern",
+  role: "Intern (certificate: Flutter Development)",
   org: "Nestafar Technologies",
   period: "Jan–Mar 2026",
-  line: "Built AI agents connected to live backend data through internal APIs.",
+  line: "Documented contributions: AI agents connected to live backend data through internal APIs.",
   stack: ["Python", "Django", "FastAPI", "FastMCP"],
 } as const;
 
@@ -180,8 +187,12 @@ export const engineering = {
 /** Nestafar, as professional proof (full case study belongs to a later milestone). */
 export const nestafar = {
   org: "Nestafar Technologies",
-  role: "AI Backend Engineer Intern",
+  role: "Internship",
   period: "Jan – Mar 2026",
+  /** Exactly what the certificate states. */
+  certificate: "Certificate of Internship: Flutter Development, three months, issued April 10, 2026.",
+  /** Introduces the profile's own account of the work, distinct from the certificate wording. */
+  contributionsLead: "What I worked on, in my own account:",
   flow: ["Agent", "Tool", "Internal API", "Live data"],
   points: [
     "Built AI agents with Python, Django, FastAPI and FastMCP.",
@@ -189,7 +200,7 @@ export const nestafar = {
     "Shipped features and bug fixes.",
     "Tested and validated releases across Linux-based development and deployment workflows.",
   ],
-  credential: "Certificate of Internship, April 2026",
+  evidence: "nestafar",
 } as const;
 
 /**
@@ -214,24 +225,39 @@ export const intelligence = {
   line: { lead: "The bar for a good agent:", quote: "For you, sir. Always.", by: "J.A.R.V.I.S.", film: "Iron Man" },
 } as const;
 
-/** Expression: profile interests (design, 3D web, gaming, Linux) and the NxtWave UI/UX workshop. */
+/**
+ * Expression (refocused 2026-11-14): what Abhishyanth makes and designs, not
+ * who Abhishyanth is off the clock (that lives in Meet the Human). Verified: the UI/UX
+ * Mega Workshop certificate (Figma app redesign, 23 Dec 2024), 3D on the web
+ * (Three.js, WebGL, Blender) and this site. Graphic design and event creative
+ * work are not documented yet, so they stay visible placeholders.
+ */
 export const expression = {
   lead: "Exact systems, loose hands.",
-  body: "Same builder, different mode. I care how things look and move: an app redesigned end to end in Figma at the NxtWave UI/UX workshop (Dec 2024), Three.js, WebGL and Blender experiments, and this site itself. Off the clock it is Valorant and BGMI, Minecraft builds, and a Linux desktop tuned until it feels right.",
+  body: "Expression is where the engineering turns visual. The same instinct that structures a backend decides how an interface moves, which colour carries a mood and where the eye should land first.",
   notes: [
-    { term: "Design", detail: "Figma, motion, colour, type" },
-    { term: "Creative web", detail: "Three.js, WebGL, GSAP, Blender" },
-    { term: "Play", detail: "Valorant, BGMI, Fortnite, Minecraft" },
-    { term: "Tinker", detail: "Hyprland, KDE, GlazeWM, Zebar. The dotfiles are never done." },
-  ],
+    {
+      term: "Interface design",
+      detail: "Redesigned an app end to end in Figma at the NIAT UI/UX Mega Workshop, December 2024.",
+      evidence: "uiux",
+    },
+    { term: "Creative development", detail: "Interactive 3D for the web with Three.js, WebGL, GSAP and shaders. This site is the largest experiment so far." },
+    { term: "Visual experiments", detail: "Blender scenes, procedural forms, colour and motion studies." },
+    {
+      term: "Graphic and event design",
+      detail: "[GRAPHIC / EVENT DESIGN WORK] Posters, event visuals or council creative work, to be supplied.",
+      placeholder: true,
+    },
+  ] as { term: string; detail: string; evidence?: string; placeholder?: boolean }[],
+  bridge: "Engineering decides how it works. Expression decides how it feels.",
   /** Guardians nod (Star-Lord's partial plan), as microcopy, not a quote. */
   aside: "Most experiments here start with about 12% of a plan. Star-Lord would approve.",
-  /** EDIT: set `src` to a file under /public (e.g. "/photos/creative.jpg") when supplied. */
+  /** EDIT: set `src` to a file under /public (e.g. "/work/creative-01.webp") when supplied. */
   photo: {
     src: null as string | null,
-    alt: "Placeholder for a creative or lifestyle photo of Abhishyanth",
-    label: "[PHOTO 02] Creative / lifestyle",
-    note: "Photo to be supplied",
+    alt: "Placeholder for a piece of Abhishyanth's creative work",
+    label: "[CREATIVE WORK 01] A design, poster or interactive piece",
+    note: "To be supplied",
   },
 };
 

@@ -41,7 +41,7 @@ export const projectStories: ProjectStory[] = [
     id: "winios",
     name: "WiniOS",
     codename: "The Bridge",
-    year: "[YEAR]",
+    year: "2026",
     idea: "A private bridge between a Windows PC and an iPhone: text and image clipboard over authenticated HTTPS.",
     stack: ["Rust", "Win32", "Axum", "Rustls", "iOS Shortcuts", "Inno Setup"],
     summary:
@@ -85,7 +85,7 @@ export const projectStories: ProjectStory[] = [
       },
     ],
     links: { repo: null, live: null },
-    placeholders: ["[WINIOS RELEASE YEAR]", "[SCREENSHOTS / RECORDING]", "[ROLE]", "[REPOSITORY OR DOWNLOAD LINK]"],
+    placeholders: ["[SCREENSHOTS / RECORDING]", "[ROLE]", "[REPOSITORY OR DOWNLOAD LINK]"],
   },
   {
     id: "jobseek",

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Unbounded } from "next/font/google";
 import { contact, site } from "@/content/site";
+import { EvidenceViewer } from "@/components/evidence/EvidenceViewer";
 import "./globals.css";
 
 const display = Unbounded({ subsets: ["latin"], variable: "--font-display", display: "swap" });
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <style>{`.loader{display:none!important}html.is-locked{overflow:auto!important}`}</style>
         </noscript>
         {children}
+        <EvidenceViewer />
       </body>
     </html>
   );

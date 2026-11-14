@@ -20,10 +20,10 @@ export type GalleryPhoto = {
 export const galleryPhotos: GalleryPhoto[] = [
   {
     id: "photo-01",
-    src: null,
-    title: "Photo 01 · Portrait",
-    caption: "A portrait or candid. Placeholder, photo to be supplied.",
-    alt: "Placeholder for a portrait of Abhishyanth Vemula",
+    src: "/photos/go-karting.webp",
+    title: "Photo 01 · Track day",
+    caption: "Go-karting, helmet under one arm, already eyeing the next lap.",
+    alt: "Abhishyanth at a go-karting track in a riding jacket, holding a helmet and smiling to the side, with tyre barriers behind.",
     tone: "lavender",
   },
   {

@@ -100,7 +100,6 @@ export function TopBar({ inert }: { inert?: boolean }) {
               </p>
               <p className="work-stack">{experience.stack.join(" · ")}</p>
             </div>
-            <p className="index-note">Case studies arrive with the Project Universe chapter.</p>
           </section>
 
           <section aria-labelledby="index-contact" className="index-section">

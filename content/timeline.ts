@@ -1,10 +1,9 @@
 /**
  * Timeline Nexus content (master plan §3, "Timeline Nexus").
  *
- * Every event is a source-controlled fact from docs/abhishyanth-vemula-profile.md,
- * with the date exactly as precise as the source. Missing history (school,
- * intermediate, B.Tech start year, WiniOS year) stays a visible placeholder.
- * Events are listed oldest first; `strand` places them on one of five strands.
+ * Every event is a source-controlled fact (profile, supplied certificates, the
+ * 2026-11-14 brief), with the date exactly as precise as the source. Events
+ * are listed oldest first; `strand` places them on one of five strands.
  */
 
 export type StrandId = "education" | "leadership" | "work" | "projects" | "learning";
@@ -23,46 +22,51 @@ export type TimelineEvent = {
   date: string;
   title: string;
   line: string;
+  /** Optional second line (e.g. what a certificate states). */
+  detail?: string;
+  /** Evidence ids (content/evidence.ts) opened in the shared viewer. */
+  evidence?: { ids: string[]; label: string };
+  /** Major events get a stronger node and a light response. */
+  major?: boolean;
   placeholder?: boolean;
 };
 
+/**
+ * Dates as precise as the sources: the profile, the supplied certificates and
+ * the user's 2026-11-14 brief (Grade 10 in 2022, Intermediate in 2024 with
+ * 8.3 CGPA, B.Tech from 2024, WiniOS 2026). No admission years, intermediate
+ * institution or release date are invented.
+ */
 export const timeline: TimelineEvent[] = [
   {
     id: "school",
     strand: "education",
-    date: "[YEAR]",
-    title: "[SCHOOL]",
-    line: "School years, in Abhishyanth's words (to be supplied).",
-    placeholder: true,
+    date: "2022",
+    title: "Grade 10, Bharatiya Vidya Bhavan's Public School",
+    line: "Completed schooling through Grade 10.",
   },
   {
     id: "intermediate",
     strand: "education",
-    date: "[YEAR]",
-    title: "[INTERMEDIATE / PRE-UNIVERSITY]",
-    line: "Intermediate studies (to be supplied).",
-    placeholder: true,
+    date: "2024",
+    title: "Intermediate (Grades 11–12)",
+    line: "Completed with 8.3 CGPA.",
   },
   {
     id: "btech",
     strand: "education",
-    date: "[START YEAR] – present",
+    date: "2024 – present",
     title: "B.Tech, Computer Science & Engineering",
     line: "NxtWave Institute of Advanced Technologies (NIAT), Hyderabad.",
-  },
-  {
-    id: "sgc",
-    strand: "leadership",
-    date: "2024 – 2026",
-    title: "Core Team Member, NIAT Student General Council",
-    line: "Core team for the 2024–2026 academic year.",
+    major: true,
   },
   {
     id: "uiux",
     strand: "learning",
     date: "Dec 2024",
-    title: "UI/UX Mega Workshop, NxtWave",
-    line: "Redesigned an app end to end in Figma.",
+    title: "UI/UX Mega Workshop, NIAT",
+    line: "Redesigned an app with Figma; certificate issued 23 December 2024.",
+    evidence: { ids: ["uiux"], label: "View certificate" },
   },
   {
     id: "scholaroid",
@@ -75,15 +79,20 @@ export const timeline: TimelineEvent[] = [
     id: "inspira",
     strand: "learning",
     date: "2025",
-    title: "INSPIRA'25, IIT Hyderabad / Forge Alumnus",
-    line: "Built CyberEdu in the Lovable hackathon.",
+    title: "INSPIRA'25, IIT Hyderabad",
+    line: "Participated in the career and corporate fest presented by Forge Alumnus.",
+    detail: "Built CyberEdu in the fest's Lovable hackathon (as recorded in the profile; no placing is claimed).",
+    evidence: { ids: ["inspira"], label: "View certificate" },
   },
   {
     id: "nestafar",
     strand: "work",
     date: "Jan – Mar 2026",
-    title: "AI Backend Engineer Intern, Nestafar Technologies",
-    line: "AI agents on live backend data through internal APIs.",
+    title: "Internship, Nestafar Technologies",
+    line: "Certificate: internship in Flutter Development, three months, issued April 10, 2026.",
+    detail: "Work I documented during it: AI agents on live backend data through internal APIs (Python, Django, FastAPI, FastMCP).",
+    evidence: { ids: ["nestafar"], label: "View internship certificate" },
+    major: true,
   },
   {
     id: "builds-2026",
@@ -93,25 +102,22 @@ export const timeline: TimelineEvent[] = [
     line: "Four builds across AI products, OCR and education tooling.",
   },
   {
-    id: "certificate",
-    strand: "work",
-    date: "Apr 2026",
-    title: "Certificate of Internship, Nestafar",
-    line: "For the three-month internship, January to March 2026.",
-  },
-  {
-    id: "award",
+    id: "council",
     strand: "leadership",
-    date: "Apr 2026",
-    title: "Best Team Member Award",
-    line: "NIAT Student General Council, for the Core Team Member contribution.",
+    date: "2024 – 2026 · Apr 2026",
+    title: "NIAT Student General Council, Best Team Member Award",
+    line: "Core Team Member for the 2024–2026 academic year.",
+    detail: "Honoured with the Best Team Member Award, 25 April 2026.",
+    evidence: { ids: ["nsgc-stage", "nsgc-award"], label: "See the award" },
+    major: true,
   },
   {
     id: "winios",
     strand: "projects",
-    date: "[YEAR]",
+    date: "2026",
     title: "WiniOS",
     line: "A private Windows-to-iPhone clipboard bridge, now in private beta.",
+    major: true,
   },
 ];
 

@@ -1,6 +1,7 @@
+/** `by` and `film` stay in content for provenance; only screen readers hear them. */
 export type Line = { lead: string; quote: string; by: string; film: string };
 
-/** A rare, attributed MCU line: lead-in in the author's voice, then the quote. */
+/** A rare MCU line: the lead-in in the author's voice, then the quote itself. */
 export function MovieLine({ line, className = "" }: { line: Line; className?: string }) {
   return (
     <figure className={`movie-line rv ${className}`}>
@@ -8,15 +9,9 @@ export function MovieLine({ line, className = "" }: { line: Line; className?: st
       <blockquote>
         <p>&ldquo;{line.quote}&rdquo;</p>
       </blockquote>
-      <figcaption>
-        {line.by} <span aria-hidden>·</span> <cite>{line.film}</cite>
+      <figcaption className="sr-only">
+        {line.by}, {line.film}
       </figcaption>
     </figure>
   );
 }
-
-/**
- * Milestone 003 story layer: real HTML for Curiosity and Engineering over the
- * persistent world. Spacing between blocks is the camera's travel distance;
- * `.chapter-block` elements are each owned by exactly one scrubbed timeline.
- */

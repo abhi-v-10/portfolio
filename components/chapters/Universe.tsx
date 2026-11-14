@@ -8,6 +8,7 @@ import { closing, contact } from "@/content/site";
 import { openIndex } from "@/components/navigation/indexEvents";
 import { setStory, story } from "@/experience/director/store";
 import { MovieLine } from "./MovieLine";
+import { EvidenceButton } from "@/components/evidence/EvidenceButton";
 
 /** One exhibit: copy beside its artifact, plus the case-study door. */
 function Exhibit({ p, index }: { p: ProjectStory; index: number }) {
@@ -129,6 +130,7 @@ export function TimelineNexus() {
               className="timeline-item rv"
               data-strand={e.strand}
               data-placeholder={e.placeholder || undefined}
+              data-major={e.major || undefined}
               tabIndex={0}
               onPointerEnter={focus(i)}
               onPointerLeave={blur}
@@ -138,6 +140,8 @@ export function TimelineNexus() {
               <time className="timeline-date">{e.date}</time>
               <span className="timeline-title">{e.title}</span>
               <span className="timeline-line">{e.line}</span>
+              {e.detail && <span className="timeline-detail">{e.detail}</span>}
+              {e.evidence && <EvidenceButton ids={e.evidence.ids} label={e.evidence.label} />}
             </li>
           ))}
         </ol>

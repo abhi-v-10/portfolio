@@ -43,7 +43,7 @@ const CENTRE = new Vector3(0, 3.6, 0);
 const EXPRESSION_WORDS: [number, string][] = [
   [2, "Design"],
   [0, "3D web"],
-  [5, "Play"],
+  [5, "Motion"],
 ];
 const LABELLED = NET_NODES.map((n, i) => (n.label ? i : -1)).filter((i) => i >= 0);
 

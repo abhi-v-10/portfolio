@@ -1,5 +1,6 @@
 import { curiosity, engineering, expression, intelligence, nestafar } from "@/content/site";
 import { MovieLine } from "./MovieLine";
+import { EvidenceButton } from "@/components/evidence/EvidenceButton";
 
 export function Curiosity() {
   return (
@@ -57,6 +58,11 @@ export function Engineering() {
         <p className="proof-role rv">
           {nestafar.role} <span aria-hidden>·</span> <time>{nestafar.period}</time>
         </p>
+        <div className="proof-cert rv">
+          <p>{nestafar.certificate}</p>
+          <EvidenceButton ids={[nestafar.evidence]} label="View internship certificate" />
+        </div>
+        <p className="proof-sub rv">{nestafar.contributionsLead}</p>
         <ol className="flow rv" aria-label="Agent architecture">
           {nestafar.flow.map((step) => (
             <li key={step} className="flow-step">
@@ -69,7 +75,6 @@ export function Engineering() {
             <li key={p}>{p}</li>
           ))}
         </ul>
-        <p className="proof-credential rv">{nestafar.credential}</p>
       </article>
     </section>
   );
@@ -117,9 +122,12 @@ export function Expression() {
         <div className="expression-grid rv">
           <dl className="expression-notes">
             {expression.notes.map((n) => (
-              <div key={n.term}>
+              <div key={n.term} data-placeholder={n.placeholder || undefined}>
                 <dt>{n.term}</dt>
-                <dd>{n.detail}</dd>
+                <dd>
+                  {n.detail}
+                  {n.evidence && <EvidenceButton ids={[n.evidence]} label="View certificate" small />}
+                </dd>
               </div>
             ))}
           </dl>
@@ -136,6 +144,7 @@ export function Expression() {
             </figcaption>
           </figure>
         </div>
+        <p className="expression-bridge rv">{expression.bridge}</p>
         <p className="chapter-aside chapter-aside--warm rv">{expression.aside}</p>
       </div>
     </section>
