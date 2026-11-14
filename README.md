@@ -83,9 +83,10 @@ The Nestafar certificate PDF (`public/evidence/original/`) is linked as proof of
 The site is fully static (`/` and the six `/work/*` pages are prerendered), so
 any Next.js host works. Recommended: Vercel.
 
-1. Set `NEXT_PUBLIC_SITE_URL` to the production origin (e.g.
-   `https://abhishyanth.dev`). It feeds canonical URLs, `sitemap.xml`,
-   `robots.txt` and Open Graph.
+1. Optional on Vercel: the production `*.vercel.app` domain is picked up
+   automatically. Set `NEXT_PUBLIC_SITE_URL` (e.g. `https://abhishyanth.dev`)
+   once you add a custom domain, then redeploy. It feeds canonical URLs,
+   `sitemap.xml`, `robots.txt` and Open Graph.
 2. Build command `npm run build`, output handled by the framework preset.
 3. After deploy, check `/sitemap.xml`, `/robots.txt`, `/opengraph-image` and a
    case study such as `/work/winios`.

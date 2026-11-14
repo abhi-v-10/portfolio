@@ -239,8 +239,18 @@ export const closing = {
 };
 
 export const site = {
-  /** EDIT: the production origin, used for canonical URLs, the sitemap and OG. */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  /**
+   * The production origin, used for canonical URLs, the sitemap and OG (server
+   * only). NEXT_PUBLIC_SITE_URL wins (set it for a custom domain); on Vercel the
+   * production domain is used automatically, so links never point at localhost.
+   */
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000"),
   name: "Abhishyanth Vemula",
   title: "Abhishyanth Vemula — Software Engineer, AI Developer, Creative Technologist",
   description:

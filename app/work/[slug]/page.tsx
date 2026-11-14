@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projectById, projectStories } from "@/content/projects";
 import { site } from "@/content/site";
+import { projectScreens } from "@/content/screens";
 import { CaseStudy } from "@/components/case/CaseStudy";
 import { BackToWork, NextCase } from "@/components/case/CaseLinks";
 
@@ -15,11 +16,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const p = projectById(slug);
   if (!p) return {};
   const title = `${p.name}, ${p.codename} — Abhishyanth Vemula`;
+  // Link previews: the project's first screenshot, else the site card.
+  const shot = projectScreens[p.id]?.[0];
+  const images = shot
+    ? [{ url: `/projects/${p.id}/1.webp`, width: shot.width, height: shot.height, alt: `${p.name}: ${shot.title}` }]
+    : ["/opengraph-image"];
   return {
     title,
     description: p.idea,
     alternates: { canonical: `/work/${p.id}` },
-    openGraph: { title, description: p.idea, type: "article" },
+    openGraph: { title, description: p.idea, type: "article", images },
+    twitter: { card: "summary_large_image", title, description: p.idea, images },
   };
 }
 
