@@ -336,8 +336,8 @@ export function Experience() {
         const hv = gsap.utils.toArray<HTMLElement>("#human .hv");
         gsap
           .timeline({ scrollTrigger: { trigger: "#human", start: "top 85%", end: "bottom top", scrub: 0.5 } })
-          .fromTo(hv, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, stagger: 0.025, duration: 0.14, ease: "power2.out" }, 0)
-          .to(hv, { autoAlpha: 0, y: -30, stagger: 0.015, duration: 0.1, ease: "power1.in" }, 0.6)
+          .fromTo(hv, { opacity: 0, y: 40 }, { opacity: 1, y: 0, stagger: 0.025, duration: 0.14, ease: "power2.out" }, 0)
+          .to(hv, { opacity: 0, y: -30, stagger: 0.015, duration: 0.1, ease: "power1.in" }, 0.6)
           .to({}, { duration: 0.01 }, 0.99);
       }
 
@@ -345,20 +345,22 @@ export function Experience() {
       // so no two tweens ever touch the same property.
       if (!reduced) {
         gsap.utils.toArray<HTMLElement>(".chapter .rv, #next .rv").forEach((el) => {
+          // Opacity, not autoAlpha: copy that has not been revealed yet must stay
+          // focusable, so keyboard users can Tab to it (focus scrolls it in).
           gsap
             .timeline({ scrollTrigger: { trigger: el, start: "top 96%", end: "bottom 14%", scrub: 0.5 } })
-            .fromTo(el, { autoAlpha: 0, y: 34 }, { autoAlpha: 1, y: 0, duration: 0.22, ease: "power2.out" }, 0)
-            .to(el, { autoAlpha: 1, duration: 0.6 }, 0.22)
-            .to(el, { autoAlpha: 0, y: -24, duration: 0.18, ease: "power1.in" }, 0.82);
+            .fromTo(el, { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.22, ease: "power2.out" }, 0)
+            .to(el, { opacity: 1, duration: 0.6 }, 0.22)
+            .to(el, { opacity: 0, y: -24, duration: 0.18, ease: "power1.in" }, 0.82);
         });
       }
 
       gsap.fromTo(
         contentRef.current,
-        { y: 0, autoAlpha: 1 },
+        { y: 0, opacity: 1 },
         {
           y: reduced ? 0 : -90,
-          autoAlpha: 0,
+          opacity: 0,
           ease: "none",
           scrollTrigger: { trigger: "#origin", start: "top top", end: "55% top", scrub: true },
         },

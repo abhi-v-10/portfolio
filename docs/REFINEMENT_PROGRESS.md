@@ -43,12 +43,23 @@ Note: the brief lists different filenames (`nestafar-internship.pdf`, …); the 
 - [x] Post-credits as triggered title-card sequence
 
 ### Pass F — regression, docs, screenshots, recording
-- [ ] lint / typecheck / build, QA scripts at 1440/1280/820/390/320
-- [ ] Docs updated, final report
+- [x] lint / typecheck / build, QA scripts at 1440/1280/820/390/320
+- [x] Docs updated, final report
 
 ## Gallery photos (user message 2026-11-14)
 - [x] `IMG_4562 (2).HEIC` (go-karting) decoded with ffmpeg, cropped to the 4:5 gallery frame: `public/photos/go-karting.webp` (slot 01)
 - [x] Four more photos supplied by path (garden café, floral backdrop, festival lights, beach at night), cropped 4:5 into `public/photos/`; gallery now has five photos
 
 ## Next action
-Pass F (full regression at five widths, reduced motion, no-WebGL, docs, screenshots, recording).
+All passes complete. Remaining items are user-supplied material (see "Open placeholders").
+
+## Fixed during regression
+- Scrubbed copy reveals used `autoAlpha`, which made off-screen links `visibility: hidden` and unreachable by Tab; they now animate opacity only.
+- Focus after closing a case opened from the index returns to Work; the standalone way back focuses the exhibit title.
+
+## Open placeholders and unverified facts
+- Project roles, decisions, lessons, screenshots, recordings, repository/live links (all six case studies).
+- CV link; Expression creative work 01; graphic/event design work.
+- Hero CGPA 9.3 and the J.A.R.V.I.S. wording still need confirmation.
+- INSPIRA'25 CyberEdu/Lovable hackathon detail comes from the earlier profile, not from the certificate.
+- Performance validated only with software rendering (SwiftShader), not on a real GPU.

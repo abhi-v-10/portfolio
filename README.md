@@ -11,9 +11,9 @@ nine chapters, plus fast, linkable case-study pages.
 | 02 | Engineering | Pieces settle into a three-tier system (Nestafar proof) |
 | 03 | Intelligence | The system becomes a living agent network |
 | 04 | Expression | The network loosens into colour and flowing form |
-| 05 | Project Universe | Six project artifacts; `/work/[slug]` case studies |
+| 05 | Project Universe | Six project artifacts; case studies open in-universe (intercepted route) or standalone at `/work/[slug]` |
 | 06 | Timeline Nexus | Emerald strands of real events converge on the present |
-| 07 | Next Chapter | Contact, a dawn horizon and a post-credits card |
+| 07 | Next Chapter | Contact, a dimensional dawn and a post-credits title card |
 
 Creative direction: `docs/PORTFOLIO_V2_CREATIVE_MASTER_PLAN.md`. Design system:
 `DESIGN.md`. Product context: `PRODUCT.md`. Facts: `docs/abhishyanth-vemula-profile.md`.
@@ -47,16 +47,18 @@ QA hooks: `?webgl=0` forces the no-WebGL route; `?slowmo=N` slows the gallery ro
   windows; `layout.ts` holds the spatial plan, camera keys and track units.
 - `components/` — the accessible DOM story layer (real HTML for every word).
 - `content/` — verified facts and visible placeholders. Nothing here is invented.
+- `app/@modal/(.)work/[slug]` — the in-universe case-study layer; `components/case/` holds the shared case body, overlay and navigation state (`caseNav.ts`, which also stops the loader replaying on internal returns).
+- `components/evidence/` — the shared certificate/photo viewer.
 
 ## Editing content
 
 | What | Where |
 |---|---|
-| Gallery photos 01–04 | `content/gallery.ts` (put files in `public/photos/`) |
-| Photo 02 (Expression) | `content/site.ts` → `expression.photo.src` |
+| Gallery photos (five supplied, 4:5 WebP 1200×1500) | `content/gallery.ts` (files in `public/photos/`) |
+| Creative work 01 (Expression) | `content/site.ts` → `expression.photo.src` |
+| Certificates and award photos | `content/evidence.ts` (display files in `public/evidence/`, originals in `public/evidence/original/`) |
 | Project links, screenshots, roles | `content/projects.ts` → `links`, `placeholders` |
-| WiniOS release year | `content/projects.ts` (`year`) and `content/timeline.ts` |
-| School, intermediate, B.Tech start year | `content/timeline.ts` |
+| Timeline events and evidence | `content/timeline.ts` |
 | CV link | `content/site.ts` → `closing.cv` |
 | Hero CGPA 9.3 (confirm before launch) | `content/site.ts` → `highlights.cgpa` |
 

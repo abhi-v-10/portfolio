@@ -2,7 +2,7 @@
 ## Creative bible, content source of truth, architecture, and phased implementation plan
 
 **Project:** Abhishyanth Vemula — immersive personal portfolio  
-**Status:** Approved creative direction; All milestones implemented (001–007, including 004A and Timeline Nexus). Portfolio V2 is feature-complete; remaining work is supplying the visible placeholders and deploying  
+**Status:** Approved creative direction; All milestones implemented (001–007, including 004A and Timeline Nexus), plus the 2026-11-14 cinematic refinement pass (see docs/REFINEMENT_PROGRESS.md). Portfolio V2 is feature-complete; remaining work is supplying the visible placeholders and deploying  
 **Target:** Fresh repository/folder (`portfolio-v2`), separate from archived `actual-portfolio`  
 **Primary builder:** Claude Code  
 **Last revised:** 2026-11-13
@@ -196,7 +196,7 @@ Source: user-supplied `abhishyanth-vemula-profile.md`. Keep this file alongside 
 
 - **Budget:** at most one attributed MCU line per chapter, and never the same line twice. Not every chapter needs one.
 - **Earned, not pasted:** a line only appears where it says something true about the work. It always follows a lead-in in Abhishyanth's own voice ("Root-cause debugging, in one line:") so it reads as commentary, not a slogan.
-- **Form:** quote in the display face, attribution in mono with character and film. Lines must be verified, short (under 15 words) and never a heading.
+- **Form:** a lead-in line in Abhishyanth's voice, then the quote in the display face. Since the 2026-11-14 refinement the character and film are not shown (they stay in content for provenance and in screen-reader text). Lines must be verified, short (under 15 words) and never a heading.
 - **Nods over quotes:** where a direct quote is uncertain or too long, use original microcopy that references the moment (14,000,605 futures; 12% of a plan) instead of reproducing dialogue.
 - **Visual nods are colour and light only:** a warmth, a glow or a spark pattern on original geometry. Never a prop, emblem, portal silhouette, costume or interface.
 - **Gen Z humour** lives in small, earned microcopy or in a response to something the visitor does (an easter egg). No meme formats, forced slang or fake terminal output.

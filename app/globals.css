@@ -2633,6 +2633,13 @@ html[data-case] .topbar {
 .cs-hero-copy {
   max-width: 38rem;
 }
+.cs-hero--solo {
+  grid-template-columns: minmax(0, 1fr);
+  padding-top: 18svh;
+}
+.cs-hero--solo .cs-hero-copy {
+  max-width: 52rem;
+}
 .cs-meta {
   margin: 0;
   display: flex;
