@@ -55,6 +55,7 @@ QA hooks: `?webgl=0` forces the no-WebGL route; `?slowmo=N` slows the gallery ro
 |---|---|
 | Gallery photos (five supplied, 4:5 WebP 1200×1500) | `content/gallery.ts` (files in `public/photos/`) |
 | Certificates and award photos | `content/evidence.ts` (display files in `public/evidence/`, originals in `public/evidence/original/`) |
+| Project screenshots (Screens block in each case study) | `content/screens.ts` (files in `public/projects/<id>/`, from `assets/project-photos/`) |
 | Project links | `content/projects.ts` → `links` (a Links section appears once one is set) |
 | Timeline events and evidence | `content/timeline.ts` |
 | CV link | `content/site.ts` → `closing.cv` |
@@ -70,7 +71,7 @@ These are not shown on the site until supplied. Nothing is invented in their pla
 | The origin of your curiosity (Curiosity chapter) | `content/site.ts` → `curiosity.anecdotePlaceholder` (render it in `components/chapters/Chapters.tsx`) |
 | CV link | `content/site.ts` → `closing.cv` (the CV link appears in Next Chapter when set) |
 | Per project: your role, key decisions and lessons | `content/projects.ts` (add a `sections` entry) |
-| Per project: screenshots or a demo recording | `public/work/<project>/`, then a media section in `components/case/CaseStudy.tsx` |
+| WiniOS screenshots (the other five projects have theirs); more ELI5 screens optional | `public/projects/<id>/n.webp` + `n-thumb.webp`, captions in `content/screens.ts` |
 | Per project: repository / live links | `content/projects.ts` → `links` |
 | Confirm: hero CGPA 9.3, the J.A.R.V.I.S. line wording | `content/site.ts` |
 | Optional: more gallery photos (4:5, at least 1200×1500) | `public/photos/` + `content/gallery.ts` |

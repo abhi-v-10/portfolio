@@ -1,13 +1,15 @@
 import type { ProjectStory } from "@/content/projects";
 import { contact } from "@/content/site";
+import { screenIds } from "@/content/screens";
+import { CaseScreens } from "./CaseScreens";
 
 /**
  * Case study body, shared by the standalone page (/work/[slug], server
  * rendered, no WebGL) and the in-universe overlay (intercepted route). In the
  * overlay the hero leaves a window open onto the live artifact behind it; on
  * the standalone page an original orbit plate stands in for it.
- * Nothing here is invented. Unsupplied material (role, decisions, screenshots,
- * links) is omitted rather than shown as raw placeholders; see README.
+ * Nothing here is invented. Unsupplied material (role, decisions, links,
+ * WiniOS screenshots) is omitted rather than shown as raw placeholders; see README.
  */
 export function CaseStudy({
   p,
@@ -146,6 +148,15 @@ export function CaseStudy({
             <p className="cs-lead">{p.summary}</p>
           </div>
         </section>
+
+        {screenIds(p.id).length > 0 && (
+          <section className="cs-block cs-block--screens">
+            <h2>
+              <span>{num()}</span> Screens
+            </h2>
+            <CaseScreens project={p.id} name={p.name} />
+          </section>
+        )}
 
         {p.sections.map((s) => (
           <section key={s.heading} className="cs-block">

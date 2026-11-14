@@ -1644,54 +1644,130 @@ html.cursor-visible .cursor-ring {
   align-items: center;
   gap: clamp(0.25rem, 1.2vw, 1rem);
 }
-.topbar-link {
-  min-height: 44px;
-  padding: 0.6rem 0.7rem;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--soft-white);
-  background: none;
-  border: 0;
-  cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: 0.5em;
-  transition: text-decoration-color 0.2s ease, color 0.2s ease;
-}
-.topbar-link:hover {
-  color: var(--core-energy);
-  text-decoration-color: currentColor;
-}
 .topbar-mark-sep,
 .loader-mark-sep {
   color: var(--core-energy);
 }
-.topbar-index {
+/* The single navigation control: a capsule with a slow orbiting signal on its
+   rim, an orbit glyph and two lines that close into one on hover. */
+@property --menu-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+.topbar-menu {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
   min-height: 44px;
-  padding: 0.6rem 1.05rem;
+  padding: 0.55rem 1rem 0.55rem 0.7rem;
   font-family: var(--font-mono), monospace;
   font-size: 0.75rem;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--soft-white);
-  background: rgb(9 12 28 / 0.6);
-  border: 1px solid rgb(246 244 250 / 0.2);
+  background: rgb(8 10 26 / 0.62);
+  border: 0;
   border-radius: 999px;
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: background-color 0.3s ease, box-shadow 0.4s ease;
 }
-.topbar-index svg {
-  width: 18px;
-  height: 18px;
+/* Rim: a faint ring with one travelling arc of core energy. */
+.topbar-menu::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--menu-angle),
+    rgb(246 244 250 / 0.16) 0deg,
+    rgb(246 244 250 / 0.16) 250deg,
+    var(--core-energy) 310deg,
+    #ffd6aa 340deg,
+    rgb(246 244 250 / 0.16) 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: menu-rim 7s linear infinite;
 }
-.topbar-index:hover {
-  border-color: var(--core-energy);
-  background: rgb(9 12 28 / 0.85);
+.topbar-menu:hover,
+.topbar-menu:focus-visible {
+  background: rgb(10 14 34 / 0.88);
+  box-shadow: 0 0 0 1px rgb(115 223 255 / 0.35), 0 0 28px -6px rgb(115 223 255 / 0.55);
+}
+.topbar-menu:hover::before,
+.topbar-menu:focus-visible::before {
+  animation-duration: 2.4s;
+}
+.topbar-menu-orbit {
+  position: relative;
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgb(115 223 255 / 0.45);
+  background: radial-gradient(circle, var(--core-energy) 0 2px, rgb(115 223 255 / 0.25) 3px, transparent 6px);
+  animation: menu-orbit 5s linear infinite;
+}
+.topbar-menu-orbit span {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: #ffd6aa;
+  box-shadow: 0 0 8px 1px rgb(255 214 170 / 0.8);
+}
+.topbar-menu-lines {
+  display: grid;
+  gap: 5px;
+  width: 16px;
+}
+.topbar-menu-lines span {
+  display: block;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1), transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.topbar-menu-lines span:first-child {
+  width: 16px;
+}
+.topbar-menu-lines span:last-child {
+  width: 10px;
+}
+.topbar-menu:hover .topbar-menu-lines span:last-child,
+.topbar-menu:focus-visible .topbar-menu-lines span:last-child {
+  width: 16px;
+}
+.topbar-menu:focus-visible {
+  outline: 2px solid var(--core-energy);
+  outline-offset: 3px;
+}
+@keyframes menu-rim {
+  to {
+    --menu-angle: 360deg;
+  }
+}
+@keyframes menu-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .topbar-menu::before,
+  .topbar-menu-orbit {
+    animation: none;
+  }
 }
 
 .index-panel {
@@ -2296,15 +2372,10 @@ html.cursor-visible .cursor-ring {
   .topbar-mark-sep {
     display: none;
   }
-  .topbar-index-label {
-    display: none;
-  }
-  .topbar-index {
-    padding-inline: 0.8rem;
-  }
-  .topbar-link {
-    padding-inline: 0.55rem;
-    letter-spacing: 0.16em;
+  .topbar-menu {
+    gap: 0.6rem;
+    padding-inline: 0.6rem 0.85rem;
+    letter-spacing: 0.18em;
   }
   .hero-sub {
     grid-template-columns: max-content minmax(0, 1fr);
@@ -2866,25 +2937,108 @@ html[data-case] .topbar {
   line-height: 1.45;
   color: var(--ink-muted);
 }
-.cs-media {
+/* Screens: the first screen leads large, the rest form a contact sheet. */
+.cs-screens {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
-.cs-shot {
-  margin: 0;
-  aspect-ratio: 16 / 10;
-  display: grid;
-  place-content: center;
-  gap: 0.4rem;
-  text-align: center;
-  border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
-  border-radius: 8px;
-  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%);
+.cs-screens > li[data-lead] {
+  grid-column: 1 / -1;
 }
-.cs-shot figcaption {
-  font-size: 0.8125rem;
+.cs-screens[data-count="3"] > li:not([data-lead]),
+.cs-screens[data-count="5"] > li:not([data-lead]) {
+  grid-column: span 1;
+}
+.cs-screens[data-count="5"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.cs-screens[data-count="5"] > li:not([data-lead]) {
+  grid-column: span 2;
+}
+.cs-shot {
+  display: grid;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: zoom-in;
+}
+.cs-shot-frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, rgb(246 244 250 / 0.08));
+  background: #07070d;
+  box-shadow: 0 18px 50px -24px color-mix(in srgb, var(--accent) 55%, transparent);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+.cs-shot-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s ease;
+  filter: saturate(0.92) brightness(0.94);
+}
+.cs-shot-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 60%, rgb(5 5 10 / 0.35));
+}
+.cs-shot:hover .cs-shot-frame,
+.cs-shot:focus-visible .cs-shot-frame {
+  border-color: var(--accent);
+  box-shadow: 0 22px 60px -22px color-mix(in srgb, var(--accent) 80%, transparent);
+}
+.cs-shot:hover img,
+.cs-shot:focus-visible img {
+  transform: scale(1.025);
+  filter: none;
+}
+.cs-shot:focus-visible {
+  outline: none;
+}
+.cs-shot:focus-visible .cs-shot-frame {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.cs-shot-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: var(--ink-muted);
+}
+.cs-shot-label span {
+  color: var(--accent);
+  margin-right: 0.4rem;
+}
+@media (max-width: 640px) {
+  .cs-screens,
+  .cs-screens[data-count="5"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cs-screens > li,
+  .cs-screens[data-count="5"] > li:not([data-lead]) {
+    grid-column: 1 / -1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-shot-frame img {
+    transition: none;
+  }
+  .cs-shot:hover img {
+    transform: none;
+  }
 }
 .cs-links {
   list-style: none;

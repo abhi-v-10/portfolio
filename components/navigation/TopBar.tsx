@@ -43,17 +43,16 @@ export function TopBar({ inert }: { inert?: boolean }) {
       </a>
 
       <nav className="topbar-nav" aria-label="Quick access">
-        <button type="button" className="topbar-link" aria-haspopup="dialog" onClick={open("work")}>
-          Work
-        </button>
-        <button type="button" className="topbar-link" aria-haspopup="dialog" onClick={open("contact")}>
-          Contact
-        </button>
-        <button type="button" className="topbar-index" aria-haspopup="dialog" aria-label="Index" onClick={open("story")}>
-          <span className="topbar-index-label">Index</span>
-          <svg viewBox="0 0 24 24" aria-hidden focusable="false">
-            <path d="M4 8h16M4 16h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
+        {/* One control for the whole index: work, contact and the story chapters. */}
+        <button type="button" className="topbar-menu" aria-haspopup="dialog" onClick={open("work")}>
+          <span className="topbar-menu-orbit" aria-hidden>
+            <span />
+          </span>
+          <span className="topbar-menu-label">Menu</span>
+          <span className="topbar-menu-lines" aria-hidden>
+            <span />
+            <span />
+          </span>
         </button>
       </nav>
 
@@ -86,7 +85,7 @@ export function TopBar({ inert }: { inert?: boolean }) {
                         href={`/work/${p.id}`}
                         scroll={false}
                         onClick={() => {
-                          caseNav.opener = document.querySelector<HTMLElement>(".topbar-link");
+                          caseNav.opener = document.querySelector<HTMLElement>(".topbar-menu");
                           close();
                         }}
                       >

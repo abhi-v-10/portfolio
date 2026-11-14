@@ -87,7 +87,7 @@ export function EvidenceViewer() {
         <div className="viewer-frame" data-kind={item.kind}>
           <div className="viewer-head">
             <p className="viewer-kind">
-              {item.kind === "certificate" ? "Document" : "Photograph"}
+              {item.kind === "certificate" ? "Document" : item.kind === "screenshot" ? "Screenshot" : "Photograph"}
               {many && (
                 <span>
                   {" "}

@@ -5,7 +5,9 @@
  * public/evidence/original/. Descriptions state only what each document shows.
  */
 
-export type EvidenceKind = "certificate" | "photo";
+import { projectScreens } from "./screens";
+
+export type EvidenceKind = "certificate" | "photo" | "screenshot";
 
 export type EvidenceItem = {
   id: string;
@@ -106,3 +108,23 @@ export const evidence: Record<string, EvidenceItem> = {
     },
   },
 };
+
+// Project screenshots join the same viewer, one item per screen.
+for (const [project, screens] of Object.entries(projectScreens)) {
+  screens.forEach((sc, i) => {
+    const id = `shot-${project}-${i + 1}`;
+    evidence[id] = {
+      id,
+      kind: "screenshot",
+      action: sc.title,
+      title: sc.title,
+      caption: sc.caption,
+      src: `/projects/${project}/${i + 1}.webp`,
+      thumb: `/projects/${project}/${i + 1}-thumb.webp`,
+      width: sc.width,
+      height: sc.height,
+      alt: `${sc.title} screen. ${sc.caption}`,
+      original: null,
+    };
+  });
+}
