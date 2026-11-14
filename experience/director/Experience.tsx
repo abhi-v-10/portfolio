@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Hero } from "@/components/hero/Hero";
-import { Curiosity, Engineering, Expression, Intelligence } from "@/components/chapters/Chapters";
+import { Curiosity, Engineering, Intelligence } from "@/components/chapters/Chapters";
 import { Closing, ProjectUniverse, TimelineNexus } from "@/components/chapters/Universe";
 import { projectStories } from "@/content/projects";
 import { Human } from "@/components/human/Human";
@@ -271,6 +271,10 @@ export function Experience() {
           const el = document.querySelector(sel);
           return el ? el.getBoundingClientRect().top + window.scrollY : 0;
         };
+        const bottom = (sel: string) => {
+          const el = document.querySelector(sel);
+          return el ? el.getBoundingClientRect().bottom + window.scrollY : 0;
+        };
         const end = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
         anchors = [
           [0, 0],
@@ -279,10 +283,12 @@ export function Experience() {
           // heading, the world's hold frame and its discoveries meet on screen.
           [top("#curiosity-title") - window.innerHeight * 0.3, 2],
           [top("#engineering"), 3],
-          // Intelligence and Expression anchor on their titles too: the hold frame
-          // of each transformation arrives with its heading.
+          // Intelligence anchors on its title too: the hold frame arrives with
+          // its heading. Its last lines leave at 4.75, then the network loosens
+          // and the camera turns toward the exhibition (4.75 → 6) across the
+          // gap before Project Universe.
           [top("#intelligence-title") - window.innerHeight * 0.3, 4],
-          [top("#expression-title") - window.innerHeight * 0.3, 5],
+          [bottom("#intelligence") - window.innerHeight * 0.75, 4.75],
           // Project Universe: overview on its title, then one artifact per
           // half unit, each arriving with its exhibit title.
           [top("#projects-title") - window.innerHeight * 0.3, 6],
@@ -315,7 +321,7 @@ export function Experience() {
         rootRef.current?.style.setProperty("--hero-scrim", (1 - 0.7 * relax).toFixed(3));
         rootRef.current?.toggleAttribute("data-past-hero", story.track > 0.6);
         // Coarse chapter for CSS-only layers (the no-WebGL fallback colour story).
-        const chapter = story.track < 0.6 ? "origin" : story.track < 1.8 ? "human" : story.track < 2.85 ? "curiosity" : story.track < 3.85 ? "engineering" : story.track < 4.7 ? "intelligence" : story.track < 5.85 ? "expression" : story.track < 9.6 ? "projects" : story.track < 11.05 ? "timeline" : "next";
+        const chapter = story.track < 0.6 ? "origin" : story.track < 1.8 ? "human" : story.track < 2.85 ? "curiosity" : story.track < 3.85 ? "engineering" : story.track < 5.2 ? "intelligence" : story.track < 9.6 ? "projects" : story.track < 11.05 ? "timeline" : "next";
         if (rootRef.current && rootRef.current.dataset.chapter !== chapter) rootRef.current.dataset.chapter = chapter;
       };
       ScrollTrigger.create({
@@ -398,7 +404,6 @@ export function Experience() {
         <Curiosity />
         <Engineering />
         <Intelligence />
-        <Expression />
         <ProjectUniverse />
         <TimelineNexus />
         <Closing />

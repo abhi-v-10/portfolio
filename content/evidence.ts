@@ -31,12 +31,12 @@ export const evidence: Record<string, EvidenceItem> = {
     action: "View internship certificate",
     title: "Certificate of Internship, Nestafar Technologies",
     caption:
-      "Internship in Flutter Development, January to March 2026 (three months). Issued April 10, 2026 by Nestafar Technologies Private Limited.",
+      "Internship at Nestafar Technologies Private Limited, January to March 2026 (three months). Issued April 10, 2026.",
     src: "/evidence/nestafar-internship-certificate.webp",
     thumb: "/evidence/nestafar-internship-certificate-thumb.webp",
     width: 2000,
     height: 1543,
-    alt: "Certificate of Internship from Nestafar Technologies Private Limited, certifying that Abhishyanth Vemula completed an internship in Flutter Development from January 2026 to March 2026, dated April 10, 2026.",
+    alt: "Certificate of Internship from Nestafar Technologies Private Limited, certifying that Abhishyanth Vemula completed an internship from January 2026 to March 2026, dated April 10, 2026.",
     original: {
       href: "/evidence/original/nestafar-internship-certificate.pdf",
       label: "Original PDF",

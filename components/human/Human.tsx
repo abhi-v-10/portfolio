@@ -98,7 +98,6 @@ export function Human({ webgl }: { webgl: boolean }) {
               </div>
             ))}
           </dl>
-          <p className="placeholder-note human-anecdote hv">{human.anecdotePlaceholder}</p>
         </div>
 
         <div

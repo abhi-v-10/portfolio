@@ -107,10 +107,10 @@ These are **continuous beats**, not disconnected web sections. Camera, signal, l
 | 01 — Curiosity | Loves understanding and making things, beyond a single framework | Signal enters evolving geometric landscape; objects assemble from possibilities | Violet, cobalt, pale mist | `[PERSONAL ORIGIN ANECDOTE]` (Photo 01 moved to Meet the Human's gallery) |
 | 02 — Engineering | Backend architecture, systems, building complete products; Nestafar experience | Organic debris organizes into modular structures and flowing data pathways | Cobalt, bright cyan, deeper blue | Verified role/date/stack; optional architecture diagrams |
 | 03 — Intelligence (Milestone 004, built) | AI agents, tool use, working applications—not AI hype | The Engineering modules fly out into a living agent network: labelled nodes trace one real request (intent, LLM, tool call via FastMCP, internal API, live data, validated result), with a walking packet and pulses on every connection | Luminous cyan, purple, soft blue on indigo | Nestafar profile facts, AI tools |
-| 04 — Expression (Milestone 004, built) | Creative design, 3D, gaming, Linux personalization, aesthetics | The same network loosens: connections widen into flowing ribbons, nodes into soft iridescent forms, plus a voxel cluster and pointer reticle for the gaming side | Violet, pink, coral, cyan, warm ivory | `[PHOTO 02]` slot in `content/site.ts` (placeholder until supplied) |
-| 05 — Project Universe (Milestone 005, built) | Proof of technical execution through six distinct projects | A dark exhibition hall: the camera visits one original artifact per project (Bridge, route graph, scanned receipt, knot→loop, pages→paper, modular campus) along the reborn living signal; ELI5 and WiniOS exhibits are interactive; every exhibit opens a linkable `/work/[slug]` case study | Multi-colored, tuned per project | Screenshots/links/roles/outcomes as placeholders in `content/projects.ts` |
-| 06 — Timeline Nexus (built, placed between Project Universe and Next Chapter) | Education, leadership, learning, projects, work | Five emerald rope-strands carry real events as nodes and converge on the present; gathering turns them from cold white to green; hovering/focusing a list item lights its node | Deep jade, emerald, cold white | `content/timeline.ts`; school, intermediate, B.Tech start year and WiniOS year are placeholders |
-| 07 — Next Chapter (Milestone 006, built) | Availability, contact, possibility | Four coloured paths rise from the nexus to a warm dawn horizon; then a post-credits end card | Lavender, warm ivory, coral | Contact links, `[CV URL]` (`closing.cv`) |
+| ~~04 — Expression~~ (removed 2026-11-14) | Its personal content already lives in Meet the Human; the chapter duplicated it | The network's loosening into warm ribbons survives only as the transition from Intelligence into Project Universe (no words, voxels or reticle) | Violet, pink, coral (transition only) | None |
+| 04 — Project Universe (Milestone 005, built; renumbered 2026-11-14) | Proof of technical execution through six distinct projects | A dark exhibition hall: an empty establishing shot (title, restrained signal), then one original artifact materialises per project (rise, assembly, a projection plane sweeping up, screens drawing on) and deconstructs before the next (Bridge, Navigator, receipt scan, knot→sentence, modules→paper, campus); ELI5 and WiniOS exhibits are interactive; every exhibit opens a case study in-universe or at `/work/[slug]` | Multi-colored, tuned per project | Roles, screenshots and links are omitted until supplied (`content/projects.ts`) |
+| 05 — Timeline Nexus (built, placed between Project Universe and Next Chapter) | Education, leadership, learning, projects, work | Five emerald rope-strands carry real events as nodes and converge on the present; gathering turns them from cold white to green; hovering/focusing a list item lights its node | Deep jade, emerald, cold white | `content/timeline.ts`; school, intermediate, B.Tech start year and WiniOS year are placeholders |
+| 06 — Next Chapter (Milestone 006, built) | Availability, contact, possibility | Four coloured paths rise from the nexus to a warm dawn horizon; then the end card "Thank you for exploring my universe / Abhishyanth Vemula will return." | Lavender, warm ivory, coral | Contact links; CV link appears once `closing.cv` is set |
 
 **Scroll direction:** A single narrative stream; neither the camera nor signal must be literally onscreen the entire time. Transition via match cuts, transforming elements, controlled occlusion and spatial staging. Limit pinned empty scroll; leave editorial reading beats. Do not measure chapters in wheel clicks; normalize against document scroll distance and test wheel/trackpad/touch/keyboard.
 
@@ -122,7 +122,7 @@ These are **continuous beats**, not disconnected web sections. Camera, signal, l
 
 **Original treatment:** luminous emerald/jade time-strands (new chapter accent, e.g. a green around `#3FE0A0`–`#7CF5C4`, tuned against the existing palette) that twist like ropes, braid, branch and converge on a central point the visitor scrolls toward. Nodes on the strands open accessible HTML detail (date, role, one verified line). Under §6: no Loki/TVA marks, no Temporal Loom machine, no throne, no copied tree silhouette or character imagery; the structure must be original geometry. Reduced motion and no-WebGL get a readable vertical timeline with the same facts.
 
-**Placement (built):** between Project Universe and Next Chapter, as Chapter 06. Its one MCU line is Loki's "I am burdened with glorious purpose." Never fabricate dates, roles or outcomes for strands; use visible placeholders.
+**Placement (built):** between Project Universe and Next Chapter, as Chapter 05 (renumbered when Expression was removed). Its one MCU line is Loki's "I am burdened with glorious purpose." Never fabricate dates, roles or outcomes for strands; use visible placeholders.
 
 **Future reference ideas (not built):** Timeline Nexus keeps Loki's glorious-purpose feeling and could close on one attributed Loki or He Who Remains line about time, chosen then. Project Universe could carry one line on the WiniOS world (for example a Tony Stark "built it in a cave" style nod in original microcopy rather than a quote) and an interaction easter egg for a project that has a real story behind it. Keep the one-line-per-chapter budget.
 
@@ -211,7 +211,7 @@ Source: user-supplied `abhishyanth-vemula-profile.md`. Keep this file alongside 
 | Curiosity | Doctor Strange (Infinity War) | Aside: "Six branches explored here. Doctor Strange checked 14,000,605. Still counts." Visual: the exploration ping's leading edge burns amber with travelling glints. | The chapter is literally exploring branching possibilities; amber dimensional sparks contrast its violet field. |
 | Engineering | Steve Rogers, The First Avenger | "I can do this all day." after "Root-cause debugging, in one line:" | Persistence is the real debugging skill; sits beside the Discipline row. |
 | Intelligence | J.A.R.V.I.S., Iron Man | "For you, sir. Always." after "The bar for a good agent:" Visual: the Result node holds a warm gold core (a Vision/Mind-light nod). | Agents exist to serve the person asking; the gold marks where a request becomes understanding. |
-| Expression | Star-Lord, Guardians of the Galaxy | Aside: "Most experiments here start with about 12% of a plan. Star-Lord would approve." Tinker note: "The dotfiles are never done." | Creative experimentation and Linux ricing, said with Guardians-style looseness. |
+| ~~Expression~~ (chapter removed 2026-11-14; the aside is retired) | Star-Lord, Guardians of the Galaxy | Aside: "Most experiments here start with about 12% of a plan. Star-Lord would approve." Tinker note: "The dotfiles are never done." | Creative experimentation and Linux ricing, said with Guardians-style looseness. |
 
 ## 7. Visual design system
 
@@ -319,12 +319,12 @@ For later milestones, replace `001 — The Origin` with the requested milestone 
 - `[PERSONAL ORIGIN ANECDOTE]`: why and when curiosity about tech/design began.
 - `[HERO TAGLINE]`: short original statement, to approve.
 - `[PHOTO PLACEHOLDER 01–04]`: Meet the Human gallery slots (portrait, at the desk, off the clock, out there); edit `content/gallery.ts` and add files under `public/photos/`.
-- `[PERSONAL ANECDOTE]`: Meet the Human, in Abhishyanth's words.
+- `[PERSONAL ANECDOTE]`: Meet the Human, in Abhishyanth's words. Not shown until supplied (README "Still to supply").
 - `[PROJECT SCREENSHOTS / RECORDINGS]`: for all projects; user-owned assets.
 - `[PROJECT LINKS / REPOS / DEMOS]`: verify before publishing.
 - `[WINIOS VERIFIED RELEASE/STATUS AND ROLE]`: verify from latest source.
 - `[PROJECT ROLES / IMPACT]`: no unsupported attribution or metrics.
-- `[CV LINK]`: unavailable in source document.
+- `[CV LINK]`: unavailable in source document. The CV link is hidden until supplied.
 - `[ADDITIONAL QUOTES/EASTER EGGS]`: select later, sparingly and with attribution.
 - `[TIMELINE NEXUS PLACEMENT + STRAND DATES]`: future chapter (see §3); confirm placement and any dates not in the profile.
 

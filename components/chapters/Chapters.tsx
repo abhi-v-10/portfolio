@@ -1,4 +1,4 @@
-import { curiosity, engineering, expression, intelligence, nestafar } from "@/content/site";
+import { curiosity, engineering, intelligence, nestafar } from "@/content/site";
 import { MovieLine } from "./MovieLine";
 import { EvidenceButton } from "@/components/evidence/EvidenceButton";
 
@@ -23,7 +23,6 @@ export function Curiosity() {
           ))}
         </ul>
         <p className="chapter-aside rv">{curiosity.aside}</p>
-        <p className="placeholder-note rv">{curiosity.anecdotePlaceholder}</p>
       </div>
     </section>
   );
@@ -102,50 +101,6 @@ export function Intelligence() {
         </ol>
         <MovieLine line={intelligence.line} className="movie-line--intel" />
         <p className="chapter-note rv">{intelligence.exploring}</p>
-      </div>
-    </section>
-  );
-}
-
-/** Chapter 04: the same network loosens into colour and flowing form. */
-export function Expression() {
-  const ph = expression.photo;
-  return (
-    <section id="expression" className="chapter chapter--expression" aria-labelledby="expression-title">
-      <div className="chapter-block chapter-block--end">
-        <h2 id="expression-title" className="chapter-title rv">
-          Expression
-        </h2>
-        <p className="chapter-meta rv">Chapter 04</p>
-        <p className="chapter-lead rv">{expression.lead}</p>
-        <p className="chapter-copy rv">{expression.body}</p>
-        <div className="expression-grid rv">
-          <dl className="expression-notes">
-            {expression.notes.map((n) => (
-              <div key={n.term} data-placeholder={n.placeholder || undefined}>
-                <dt>{n.term}</dt>
-                <dd>
-                  {n.detail}
-                  {n.evidence && <EvidenceButton ids={[n.evidence]} label="View certificate" small />}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <figure className="expression-photo" aria-label={ph.alt}>
-            {ph.src ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={ph.src} alt={ph.alt} />
-            ) : (
-              <span className="expression-photo-mark" aria-hidden />
-            )}
-            <figcaption>
-              {ph.label}
-              {!ph.src && <span>{ph.note}</span>}
-            </figcaption>
-          </figure>
-        </div>
-        <p className="expression-bridge rv">{expression.bridge}</p>
-        <p className="chapter-aside chapter-aside--warm rv">{expression.aside}</p>
       </div>
     </section>
   );

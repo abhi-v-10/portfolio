@@ -81,7 +81,7 @@ export const timeline: TimelineEvent[] = [
     date: "2025",
     title: "INSPIRA'25, IIT Hyderabad",
     line: "Participated in the career and corporate fest presented by Forge Alumnus.",
-    detail: "Built CyberEdu in the fest's Lovable hackathon (as recorded in the profile; no placing is claimed).",
+    detail: "Built CyberEdu in the fest's Lovable hackathon.",
     evidence: { ids: ["inspira"], label: "View certificate" },
   },
   {
@@ -89,7 +89,7 @@ export const timeline: TimelineEvent[] = [
     strand: "work",
     date: "Jan – Mar 2026",
     title: "Internship, Nestafar Technologies",
-    line: "Certificate: internship in Flutter Development, three months, issued April 10, 2026.",
+    line: "AI backend development: agents wired to live data through internal APIs. Certificate issued April 10, 2026.",
     detail: "Work I documented during it: AI agents on live backend data through internal APIs (Python, Django, FastAPI, FastMCP).",
     evidence: { ids: ["nestafar"], label: "View internship certificate" },
     major: true,

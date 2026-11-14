@@ -21,7 +21,7 @@ Visitors arrive from LinkedIn or résumé links, on phones as often as laptops; 
 
 ## Product Purpose
 
-Show who Abhishyanth is and what they have built, as one continuous story (Curiosity → Engineering → Intelligence → Expression → Projects → Next Chapter), so that a visitor leaves understanding the work and knowing how to get in touch. Success: a recruiter can find projects and contact details within seconds, and a collaborator finishes the journey wanting to collaborate.
+Show who Abhishyanth is and what they have built, as one continuous story (Meet the Human → Curiosity → Engineering → Intelligence → Projects → Timeline → Next Chapter), so that a visitor leaves understanding the work and knowing how to get in touch. Success: a recruiter can find projects and contact details within seconds, and a collaborator finishes the journey wanting to collaborate.
 
 ## Positioning
 
@@ -38,7 +38,7 @@ A full-system builder: Abhishyanth builds complete, working systems end to end (
 
 - Built with Next.js (App Router), TypeScript, React Three Fiber/Three.js and GSAP; one persistent WebGL canvas; native document scrolling.
 - **Deploy target: Vercel.** Domain is undecided.
-- Built one milestone at a time (001–007, see master plan §10); Milestones 001 (The Origin), 002 (hero workspace), 003 (Curiosity → Engineering), 003.5 (Meet the Human), 004 (Intelligence → Expression), 004A (personality pass), 005 (Project Universe with /work case studies), Timeline Nexus and 006 (Next Chapter and post-credits) are implemented. Milestone 007 (production pass) and the 2026-11-14 cinematic refinement (evidence viewer, verified timeline, upgraded artifacts, in-universe case studies, new ending and post-credits) are implemented.
+- Built one milestone at a time (001–007, see master plan §10); Milestones 001 (The Origin), 002 (hero workspace), 003 (Curiosity → Engineering), 003.5 (Meet the Human), 004 (Intelligence → Expression), 004A (personality pass), 005 (Project Universe with /work case studies), Timeline Nexus and 006 (Next Chapter and post-credits) are implemented. Milestone 007 (production pass) and the 2026-11-14 cinematic refinement (evidence viewer, verified timeline, upgraded artifacts, in-universe case studies, new ending and post-credits) are implemented. The 2026-11-14 story refinement removed the Expression chapter (Intelligence now flows straight into Project Universe), made project artifacts appear one at a time and removed raw placeholders from the public page.
 - Must perform on mobile: quality tiers, capped resolution, reduced-motion route and a static no-WebGL fallback are required, not optional.
 - Undecided: final hero tagline (current line is a draft pending approval), CV link, domain, analytics/privacy approach.
 

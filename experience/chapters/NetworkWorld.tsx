@@ -4,7 +4,6 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import {
   AdditiveBlending,
-  BoxGeometry,
   BufferGeometry,
   Color,
   CustomBlending,
@@ -15,13 +14,11 @@ import {
   InstancedMesh,
   Matrix4,
   Mesh,
-  MeshBasicMaterial,
   OneFactor,
   OneMinusSrcAlphaFactor,
   PlaneGeometry,
   Points,
   Quaternion,
-  RingGeometry,
   ShaderMaterial,
   Texture,
   Vector3,
@@ -29,22 +26,13 @@ import {
 import { story } from "../director/store";
 import { labelFragment, labelVertex } from "../shaders/chapters";
 import { nodeFragment, nodeVertex } from "../shaders/hologram";
-import { blobFragment, blobVertex, ribbonFragment, ribbonVertex, voxelFragment, voxelVertex } from "../shaders/network";
+import { blobFragment, blobVertex, ribbonFragment, ribbonVertex } from "../shaders/network";
 import { createLabelTexture } from "../world/panelText";
 import { smoothstep } from "../world/paths";
 import { ENGINEERING_CENTRE as E, MORPH, mulberry32, NET_EDGES, NET_FLOW, NET_NODES } from "./layout";
 
 type V3 = [number, number, number];
 const CENTRE = new Vector3(0, 3.6, 0);
-/**
- * Expression words that settle onto three of the forms. "Tinker" was dropped
- * (Milestone 004A): its node lands behind the copy column on desktop.
- */
-const EXPRESSION_WORDS: [number, string][] = [
-  [2, "Design"],
-  [0, "3D web"],
-  [5, "Motion"],
-];
 const LABELLED = NET_NODES.map((n, i) => (n.label ? i : -1)).filter((i) => i >= 0);
 
 /** Control point for an edge: bowed outward from the network centre. */
@@ -59,21 +47,18 @@ const bez = (a: Vector3, c: Vector3, b: Vector3, t: number, out: Vector3) => {
 };
 
 /**
- * Chapters 03–04: Intelligence → Expression, one object set in one place.
- * Engineering modules arrive at these nodes; connections carry an agent's
- * request (intent → LLM → tool → internal API → live data → result); then the
- * same connections loosen into ribbons and the nodes soften into forms as the
- * palette warms. Every state is a function of the scroll track, so it reverses
+ * Chapter 03, Intelligence, and the transition out of it. Engineering modules
+ * arrive at these nodes; connections carry an agent's request (intent → LLM →
+ * tool → internal API → live data → result); then, as the story turns toward
+ * Project Universe, the same connections loosen into ribbons and the nodes
+ * soften into forms as the palette warms. Every state is a function of the scroll track, so it reverses
  * exactly. Idle motion (pulses, breathing) is time-based and never scroll-owned.
  */
 export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
   const root = useRef<Group>(null);
   const blobs = useRef<InstancedMesh>(null);
   const packets = useRef<Points>(null);
-  const voxels = useRef<InstancedMesh>(null);
-  const reticle = useRef<Group>(null);
   const intelLabels = useRef<(Mesh | null)[]>([]);
-  const exprLabels = useRef<(Mesh | null)[]>([]);
   const gl = useThree((s) => s.gl);
 
   const r = useMemo(() => {
@@ -173,7 +158,7 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
       blending: AdditiveBlending,
     });
 
-    // Labels: Intelligence roles, then Expression words.
+    // Labels: Intelligence roles.
     const aniso = Math.min(8, gl.capabilities.getMaxAnisotropy());
     const labelGeo = new PlaneGeometry(1.5, 0.375);
     const labelMat = (text: string, color: Color) =>
@@ -187,31 +172,6 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
         blending: AdditiveBlending,
       });
     const intelMats = LABELLED.map((i) => labelMat(NET_NODES[i].label!, new Color(0.62, 0.92, 1.0)));
-    const exprMats = EXPRESSION_WORDS.map(([, w]) => labelMat(w, new Color(1.0, 0.9, 0.82)));
-
-    // Gaming layer: a small voxel cluster that keeps rebuilding itself, and a reticle.
-    const voxelGeo = new BoxGeometry(0.3, 0.3, 0.3);
-    const vox: { home: Vector3; dir: Vector3 }[] = [];
-    const colors: number[] = [];
-    const tones = [new Color(1.0, 0.62, 0.44), new Color(0.98, 0.88, 0.76), new Color(0.95, 0.45, 0.66), new Color(0.38, 0.86, 0.9)];
-    for (let x = -1; x <= 1; x++)
-      for (let y = -1; y <= 1; y++)
-        for (let z = -1; z <= 1; z++) {
-          const home = new Vector3(x, y, z).multiplyScalar(0.32);
-          vox.push({ home, dir: home.clone().add(new Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).multiplyScalar(0.4)).normalize() });
-          const c = tones[Math.floor(rand() * tones.length)];
-          colors.push(c.r, c.g, c.b);
-        }
-    voxelGeo.setAttribute("aColor", new InstancedBufferAttribute(new Float32Array(colors), 3));
-    const voxelMat = new ShaderMaterial({
-      vertexShader: voxelVertex,
-      fragmentShader: voxelFragment,
-      uniforms: { uOpacity: { value: 0 } },
-      transparent: true,
-    });
-    const ringGeo = new RingGeometry(0.42, 0.45, 64);
-    const tickGeo = new PlaneGeometry(0.03, 0.2);
-    const reticleMat = new MeshBasicMaterial({ color: new Color(1.0, 0.9, 0.82), transparent: true, opacity: 0, blending: AdditiveBlending, depthWrite: false });
 
     return {
       nodes,
@@ -225,19 +185,12 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
       PACKETS,
       labelGeo,
       intelMats,
-      exprMats,
-      voxelGeo,
-      voxelMat,
-      vox,
-      ringGeo,
-      tickGeo,
-      reticleMat,
     };
   }, [lowPower, gl]);
 
   // Upload label textures up front (no first-view hitch), and again after webfonts.
   useEffect(() => {
-    const all = [...r.intelMats, ...r.exprMats];
+    const all = r.intelMats;
     const upload = () => all.forEach((m) => gl.initTexture(m.uniforms.uText.value as Texture));
     upload();
     document.fonts?.ready.then(() => requestAnimationFrame(upload));
@@ -322,7 +275,7 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
     r.packetMat.uniforms.uIntensity.value = presence * (1 - flex) * (reduced ? 0.6 : 1);
     r.packetMat.uniforms.uScale.value = state.viewport.dpr * state.size.height * 0.012;
 
-    // Labels: roles in Intelligence, interests in Expression.
+    // Labels: roles in Intelligence.
     LABELLED.forEach((ni, k) => {
       const el = intelLabels.current[k];
       if (!el) return;
@@ -331,37 +284,6 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
       const on = smoothstep(0.6 + k * 0.03, 0.95, net) * (1 - smoothstep(0, 0.4, flex));
       r.intelMats[k].uniforms.uIntensity.value = on * (ni === hot ? 1.25 : 0.85);
     });
-    EXPRESSION_WORDS.forEach(([ni], k) => {
-      const el = exprLabels.current[k];
-      if (!el) return;
-      const big = 0.56 + (ni % 3) * 0.16;
-      el.position.copy(r.nodes[ni]).add(tmp.w.set(0, big * flex + 0.55, 0));
-      el.quaternion.copy(cam.quaternion);
-      // Portrait: the copy sits over the world and already names these words.
-      const portrait = state.size.width < state.size.height;
-      r.exprMats[k].uniforms.uIntensity.value = smoothstep(0.6 + k * 0.08, 1, flex) * (portrait ? 0 : 1);
-    });
-
-    // Gaming layer: voxels build, pop a block, rebuild; a reticle tracks the pointer.
-    const gv = smoothstep(0.45, 1, flex);
-    r.voxelMat.uniforms.uOpacity.value = gv;
-    if (voxels.current) {
-      const home = r.nodes[5];
-      r.vox.forEach((v, i) => {
-        const cycle = reduced ? 0 : Math.max(0, Math.sin(t * 0.9 + i * 0.37));
-        const pop = Math.pow(cycle, 6) * 0.55;
-        tmp.p.copy(v.home).addScaledVector(v.dir, pop + (1 - gv) * 1.2).add(home).add(tmp.w.set(1.25, 0.9, 0.6));
-        tmp.m.makeRotationY(t * 0.25).setPosition(tmp.p);
-        tmp.m.scale(tmp.s.setScalar(gv));
-        voxels.current!.setMatrixAt(i, tmp.m);
-      });
-      voxels.current.instanceMatrix.needsUpdate = true;
-    }
-    if (reticle.current) {
-      reticle.current.position.copy(r.nodes[5]).add(tmp.w.set(-1.1 + px * 0.5, 1.4 + py * 0.4, 0.8));
-      reticle.current.quaternion.copy(cam.quaternion);
-      r.reticleMat.opacity = gv * 0.7;
-    }
   });
 
   return (
@@ -369,19 +291,6 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
       <mesh geometry={r.ribbonGeo} material={r.ribbonMat} renderOrder={3} frustumCulled={false} />
       <instancedMesh ref={blobs} args={[r.blobGeo, r.blobMat, NET_NODES.length]} frustumCulled={false} renderOrder={4} />
       <points ref={packets} geometry={r.packetGeo} material={r.packetMat} renderOrder={6} frustumCulled={false} />
-      <instancedMesh ref={voxels} args={[r.voxelGeo, r.voxelMat, r.vox.length]} frustumCulled={false} renderOrder={5} />
-      <group ref={reticle}>
-        <mesh geometry={r.ringGeo} material={r.reticleMat} />
-        {[0, 1, 2, 3].map((k) => (
-          <mesh
-            key={k}
-            geometry={r.tickGeo}
-            material={r.reticleMat}
-            position={[Math.cos((k * Math.PI) / 2) * 0.6, Math.sin((k * Math.PI) / 2) * 0.6, 0]}
-            rotation={[0, 0, (k * Math.PI) / 2 + Math.PI / 2]}
-          />
-        ))}
-      </group>
       {LABELLED.map((ni, k) => (
         <mesh
           key={`i${ni}`}
@@ -390,17 +299,6 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
           }}
           geometry={r.labelGeo}
           material={r.intelMats[k]}
-          renderOrder={7}
-        />
-      ))}
-      {EXPRESSION_WORDS.map(([ni], k) => (
-        <mesh
-          key={`x${ni}`}
-          ref={(el) => {
-            exprLabels.current[k] = el;
-          }}
-          geometry={r.labelGeo}
-          material={r.exprMats[k]}
           renderOrder={7}
         />
       ))}

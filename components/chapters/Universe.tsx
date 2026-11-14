@@ -90,7 +90,7 @@ function Exhibit({ p, index }: { p: ProjectStory; index: number }) {
   );
 }
 
-/** Chapter 05: the exhibition. Scrolls past one artifact per project. */
+/** Chapter 04: the exhibition. Scrolls past one artifact per project. */
 export function ProjectUniverse() {
   return (
     <section id="projects" className="chapter chapter--projects" aria-labelledby="projects-title">
@@ -98,7 +98,7 @@ export function ProjectUniverse() {
         <h2 id="projects-title" className="chapter-title rv">
           {universe.title}
         </h2>
-        <p className="chapter-meta rv">Chapter 05</p>
+        <p className="chapter-meta rv">Chapter 04</p>
         <p className="chapter-lead rv">{universe.lead}</p>
         <p className="chapter-copy rv">{universe.body}</p>
         <nav className="exhibit-jump rv" aria-label="Case studies">
@@ -108,6 +108,9 @@ export function ProjectUniverse() {
             </Link>
           ))}
         </nav>
+        <p className="universe-cue rv" aria-hidden>
+          <span /> Scroll to enter the first world
+        </p>
       </div>
       {projectStories.map((p, i) => (
         <Exhibit key={p.id} p={p} index={i} />
@@ -116,7 +119,7 @@ export function ProjectUniverse() {
   );
 }
 
-/** Chapter 06: the timeline as strands. The list is the accessible source of truth. */
+/** Chapter 05: the timeline as strands. The list is the accessible source of truth. */
 export function TimelineNexus() {
   const listRef = useRef<HTMLOListElement>(null);
   /** Hover/keyboard focus wins over the reading position. */
@@ -175,7 +178,7 @@ export function TimelineNexus() {
         <h2 id="timeline-title" className="chapter-title rv">
           {nexus.title}
         </h2>
-        <p className="chapter-meta rv">Chapter 06</p>
+        <p className="chapter-meta rv">Chapter 05</p>
         <p className="chapter-lead rv">{nexus.lead}</p>
         <p className="chapter-copy rv">{nexus.body}</p>
         <ul className="strand-key rv" aria-label="Strands">
@@ -282,12 +285,12 @@ function PostCredits() {
   );
 }
 
-/** Chapter 07: the close. Contact first, then a small post-credits scene. */
+/** Chapter 06: the close. Contact first, then a small post-credits scene. */
 export function Closing() {
   return (
     <section id="next" className="closing" aria-labelledby="next-title">
       <div className="closing-card chapter-block">
-        <p className="chapter-meta rv">Chapter 07</p>
+        <p className="chapter-meta rv">Chapter 06</p>
         <h2 id="next-title" className="closing-title rv">
           {closing.title}
         </h2>
@@ -320,7 +323,11 @@ export function Closing() {
               Instagram
             </a>
           </li>
-          <li>{closing.cv ? <a href={closing.cv}>CV</a> : <span className="placeholder-inline">{closing.cvPlaceholder}</span>}</li>
+          {closing.cv && (
+            <li>
+              <a href={closing.cv}>CV</a>
+            </li>
+          )}
         </ul>
       </div>
       <PostCredits />

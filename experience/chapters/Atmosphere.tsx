@@ -17,7 +17,7 @@ const STOPS: [number, string, number, number][] = [
   [3.35, "#0a1433", 16, 70],
   [3.9, "#0d1838", 18, 74],
   [4.4, "#151344", 16, 74], // Intelligence: indigo, cyan and purple light
-  [5.2, "#2a1840", 14, 70], // Expression: warm violet with pink and coral
+  [5.2, "#2a1840", 14, 70], // Intelligence → Universe transition: warm violet
   [5.85, "#2d1c42", 16, 82],
   [6.3, "#121433", 14, 60], // Project Universe: a dark exhibition hall, each artifact its own light
   [9.2, "#121433", 14, 60],

@@ -2,11 +2,11 @@
  * Milestone 004 shaders. One ribbon system and one node system carry both
  * chapters, so the change is a single continuous transformation driven by
  * `uFlex` (0 = Intelligence: thin precise connections with request pulses,
- * 1 = Expression: wide flowing ribbons in the warm palette).
+ * 1 = the transition toward Project Universe: wide flowing ribbons in the warm palette).
  */
 
 const palette = /* glsl */ `
-  // Expression palette: violet → pink → coral → cyan → warm ivory (display values).
+  // Transition palette: violet → pink → coral → cyan → warm ivory (display values).
   vec3 pal(float k) {
     k = fract(k) * 5.0;
     vec3 c0 = vec3(0.50, 0.38, 0.95);
@@ -39,7 +39,7 @@ export const ribbonVertex = /* glsl */ `
   vec3 bez(vec3 a, vec3 c, vec3 b, float t) { float u = 1.0 - t; return u * u * a + 2.0 * u * t * c + t * t * b; }
 
   void main() {
-    // The control point loosens: still in Intelligence, wandering in Expression.
+    // The control point loosens: still in Intelligence, wandering in the transition.
     vec3 wander = vec3(sin(uTime * 0.35 + aSeed * 6.0), 0.8 * sin(uTime * 0.28 + aSeed * 4.1), cos(uTime * 0.31 + aSeed * 5.3));
     vec3 c = aC + wander * (0.12 + 2.4 * uFlex);
     vec3 p = bez(aA, c, aB, aT);
@@ -127,34 +127,12 @@ export const blobFragment = /* glsl */ `
     // Result node: a gold core inside a cyan rim, breathing slowly (a nod to Vision, original form).
     vec3 gold = mix(vec3(1.0, 0.82, 0.38), vec3(0.45, 0.6, 1.0), f) * (1.0 + 0.18 * sin(uTime * 1.6));
     cold = mix(cold, gold, vWarm);
-    // Expression: iridescent palette form with an ivory highlight.
+    // Transition: iridescent palette form with an ivory highlight.
     float k = vSeed + f * 0.35 + uTime * 0.02;
     vec3 warm = mix(pal(k), pal(k + 0.25), f) * (0.65 + 0.5 * f);
     warm += vec3(1.0, 0.95, 0.88) * pow(max(dot(normalize(vN), normalize(vec3(-0.3, 0.8, 0.5))), 0.0), 18.0) * 0.5;
     vec3 col = mix(cold, warm, uFlex);
     float a = mix(0.0, 0.8, uFlex);
     gl_FragColor = vec4(col * uIntensity, a * uIntensity);
-  }
-`;
-
-/** Voxels for the gaming layer: flat-shaded, fixed light, instance colour. */
-export const voxelVertex = /* glsl */ `
-  attribute vec3 aColor;
-  varying vec3 vC;
-  varying vec3 vN;
-  void main() {
-    vC = aColor;
-    vN = normalize(mat3(modelMatrix) * mat3(instanceMatrix) * normal);
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
-  }
-`;
-export const voxelFragment = /* glsl */ `
-  precision highp float;
-  uniform float uOpacity;
-  varying vec3 vC;
-  varying vec3 vN;
-  void main() {
-    float l = 0.45 + 0.55 * max(dot(normalize(vN), normalize(vec3(-0.4, 0.85, 0.35))), 0.0);
-    gl_FragColor = vec4(vC * l * uOpacity, uOpacity);
   }
 `;

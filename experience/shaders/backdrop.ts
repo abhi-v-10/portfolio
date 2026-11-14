@@ -121,7 +121,7 @@ export const backdropFragment = /* glsl */ `
     intel += cyan * smoothstep(0.6, 0.9, w) * 0.16 + violet * wisp * 0.22;
     col = mix(col, intel, uIntel * 0.9);
 
-    // Expression: warm, lighter and more fluid. Violet field, pink and coral
+    // Transition into Project Universe: warm, lighter and more fluid. Violet field, pink and coral
     // bands low on the horizon, a warm ivory haze, a little cyan.
     vec3 ivory = vec3(0.94, 0.85, 0.75);
     vec3 expr = mix(violet * 0.5, pink * 0.45, smoothstep(0.3, 0.85, n));

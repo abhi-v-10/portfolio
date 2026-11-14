@@ -9,7 +9,9 @@ const v = (x: number, y: number, z: number) => new Vector3(x, y, z);
  *   Origin (0,0,0) ─signal→ Gallery (≈ 3, 3, −11.5) → Curiosity (≈ 9, 2, −36) ─converge→ Engineering (≈ 10, 1, −64)
  *
  * Track units (story.track): 0 hero · 1 Meet the Human · 2 Curiosity ·
- * 3 Engineering · 4 Intelligence · 5 Expression · 6 Project Universe ·
+ * 3 Engineering · 4 Intelligence · 4.75–6 transition (the network loosens
+ * and the camera turns to the exhibition; Expression was removed 2026-11-14) ·
+ * 6 Project Universe ·
  * 6.5–9 one project per half unit · 10 Timeline Nexus · 11.5 Next Chapter ·
  * 12 end. Curiosity/Engineering worlds were authored
  * in Milestone 003 units (one lower); they read `track - TRACK_SHIFT`.
@@ -111,7 +113,7 @@ export const CAMERA_POS = [
   // Milestone 004: the system transforms in place; the camera orbits it.
   v(21.5, 6.8, -60.5), // 4.5 Intelligence hold (side view, copy left)
   v(18.5, 9.0, -75.5), // 5.0 flexing
-  v(6.5, 5.6, -80.0), // 5.5 Expression hold (other side, copy right)
+  v(6.5, 5.6, -80.0), // 5.5 passing the loosened network, turning away
   // Milestone 005: the camera turns away from the expressive world toward the
   // exhibition, then visits one artifact per half unit.
   v(1.0, 10.0, -84.0), // 6.0 Project Universe overview
@@ -162,8 +164,6 @@ export const LENS = [
   [3.95, -0.2, 0.2],
   [4.35, 0.2, 0.2],
   [4.6, 0.2, 0.2],
-  [5.0, -0.22, 0.2],
-  [5.95, -0.2, 0.2],
   [6.3, 0.2, 0.28],
   [9.4, 0.2, 0.28],
   [9.8, 0.2, 0.2],
@@ -194,7 +194,7 @@ export function mulberry32(seed: number) {
   };
 }
 
-/* ───────────── Milestone 004: Intelligence → Expression ───────────── */
+/* ───────────── Milestone 004: Intelligence, then the transition ───────────── */
 
 /**
  * Transformation windows (track units). One continuous, scroll-scrubbed change:

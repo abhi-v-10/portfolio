@@ -34,7 +34,7 @@ html {
   background: var(--loader-black);
   color: var(--soft-white);
   color-scheme: dark;
-  scrollbar-color: #3a4372 var(--loader-black);
+  scrollbar-width: none;
   -webkit-text-size-adjust: 100%;
 }
 html.is-locked {
@@ -905,13 +905,10 @@ html.cursor-visible .cursor-ring {
   margin-top: 0.9rem;
 }
 
-/* ───────────────────────── Chapters 03–04 (Milestone 004) ───────────────────────── */
+/* ───────────────────────── Chapter 03: Intelligence (Milestone 004) ───────────────────────── */
 /* Long lead-ins: the transformation plays in the space before each title. */
 .chapter--intelligence {
   padding-block: 72svh 30svh;
-}
-.chapter--expression {
-  padding-block: 78svh 34svh;
 }
 .flow-title {
   margin: 1.75rem 0 0.25rem;
@@ -964,94 +961,6 @@ html.cursor-visible .cursor-ring {
   color: var(--ink-muted);
 }
 
-/* Expression: the warm chapter. Copy picks up ivory and peach. */
-.chapter--expression .chapter-block::before {
-  background: radial-gradient(closest-side, rgb(30 14 36 / 0.62), rgb(30 14 36 / 0.3) 62%, transparent);
-}
-.chapter--expression .chapter-lead {
-  color: #ffd6c2;
-}
-.chapter--expression .chapter-copy {
-  color: #f3e8ef;
-}
-.expression-grid {
-  margin-top: 1.6rem;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 9.5rem;
-  gap: 1.5rem;
-  align-items: start;
-}
-.expression-notes {
-  margin: 0;
-  display: grid;
-  gap: 0.85rem;
-}
-.expression-notes dt {
-  font-family: var(--font-mono), monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #ffb59a;
-}
-.expression-notes dd {
-  margin: 0.2rem 0 0;
-  font-size: 0.9375rem;
-  color: #eadff0;
-}
-.expression-notes dd .evidence-btn {
-  margin-top: 0.5rem;
-}
-.expression-notes [data-placeholder] dd {
-  font-style: italic;
-  color: rgb(234 223 240 / 0.7);
-}
-.expression-bridge {
-  margin: 1.6rem 0 0;
-  font-family: var(--font-display), sans-serif;
-  font-weight: 600;
-  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem);
-  line-height: 1.3;
-  color: #ffe1d2;
-}
-.expression-photo {
-  margin: 0;
-  position: relative;
-  aspect-ratio: 4 / 5;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  border: 1px dashed rgb(255 214 194 / 0.5);
-  border-radius: 6px;
-  background: linear-gradient(160deg, rgb(241 126 152 / 0.25), rgb(103 80 200 / 0.25) 60%, rgb(86 220 224 / 0.15));
-}
-.expression-photo img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.expression-photo-mark {
-  width: 2rem;
-  height: 3rem;
-  margin-bottom: 1.5rem;
-  border: 1.5px solid rgb(255 236 226 / 0.75);
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-}
-.expression-photo figcaption {
-  position: absolute;
-  inset: auto 0.5rem 0.5rem;
-  display: grid;
-  gap: 0.15rem;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.625rem;
-  line-height: 1.3;
-  color: #ffece2;
-}
-.expression-photo figcaption span {
-  color: rgb(255 236 226 / 0.7);
-}
-
 /* ───────── Personality layer (Milestone 004A): rare MCU lines and asides ───────── */
 /* One line per chapter at most. Lead-in in Abhishyanth's voice, then the quote
    in the display face. No visible attribution (2026-11-14 refinement). A hairline
@@ -1091,7 +1000,7 @@ html.cursor-visible .cursor-ring {
   color: #ffd6c2;
 }
 
-/* ───────────────────────── Chapter 05: Project Universe (Milestone 005) ───────────────────────── */
+/* ───────────────────────── Chapter 04: Project Universe (Milestone 005) ───────────────────────── */
 /* One exhibit per artifact. Long gaps between exhibits are the camera's travel. */
 .chapter--projects {
   padding-block: 76svh 40svh;
@@ -1121,6 +1030,44 @@ html.cursor-visible .cursor-ring {
 .exhibit-jump a:hover {
   color: var(--soft-white);
   text-decoration-color: var(--core-energy);
+}
+.universe-cue {
+  margin: 2.4rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.universe-cue span {
+  position: relative;
+  width: 1px;
+  height: 2.4rem;
+  overflow: hidden;
+  background: rgb(220 227 255 / 0.18);
+}
+.universe-cue span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, var(--core-energy), transparent);
+  animation: universe-cue 2.6s ease-in-out infinite;
+}
+@keyframes universe-cue {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .universe-cue span::after {
+    animation: none;
+  }
 }
 .exhibit {
   --accent: var(--core-energy);
@@ -1441,12 +1388,13 @@ html.cursor-visible .cursor-ring {
   background: radial-gradient(120% 90% at 50% 55%, rgb(10 8 22 / 0.78), rgb(3 3 8 / 0.97));
 }
 .credits-inner {
-  max-width: 64rem;
+  width: 100%;
+  max-width: 92rem;
 }
 .credits-meta {
   margin: 0;
   font-family: var(--font-mono), monospace;
-  font-size: 0.6875rem;
+  font-size: clamp(0.6875rem, 0.62rem + 0.25vw, 0.8125rem);
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: #cfc4e8;
@@ -1455,8 +1403,9 @@ html.cursor-visible .cursor-ring {
   margin: 1.4rem 0 0;
   font-family: var(--font-display), sans-serif;
   font-weight: 800;
-  font-size: clamp(1.9rem, 0.6rem + 5.6vw, 5.6rem);
-  line-height: 1.02;
+  /* Fluid: the whole line fits one row from tablet width up. */
+  font-size: clamp(1.9rem, 0.6rem + 6vw, 3.2rem);
+  line-height: 1.08;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   text-wrap: balance;
@@ -1465,6 +1414,14 @@ html.cursor-visible .cursor-ring {
 }
 .credits-word {
   display: inline-block;
+  /* Room for the mask so descenders and tracking never clip at rest. */
+  padding-block: 0.08em;
+}
+@media (min-width: 760px) {
+  .credits-title {
+    white-space: nowrap;
+    font-size: clamp(1.9rem, 3.4vw, 4.6rem);
+  }
 }
 .credits-line {
   margin: 1.6rem auto 0;
@@ -1488,17 +1445,19 @@ html.cursor-visible .cursor-ring {
     opacity: 0;
   }
   .credits[data-state="playing"] .credits-meta {
-    animation: credits-fade 1.2s ease 1.3s both;
+    animation: credits-fade 1.8s ease 1.4s both;
   }
+  /* Each word rises through a mask, slowly, one after another. */
   .credits[data-state="playing"] .credits-word {
-    animation: credits-word 1.5s var(--ease-out-expo) both;
-    animation-delay: calc(2.1s + var(--w) * 0.16s);
+    animation: credits-word 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(3.2s + var(--w) * 0.42s);
   }
+  /* The joke lands last, after the title has settled. */
   .credits[data-state="playing"] .credits-line {
-    animation: credits-fade 1s ease 4.4s both;
+    animation: credits-fade 1.6s ease 7.6s both;
   }
   .credits[data-state="playing"] .credits-after {
-    animation: credits-fade 0.8s ease 5.6s both;
+    animation: credits-fade 1.2s ease 9.4s both;
   }
 }
 @keyframes credits-fade {
@@ -1514,12 +1473,17 @@ html.cursor-visible .cursor-ring {
 @keyframes credits-word {
   from {
     opacity: 0;
-    letter-spacing: 0.3em;
-    filter: blur(10px);
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(0.45em);
+    filter: blur(6px);
+  }
+  40% {
+    opacity: 1;
   }
   to {
     opacity: 1;
-    letter-spacing: 0.02em;
+    clip-path: inset(0 0 0 0);
+    transform: none;
     filter: blur(0);
   }
 }
@@ -2208,22 +2172,11 @@ html.cursor-visible .cursor-ring {
   .chapter--intelligence {
     padding-block: 62svh 25svh;
   }
-  .chapter--expression {
-    padding-block: 66svh 28svh;
-  }
   .request-flow li {
     grid-template-columns: 1.8rem minmax(0, 1fr);
   }
   .request-detail {
     grid-column: 2;
-  }
-  .expression-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.2rem;
-  }
-  .expression-photo {
-    width: min(100%, 12rem);
-    aspect-ratio: 5 / 4;
   }
   .chapter-block + .chapter-block {
     margin-top: 45svh;
@@ -2524,8 +2477,16 @@ html.has-viewer {
 }
 
 /* ───────────────────────── Case studies: in-universe layer + standalone page (2026-11-14) ───────────────────────── */
-html {
-  scrollbar-gutter: stable;
+/* Scrollbars are hidden site-wide (2026-11-14); every surface still scrolls. */
+*,
+*::before,
+*::after {
+  scrollbar-width: none;
+}
+::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 html.has-case {
   overflow: hidden;

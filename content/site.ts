@@ -96,16 +96,15 @@ export const projects: Project[] = [
 ];
 
 /**
- * Nestafar. The official certificate (public/evidence/original) names a
- * three-month internship in Flutter Development, Jan–Mar 2026, issued
- * April 10, 2026. The profile documents AI/backend contributions during that
- * internship. The two are kept distinct: no new job title is asserted.
+ * Nestafar. Abhishyanth confirmed (2026-11-14) that the internship was AI
+ * backend development. The certificate (public/evidence/original) is linked as
+ * proof of the internship and its dates (Jan–Mar 2026, issued April 10, 2026).
  */
 export const experience = {
-  role: "Intern (certificate: Flutter Development)",
+  role: "AI Backend Development Intern",
   org: "Nestafar Technologies",
   period: "Jan–Mar 2026",
-  line: "Documented contributions: AI agents connected to live backend data through internal APIs.",
+  line: "AI agents connected to live backend data through internal APIs.",
   stack: ["Python", "Django", "FastAPI", "FastMCP"],
 } as const;
 
@@ -125,10 +124,9 @@ export const chapters: { id: string; index: string; title: string; status: Chapt
   { id: "curiosity", index: "01", title: "Curiosity", status: "live" },
   { id: "engineering", index: "02", title: "Engineering", status: "live" },
   { id: "intelligence", index: "03", title: "Intelligence", status: "live" },
-  { id: "expression", index: "04", title: "Expression", status: "live" },
-  { id: "projects", index: "05", title: "Project Universe", status: "live" },
-  { id: "timeline", index: "06", title: "Timeline Nexus", status: "live" },
-  { id: "next", index: "07", title: "Next Chapter", status: "live" },
+  { id: "projects", index: "04", title: "Project Universe", status: "live" },
+  { id: "timeline", index: "05", title: "Timeline Nexus", status: "live" },
+  { id: "next", index: "06", title: "Next Chapter", status: "live" },
 ];
 
 /**
@@ -187,12 +185,11 @@ export const engineering = {
 /** Nestafar, as professional proof (full case study belongs to a later milestone). */
 export const nestafar = {
   org: "Nestafar Technologies",
-  role: "Internship",
+  role: "AI Backend Development Intern",
   period: "Jan – Mar 2026",
-  /** Exactly what the certificate states. */
-  certificate: "Certificate of Internship: Flutter Development, three months, issued April 10, 2026.",
-  /** Introduces the profile's own account of the work, distinct from the certificate wording. */
-  contributionsLead: "What I worked on, in my own account:",
+  /** The certificate proves the internship and its dates. */
+  certificate: "Three-month internship, January to March 2026. Certificate issued April 10, 2026.",
+  contributionsLead: "What I worked on:",
   flow: ["Agent", "Tool", "Internal API", "Live data"],
   points: [
     "Built AI agents with Python, Django, FastAPI and FastMCP.",
@@ -225,43 +222,7 @@ export const intelligence = {
   line: { lead: "The bar for a good agent:", quote: "For you, sir. Always.", by: "J.A.R.V.I.S.", film: "Iron Man" },
 } as const;
 
-/**
- * Expression (refocused 2026-11-14): what Abhishyanth makes and designs, not
- * who Abhishyanth is off the clock (that lives in Meet the Human). Verified: the UI/UX
- * Mega Workshop certificate (Figma app redesign, 23 Dec 2024), 3D on the web
- * (Three.js, WebGL, Blender) and this site. Graphic design and event creative
- * work are not documented yet, so they stay visible placeholders.
- */
-export const expression = {
-  lead: "Exact systems, loose hands.",
-  body: "Expression is where the engineering turns visual. The same instinct that structures a backend decides how an interface moves, which colour carries a mood and where the eye should land first.",
-  notes: [
-    {
-      term: "Interface design",
-      detail: "Redesigned an app end to end in Figma at the NIAT UI/UX Mega Workshop, December 2024.",
-      evidence: "uiux",
-    },
-    { term: "Creative development", detail: "Interactive 3D for the web with Three.js, WebGL, GSAP and shaders. This site is the largest experiment so far." },
-    { term: "Visual experiments", detail: "Blender scenes, procedural forms, colour and motion studies." },
-    {
-      term: "Graphic and event design",
-      detail: "[GRAPHIC / EVENT DESIGN WORK] Posters, event visuals or council creative work, to be supplied.",
-      placeholder: true,
-    },
-  ] as { term: string; detail: string; evidence?: string; placeholder?: boolean }[],
-  bridge: "Engineering decides how it works. Expression decides how it feels.",
-  /** Guardians nod (Star-Lord's partial plan), as microcopy, not a quote. */
-  aside: "Most experiments here start with about 12% of a plan. Star-Lord would approve.",
-  /** EDIT: set `src` to a file under /public (e.g. "/work/creative-01.webp") when supplied. */
-  photo: {
-    src: null as string | null,
-    alt: "Placeholder for a piece of Abhishyanth's creative work",
-    label: "[CREATIVE WORK 01] A design, poster or interactive piece",
-    note: "To be supplied",
-  },
-};
-
-/** Chapter 07, Next Chapter. Availability is the profile's own wording. */
+/** Chapter 06, Next Chapter. Availability is the profile's own wording. */
 export const closing = {
   title: "Next Chapter",
   lead: "The story so far. The next part is yours to start.",
@@ -271,7 +232,7 @@ export const closing = {
   cvPlaceholder: "[CV URL]",
   /** Post-credits scene: MCU end-card convention, original line. */
   postCredits: {
-    meta: "Post-credits scene",
+    meta: "Thank you for exploring my universe",
     title: "Abhishyanth Vemula will return.",
     line: "Right after one more Hyprland config. It is always one more.",
   },

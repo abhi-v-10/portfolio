@@ -29,6 +29,7 @@ import {
   TubeGeometry,
   Vector3,
 } from "three";
+import { projectStories } from "@/content/projects";
 import { story } from "../director/store";
 import { glowFragment, glowVertex, signalFragment, signalVertex } from "../shaders/signal";
 import {
@@ -192,6 +193,25 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
       root.add(g);
       groups.push(g);
       lit.push([]);
+    });
+    // Projection rings: a horizontal light plane that sweeps up through an
+    // artifact as it materialises and back down as it leaves. Children of the
+    // artifact's group, so they share its visibility gate.
+    const ringGeo = new TorusGeometry(1, 0.012, 6, 128);
+    const projectors = ARTIFACTS.map((a, i) => {
+      const accent = projectStories.find((p) => p.id === a.id)?.accent ?? "#73dfff";
+      const mat = shell(accent, 0.0);
+      const ringA = new Mesh(ringGeo, mat);
+      const ringB = new Mesh(ringGeo, mat);
+      ringA.rotation.x = ringB.rotation.x = Math.PI / 2;
+      ringB.scale.setScalar(0.72);
+      const halo = new Mesh(sprite, glow(accent));
+      halo.rotation.x = -Math.PI / 2;
+      const rig = new Group();
+      rig.add(ringA, ringB, halo);
+      rig.scale.setScalar(2.7);
+      groups[i].add(rig);
+      return { rig, mat, halo: halo.material as ShaderMaterial };
     });
 
     /* ── 0 · WiniOS, The Bridge: a laptop and a phone joined by a private, sealed current. ── */
@@ -455,7 +475,7 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     sc.add(plinth, campusRing, school, door);
     sc.rotation.x = 0.12;
 
-    /* ── The living signal, reborn: it leaves Expression, threads every artifact, runs on to the Nexus. ── */
+    /* ── The living signal, reborn: it leaves the Intelligence network, threads every artifact, runs on to the Nexus. ── */
     const path = new CatmullRomCurve3(
       [
         v(6, 6.5, -80),
@@ -473,7 +493,7 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     redrawWhenFontsReady();
     root.visible = false;
     return {
-      root, groups, lit,
+      root, groups, lit, projectors,
       // WiniOS
       laptop, phone, pcScreen, phScreen, pcIdle, pcSending, pcReceived, phIdle, phSending, phReceived,
       bridgeCurve, bridgeMat, bridgeHalo, ringMat, ring, ring2, ambient, ambientMats, packet, packetText, packetImage,
@@ -518,6 +538,8 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     const reduced = story.reducedMotion;
     const t = reduced ? 0 : state.clock.elapsedTime;
     const presence = smoothstep(5.7, 6.15, tr) * (1 - smoothstep(9.35, 9.9, tr));
+    // The establishing shot (6.0) shows only the environment and a restrained signal.
+    const signalLevel = presence * (0.45 + 0.55 * smoothstep(6.1, 6.5, tr));
     const cam = state.camera;
     const k = (rate: number) => 1 - Math.exp(-Math.min(dt, 0.1) * (reduced ? 40 : rate));
 
@@ -526,170 +548,209 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     const caseAmt = story.universe.caseAmt;
     const caseFocus = story.universe.caseFocus;
 
-    // Each artifact brightens as the camera arrives at it.
+    // Progressive reveal (2026-11-14): each artifact exists only around its own
+    // track key. It materialises (rises, assembles, a projection plane sweeps
+    // up and its screens draw on top-down), holds while its exhibit is read,
+    // then deconstructs (lifts, scatters its light, the plane sweeps down)
+    // just before the next one begins. Pure functions of the track, so every
+    // state reverses exactly. The case-study focus overrides for its artifact.
+    const enter = ARTIFACTS.map((_, i) => smoothstep(artifactTrack(i) - 0.3, artifactTrack(i) - 0.06, tr));
+    const exit = ARTIFACTS.map((_, i) => smoothstep(artifactTrack(i) + 0.08, artifactTrack(i) + 0.3, tr));
     const level = ARTIFACTS.map((_, i) => {
-      const f = 1 - smoothstep(0.28, 0.8, Math.abs(tr - artifactTrack(i)));
-      const overview = 1 - smoothstep(6.05, 6.4, tr);
-      const l = presence * Math.max(0.05 + 0.95 * f, 0.75 * overview);
-      return caseFocus === i ? Math.max(l, caseAmt) : l * (1 - caseAmt * 0.92);
+      const l = enter[i] * (1 - exit[i]);
+      return caseFocus === i ? Math.max(l, caseAmt) : l * (1 - caseAmt);
     });
     // Portrait screens: recompose a little smaller so artifacts clear the copy.
     const aspect = (cam as { aspect?: number }).aspect ?? 1.6;
     const fit = aspect < 0.8 ? 0.9 : 1;
     r.groups.forEach((g, i) => {
-      g.visible = level[i] > 0.01;
-      g.scale.setScalar(ARTIFACTS[i].scale * fit);
-      // Surfaces fade faster than light, so out-of-focus neighbours never compete with copy.
-      r.lit[i].forEach((l) => (l.mat.uniforms.uIntensity.value = l.base * (l.panel ? level[i] * level[i] : level[i])));
+      const on = level[i] > 0.003;
+      // Real visibility, not just zero opacity: hidden groups are not drawn.
+      g.visible = on;
+      if (!on) return;
+      const held = caseFocus === i ? caseAmt : 0;
+      const e = Math.max(enter[i], held);
+      const x = exit[i] * (1 - held);
+      const ee = 1 - Math.pow(1 - e, 3);
+      const a = ARTIFACTS[i];
+      g.scale.setScalar(a.scale * fit * (0.84 + 0.16 * ee) * (1 + 0.07 * x));
+      g.position.set(a.pos.x, a.pos.y - (1 - ee) * 1.2 * a.scale + x * 0.8 * a.scale, a.pos.z);
+      g.rotation.set(0, (1 - ee) * 0.5 - x * 0.35, 0);
+      // Surfaces fade faster than light, so a leaving artifact never competes with copy.
+      r.lit[i].forEach((l) => {
+        l.mat.uniforms.uIntensity.value = l.base * (l.panel ? level[i] * level[i] : level[i]);
+        // Screens and cards draw on top-down as the artifact assembles.
+        if (l.panel && l.mat !== r.paper.material) l.mat.uniforms.uReveal.value = -0.05 + 1.16 * smoothstep(0.25, 1, e);
+      });
+      // Projection plane: up through the artifact on arrival, down on departure.
+      const pr = r.projectors[i];
+      const sweepIn = e < 1 ? e : 0;
+      const pulse = Math.sin(Math.PI * Math.min(1, sweepIn)) + Math.sin(Math.PI * x);
+      pr.rig.position.y = x > 0 ? 0.75 - x * 0.75 * 2.1 : -0.75 + e * 0.75 * 2.1;
+      pr.rig.rotation.y = t * 0.3;
+      pr.mat.uniforms.uIntensity.value = pulse * 1.1;
+      pr.halo.uniforms.uIntensity.value = pulse * 0.35;
     });
 
     r.signalMat.uniforms.uReveal.value = Math.min(1.001, smoothstep(5.75, 9.7, tr) * 1.08);
     r.signalMat.uniforms.uTime.value = t;
-    r.signalMat.uniforms.uIntensity.value = presence * 0.95 * (1 - caseAmt * 0.85);
+    r.signalMat.uniforms.uIntensity.value = signalLevel * 0.95 * (1 - caseAmt * 0.85);
 
     /* WiniOS: source activates → packet leaves → sealed bridge → destination receives and acknowledges. */
-    const L0 = level[0];
-    r.bridgeMat.uniforms.uTime.value = t;
-    (r.bridgeHalo.material as ShaderMaterial).uniforms.uTime.value = t;
-    r.ring.rotation.z = t * 0.6;
-    r.ring2.rotation.z = -t * 0.4;
-    r.ambient.forEach((p, i) => {
-      const u = (t * 0.2 + i / 4) % 1;
-      r.bridgeCurve.getPoint(i % 2 ? 1 - u : u, p.position);
-      faceCamera(p, cam.quaternion);
-      r.ambientMats[i].uniforms.uIntensity.value = L0 * Math.sin(Math.PI * u) * 0.55;
-    });
-    const s = (performance.now() - story.universe.bridgeAt) / 1000;
-    const dir = story.universe.bridgeDir; // 1: PC → iPhone, -1: iPhone → PC
-    const toPhone = dir > 0;
-    const active = s >= 0 && s < 6;
-    const travel = reduced ? (s > 0.2 ? 1 : 0) : smoothstep(0.35, 1.6, s);
-    const srcOn = active ? smoothstep(0, 0.25, s) * (1 - smoothstep(1.4, 1.9, s)) : 0;
-    const dstOn = active ? smoothstep(1.5, 1.8, s) * (1 - smoothstep(4.6, 5.6, s)) : 0;
-    // Screens: crossfade toward the state; the texture B slot holds the state.
-    const pcState = toPhone ? (srcOn > 0.01 ? r.pcSending : null) : dstOn > 0.01 ? r.pcReceived : null;
-    const phState = toPhone ? (dstOn > 0.01 ? r.phReceived : null) : srcOn > 0.01 ? r.phSending : null;
-    if (pcState) r.pcScreen.material.uniforms.uTexB.value = pcState;
-    if (phState) r.phScreen.material.uniforms.uTexB.value = phState;
-    damp.pcMix += ((pcState ? 1 : 0) - damp.pcMix) * k(8);
-    damp.phMix += ((phState ? 1 : 0) - damp.phMix) * k(8);
-    r.pcScreen.material.uniforms.uMix.value = damp.pcMix;
-    r.phScreen.material.uniforms.uMix.value = damp.phMix;
-    r.pcScreen.material.uniforms.uGlow.value = toPhone ? srcOn : dstOn;
-    r.phScreen.material.uniforms.uGlow.value = toPhone ? dstOn : srcOn;
-    // Packet card along the bridge.
-    const inFlight = active && s > 0.3 && s < 1.75;
-    r.packet.material.uniforms.uTexA.value = story.universe.bridgeCount % 2 ? r.packetImage : r.packetText;
-    r.bridgeCurve.getPoint(toPhone ? travel : 1 - travel, r.packet.position);
-    r.packet.position.y += 0.22;
-    r.packetGlow.position.copy(r.packet.position);
-    faceCamera(r.packet, cam.quaternion);
-    faceCamera(r.packetGlow, cam.quaternion);
-    const pv = inFlight ? smoothstep(0.3, 0.45, s) * (1 - smoothstep(1.55, 1.75, s)) : 0;
-    r.packet.material.uniforms.uIntensity.value = L0 * pv;
-    r.packetGlow.scale.setScalar(0.9 + 0.3 * pv);
-    r.packetGlowMat.uniforms.uIntensity.value = L0 * pv * 0.9;
-    const throughRing = active ? Math.exp(-Math.pow((travel - 0.5) * 7, 2)) * pv : 0;
-    r.ringMat.uniforms.uIntensity.value = L0 * (0.85 + 1.6 * throughRing);
-    r.bridgeMat.uniforms.uIntensity.value = L0 * (1.1 + 0.8 * pv);
-    // Acknowledgement ripple at the destination screen.
-    const dst = toPhone ? r.phScreen : r.pcScreen;
-    dst.getWorldPosition(tmp.w);
-    r.ack.position.copy(r.groups[0].worldToLocal(tmp.w));
-    faceCamera(r.ack, cam.quaternion);
-    const ap = active ? Math.min(1, Math.max(0, (s - 1.55) / 0.9)) : 1;
-    r.ack.scale.setScalar(0.4 + ap * (toPhone ? 1.1 : 1.8));
-    r.ackMat.uniforms.uIntensity.value = L0 * (active && ap < 1 ? (1 - ap) * 1.4 : 0);
+    if (level[0] > 0.003) {
+      const L0 = level[0];
+      r.bridgeMat.uniforms.uTime.value = t;
+      (r.bridgeHalo.material as ShaderMaterial).uniforms.uTime.value = t;
+      r.ring.rotation.z = t * 0.6;
+      r.ring2.rotation.z = -t * 0.4;
+      r.ambient.forEach((p, i) => {
+        const u = (t * 0.2 + i / 4) % 1;
+        r.bridgeCurve.getPoint(i % 2 ? 1 - u : u, p.position);
+        faceCamera(p, cam.quaternion);
+        r.ambientMats[i].uniforms.uIntensity.value = L0 * Math.sin(Math.PI * u) * 0.55;
+      });
+      const s = (performance.now() - story.universe.bridgeAt) / 1000;
+      const dir = story.universe.bridgeDir; // 1: PC → iPhone, -1: iPhone → PC
+      const toPhone = dir > 0;
+      const active = s >= 0 && s < 6;
+      const travel = reduced ? (s > 0.2 ? 1 : 0) : smoothstep(0.35, 1.6, s);
+      const srcOn = active ? smoothstep(0, 0.25, s) * (1 - smoothstep(1.4, 1.9, s)) : 0;
+      const dstOn = active ? smoothstep(1.5, 1.8, s) * (1 - smoothstep(4.6, 5.6, s)) : 0;
+      // Screens: crossfade toward the state; the texture B slot holds the state.
+      const pcState = toPhone ? (srcOn > 0.01 ? r.pcSending : null) : dstOn > 0.01 ? r.pcReceived : null;
+      const phState = toPhone ? (dstOn > 0.01 ? r.phReceived : null) : srcOn > 0.01 ? r.phSending : null;
+      if (pcState) r.pcScreen.material.uniforms.uTexB.value = pcState;
+      if (phState) r.phScreen.material.uniforms.uTexB.value = phState;
+      damp.pcMix += ((pcState ? 1 : 0) - damp.pcMix) * k(8);
+      damp.phMix += ((phState ? 1 : 0) - damp.phMix) * k(8);
+      r.pcScreen.material.uniforms.uMix.value = damp.pcMix;
+      r.phScreen.material.uniforms.uMix.value = damp.phMix;
+      r.pcScreen.material.uniforms.uGlow.value = toPhone ? srcOn : dstOn;
+      r.phScreen.material.uniforms.uGlow.value = toPhone ? dstOn : srcOn;
+      // Packet card along the bridge.
+      const inFlight = active && s > 0.3 && s < 1.75;
+      r.packet.material.uniforms.uTexA.value = story.universe.bridgeCount % 2 ? r.packetImage : r.packetText;
+      r.bridgeCurve.getPoint(toPhone ? travel : 1 - travel, r.packet.position);
+      r.packet.position.y += 0.22;
+      r.packetGlow.position.copy(r.packet.position);
+      faceCamera(r.packet, cam.quaternion);
+      faceCamera(r.packetGlow, cam.quaternion);
+      const pv = inFlight ? smoothstep(0.3, 0.45, s) * (1 - smoothstep(1.55, 1.75, s)) : 0;
+      r.packet.material.uniforms.uIntensity.value = L0 * pv;
+      r.packetGlow.scale.setScalar(0.9 + 0.3 * pv);
+      r.packetGlowMat.uniforms.uIntensity.value = L0 * pv * 0.9;
+      const throughRing = active ? Math.exp(-Math.pow((travel - 0.5) * 7, 2)) * pv : 0;
+      r.ringMat.uniforms.uIntensity.value = L0 * (0.85 + 1.6 * throughRing);
+      r.bridgeMat.uniforms.uIntensity.value = L0 * (1.1 + 0.8 * pv);
+      // Acknowledgement ripple at the destination screen.
+      const dst = toPhone ? r.phScreen : r.pcScreen;
+      dst.getWorldPosition(tmp.w);
+      r.ack.position.copy(r.groups[0].worldToLocal(tmp.w));
+      faceCamera(r.ack, cam.quaternion);
+      const ap = active ? Math.min(1, Math.max(0, (s - 1.55) / 0.9)) : 1;
+      r.ack.scale.setScalar(0.4 + ap * (toPhone ? 1.1 : 1.8));
+      r.ackMat.uniforms.uIntensity.value = L0 * (active && ap < 1 ? (1 - ap) * 1.4 : 0);
+    }
 
     /* JobSeek: matching lines sweep the openings, settle on the match; SeekBot answers. */
-    const L1 = level[1];
-    const cyc = reduced ? 9 : (t * 0.55) % 7;
-    const arr = r.mLit.array as Float32Array;
-    r.jobPos.forEach((_, i) => {
-      const scan = Math.max(0, 1 - Math.abs(cyc - i * 0.8) * 1.4);
-      const locked = cyc > 3.6 && i === r.matchIdx ? 1 : 0;
-      arr[i * 2] = arr[i * 2 + 1] = Math.max(scan * 0.8, locked);
-    });
-    r.mLit.needsUpdate = true;
-    const matched = cyc > 3.6 ? 1 : 0;
-    damp.match += (matched - damp.match) * k(5);
-    const mj = r.jobs[r.matchIdx];
-    mj.material.uniforms.uMix.value = damp.match;
-    mj.material.uniforms.uGlow.value = damp.match * 0.8;
-    mj.scale.setScalar(1 + damp.match * 0.08);
-    const target = r.jobPos[Math.min(3, Math.floor(Math.min(cyc, 3.2) / 0.8))];
-    tmp.p.copy(r.from).lerp(tmp.a.set(target.x - 0.64, target.y, target.z), (cyc % 0.8) / 0.8);
-    if (matched) tmp.p.copy(r.jobPos[r.matchIdx]).add(tmp.a.set(-0.64, 0, 0));
-    r.scout.position.copy(tmp.p);
-    faceCamera(r.scout, cam.quaternion);
-    r.scoutMat.uniforms.uIntensity.value = L1 * (matched ? 0.6 : 1);
-    r.bot.rotation.set(t * 0.8, t * 1.1, 0);
-    r.bot.position.y = 1.05 + Math.sin(t * 1.3) * 0.06;
-    r.botCore.position.y = r.bot.position.y;
-    faceCamera(r.botCore, cam.quaternion);
-    r.botCoreMat.uniforms.uIntensity.value = L1 * (0.7 + 0.3 * Math.sin(t * 2.4));
-    const botShow = reduced ? 1 : smoothstep(4.0, 4.5, cyc) * (1 - smoothstep(6.6, 7, cyc));
-    r.botCard.material.uniforms.uIntensity.value = L1 * botShow;
-    r.botCard.position.y = 1.75 + (1 - botShow) * -0.12;
+    if (level[1] > 0.003) {
+      const L1 = level[1];
+      const cyc = reduced ? 9 : (t * 0.55) % 7;
+      const arr = r.mLit.array as Float32Array;
+      r.jobPos.forEach((_, i) => {
+        const scan = Math.max(0, 1 - Math.abs(cyc - i * 0.8) * 1.4);
+        const locked = cyc > 3.6 && i === r.matchIdx ? 1 : 0;
+        arr[i * 2] = arr[i * 2 + 1] = Math.max(scan * 0.8, locked);
+      });
+      r.mLit.needsUpdate = true;
+      const matched = cyc > 3.6 ? 1 : 0;
+      damp.match += (matched - damp.match) * k(5);
+      const mj = r.jobs[r.matchIdx];
+      mj.material.uniforms.uMix.value = damp.match;
+      mj.material.uniforms.uGlow.value = damp.match * 0.8;
+      mj.scale.setScalar(1 + damp.match * 0.08);
+      const target = r.jobPos[Math.min(3, Math.floor(Math.min(cyc, 3.2) / 0.8))];
+      tmp.p.copy(r.from).lerp(tmp.a.set(target.x - 0.64, target.y, target.z), (cyc % 0.8) / 0.8);
+      if (matched) tmp.p.copy(r.jobPos[r.matchIdx]).add(tmp.a.set(-0.64, 0, 0));
+      r.scout.position.copy(tmp.p);
+      faceCamera(r.scout, cam.quaternion);
+      r.scoutMat.uniforms.uIntensity.value = L1 * (matched ? 0.6 : 1);
+      r.bot.rotation.set(t * 0.8, t * 1.1, 0);
+      r.bot.position.y = 1.05 + Math.sin(t * 1.3) * 0.06;
+      r.botCore.position.y = r.bot.position.y;
+      faceCamera(r.botCore, cam.quaternion);
+      r.botCoreMat.uniforms.uIntensity.value = L1 * (0.7 + 0.3 * Math.sin(t * 2.4));
+      const botShow = reduced ? 1 : smoothstep(4.0, 4.5, cyc) * (1 - smoothstep(6.6, 7, cyc));
+      r.botCard.material.uniforms.uIntensity.value = L1 * botShow;
+      r.botCard.position.y = 1.75 + (1 - botShow) * -0.12;
+    }
 
     /* IRIS: the OCR plane passes; fields lift into a record; the totals are verified. */
-    const L2 = level[2];
-    const phase = reduced ? 0.8 : (t / 5) % 1;
-    const scan = 1.04 - phase * 1.2;
-    r.receipt.material.uniforms.uScan.value = scan;
-    r.scanBar.position.set(0, (scan - 0.5) * 2.1, 0.01);
-    r.scanBarMat.uniforms.uIntensity.value = L2 * (scan > -0.02 && scan < 1.02 ? 0.9 : 0);
-    const fade = 1 - smoothstep(0.9, 1, phase);
-    r.fields.forEach((f, i) => {
-      const u = smoothstep(0, 1, Math.min(1, Math.max(0, (r.rowUv[i] - scan) / 0.18)));
-      tmp.a.set(-1.0, (r.rowUv[i] - 0.5) * 2.1, 0.12);
-      tmp.b.set(1.15, 0.72 - i * 0.29, 0.35);
-      f.position.copy(tmp.a).lerp(tmp.b, u);
-      f.position.z += Math.sin(Math.PI * u) * 0.5;
-      f.scale.setScalar(0.6 + 0.4 * u);
-      f.material.uniforms.uIntensity.value = L2 * smoothstep(0.02, 0.2, u) * fade;
-    });
-    const done = smoothstep(0.62, 0.75, phase) * fade;
-    r.recordMat.uniforms.uIntensity.value = L2 * (0.25 + 0.75 * done);
-    r.verified.material.uniforms.uIntensity.value = L2 * done;
-    r.verified.material.uniforms.uGlow.value = done;
+    if (level[2] > 0.003) {
+      const L2 = level[2];
+      const phase = reduced ? 0.8 : (t / 5) % 1;
+      const scan = 1.04 - phase * 1.2;
+      r.receipt.material.uniforms.uScan.value = scan;
+      r.scanBar.position.set(0, (scan - 0.5) * 2.1, 0.01);
+      r.scanBarMat.uniforms.uIntensity.value = L2 * (scan > -0.02 && scan < 1.02 ? 0.9 : 0);
+      const fade = 1 - smoothstep(0.9, 1, phase);
+      r.fields.forEach((f, i) => {
+        const u = smoothstep(0, 1, Math.min(1, Math.max(0, (r.rowUv[i] - scan) / 0.18)));
+        tmp.a.set(-1.0, (r.rowUv[i] - 0.5) * 2.1, 0.12);
+        tmp.b.set(1.15, 0.72 - i * 0.29, 0.35);
+        f.position.copy(tmp.a).lerp(tmp.b, u);
+        f.position.z += Math.sin(Math.PI * u) * 0.5;
+        f.scale.setScalar(0.6 + 0.4 * u);
+        f.material.uniforms.uIntensity.value = L2 * smoothstep(0.02, 0.2, u) * fade;
+      });
+      const done = smoothstep(0.62, 0.75, phase) * fade;
+      r.recordMat.uniforms.uIntensity.value = L2 * (0.25 + 0.75 * done);
+      r.verified.material.uniforms.uIntensity.value = L2 * done;
+      r.verified.material.uniforms.uGlow.value = done;
+    }
 
     /* ELI5: the visitor's toggle relaxes the knot and simplifies the text (damped, reversible). */
-    damp.eli5 += (story.universe.eli5 - damp.eli5) * k(2.2);
-    r.knotMat.uniforms.uMorph.value = damp.eli5;
-    r.knotMat.uniforms.uTime.value = t;
-    r.knotGroup.rotation.set(0.35 * (1 - damp.eli5), t * 0.15 * (1 - damp.eli5), 0);
-    r.eliText.material.uniforms.uMix.value = smoothstep(0.25, 0.85, damp.eli5);
-    r.eliText.material.uniforms.uGlow.value = Math.sin(Math.PI * damp.eli5) * 0.8;
+    if (level[3] > 0.003) {
+      damp.eli5 += (story.universe.eli5 - damp.eli5) * k(2.2);
+      r.knotMat.uniforms.uMorph.value = damp.eli5;
+      r.knotMat.uniforms.uTime.value = t;
+      r.knotGroup.rotation.set(0.35 * (1 - damp.eli5), t * 0.15 * (1 - damp.eli5), 0);
+      r.eliText.material.uniforms.uMix.value = smoothstep(0.25, 0.85, damp.eli5);
+      r.eliText.material.uniforms.uGlow.value = Math.sin(Math.PI * damp.eli5) * 0.8;
+    }
 
     /* QP-Gen: chapter chosen → question modules flow in → the paper builds section by section (scroll-owned). */
-    const asm = smoothstep(artifactTrack(4) - 0.45, artifactTrack(4) + 0.02, tr);
-    r.chapters.forEach((c, i) => (c.material.uniforms.uGlow.value = i === 0 ? 0.6 + 0.4 * smoothstep(0, 0.2, asm) : 0));
-    r.paper.material.uniforms.uReveal.value = 0.22 + asm * 0.9;
-    r.qChips.forEach((c, i) => {
-      const m = smoothstep(0.1 + i * 0.1, 0.45 + i * 0.1, asm);
-      tmp.a.set(-1.25, 0.75, 0.25);
-      tmp.b.set(0.75, (r.paper.material.uniforms.uReveal.value > 0 ? (QP_SLOTS[i] - 0.5) * 2.2 : 0), 0.08);
-      c.position.copy(tmp.a).lerp(tmp.b, m);
-      c.position.z += Math.sin(Math.PI * m) * 0.45;
-      c.rotation.y = -0.12 * m + 0.25 * (1 - m);
-      c.material.uniforms.uIntensity.value = level[4] * smoothstep(0.0, 0.08, m) * (1 - smoothstep(0.85, 1, m));
-    });
+    if (level[4] > 0.003) {
+      const asm = smoothstep(artifactTrack(4) - 0.45, artifactTrack(4) + 0.02, tr);
+      r.chapters.forEach((c, i) => (c.material.uniforms.uGlow.value = i === 0 ? 0.6 + 0.4 * smoothstep(0, 0.2, asm) : 0));
+      r.paper.material.uniforms.uReveal.value = 0.22 + asm * 0.9;
+      r.qChips.forEach((c, i) => {
+        const m = smoothstep(0.1 + i * 0.1, 0.45 + i * 0.1, asm);
+        tmp.a.set(-1.25, 0.75, 0.25);
+        tmp.b.set(0.75, (r.paper.material.uniforms.uReveal.value > 0 ? (QP_SLOTS[i] - 0.5) * 2.2 : 0), 0.08);
+        c.position.copy(tmp.a).lerp(tmp.b, m);
+        c.position.z += Math.sin(Math.PI * m) * 0.45;
+        c.rotation.y = -0.12 * m + 0.25 * (1 - m);
+        c.material.uniforms.uIntensity.value = level[4] * smoothstep(0.0, 0.08, m) * (1 - smoothstep(0.85, 1, m));
+      });
+    }
 
     /* Scholaroid: the campus turns slowly; information moves hub ↔ roles and between roles. */
-    const L5 = level[5];
-    r.sc.rotation.y = 0.35 + t * 0.08;
-    r.rolePanels.forEach((p) => faceCamera(p, cam.quaternion));
-    r.arcMats.forEach((m) => (m.uniforms.uTime.value = t));
-    r.doorMat.uniforms.uIntensity.value = L5 * 0.8;
-    const curves = [...r.arcs, ...r.cross];
-    r.pulses.forEach((p, i) => {
-      const u = (t * 0.32 + i * 0.17) % 1;
-      const back = i < 4 && Math.floor(t * 0.32 + i * 0.17) % 2 === 1;
-      curves[i].getPoint(back ? 1 - u : u, p.position);
-      faceCamera(p, cam.quaternion);
-      r.pulseMats[i].uniforms.uIntensity.value = L5 * Math.sin(Math.PI * u) * 0.95;
-    });
+    if (level[5] > 0.003) {
+      const L5 = level[5];
+      r.sc.rotation.y = 0.35 + t * 0.08;
+      r.rolePanels.forEach((p) => faceCamera(p, cam.quaternion));
+      r.arcMats.forEach((m) => (m.uniforms.uTime.value = t));
+      r.doorMat.uniforms.uIntensity.value = L5 * 0.8;
+      const curves = [...r.arcs, ...r.cross];
+      r.pulses.forEach((p, i) => {
+        const u = (t * 0.32 + i * 0.17) % 1;
+        const back = i < 4 && Math.floor(t * 0.32 + i * 0.17) % 2 === 1;
+        curves[i].getPoint(back ? 1 - u : u, p.position);
+        faceCamera(p, cam.quaternion);
+        r.pulseMats[i].uniforms.uIntensity.value = L5 * Math.sin(Math.PI * u) * 0.95;
+      });
+    }
   });
 
   return <primitive object={r.root} />;
