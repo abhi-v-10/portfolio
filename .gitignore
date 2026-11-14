@@ -13,3 +13,6 @@ next-env.d.ts
 # Raw source photos (optimised copies live in public/)
 assets/
 AGENTS.md
+
+.vercel
+.env*

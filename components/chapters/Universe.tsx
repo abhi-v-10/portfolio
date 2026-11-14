@@ -340,6 +340,12 @@ export function Closing() {
           <a className="action action--primary" href={`mailto:${contact.email}`}>
             {contact.email}
           </a>
+          {closing.cv && (
+            <a className="action" href={closing.cv} target="_blank" rel="noopener">
+              View CV <span aria-hidden>↗</span>
+              <span className="sr-only"> (PDF, opens in a new tab)</span>
+            </a>
+          )}
           <button type="button" className="action" onClick={() => openIndex("work")}>
             See the work
           </button>
@@ -363,11 +369,6 @@ export function Closing() {
               Instagram
             </a>
           </li>
-          {closing.cv && (
-            <li>
-              <a href={closing.cv}>CV</a>
-            </li>
-          )}
         </ul>
       </div>
       <PostCredits />

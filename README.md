@@ -58,7 +58,6 @@ QA hooks: `?webgl=0` forces the no-WebGL route; `?slowmo=N` slows the gallery ro
 | Project screenshots (Screens block in each case study) | `content/screens.ts` (files in `public/projects/<id>/`, from `assets/project-photos/`) |
 | Project links | `content/projects.ts` → `links` (a Links section appears once one is set) |
 | Timeline events and evidence | `content/timeline.ts` |
-| CV link | `content/site.ts` → `closing.cv` |
 | Hero CGPA 9.3 (confirm before launch) | `content/site.ts` → `highlights.cgpa` |
 
 ## Still to supply (personal information and photos)
@@ -69,7 +68,6 @@ These are not shown on the site until supplied. Nothing is invented in their pla
 |---|---|
 | A personal anecdote for Meet the Human, in your own words | `content/site.ts` → `human.anecdotePlaceholder` (render it in `components/human/Human.tsx`) |
 | The origin of your curiosity (Curiosity chapter) | `content/site.ts` → `curiosity.anecdotePlaceholder` (render it in `components/chapters/Chapters.tsx`) |
-| CV link | `content/site.ts` → `closing.cv` (the CV link appears in Next Chapter when set) |
 | Per project: your role, key decisions and lessons | `content/projects.ts` (add a `sections` entry) |
 | Optional: more WiniOS and ELI5 screens (each has one) | `public/projects/<id>/n.webp` + `n-thumb.webp`, captions in `content/screens.ts` |
 | Per project: repository / live links | `content/projects.ts` → `links` |

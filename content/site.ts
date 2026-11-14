@@ -227,9 +227,8 @@ export const closing = {
   title: "Next Chapter",
   lead: "The story so far. The next part is yours to start.",
   copy: "Open to internships, collaborations and interesting problems, especially involving AI agents, backends or 3D on the web.",
-  /** EDIT: set to a CV URL (e.g. "/cv.pdf") when supplied. */
-  cv: null as string | null,
-  cvPlaceholder: "[CV URL]",
+  /** One-page CV, built from docs/resume/resume.html (see docs/resume/build.mjs). */
+  cv: "/Abhishyanth-Vemula-Resume.pdf" as string | null,
   /** Post-credits scene: MCU end-card convention, original line. */
   postCredits: {
     meta: "Thank you for exploring my universe",

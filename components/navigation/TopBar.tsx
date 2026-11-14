@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import { chapters, contact, experience, projects } from "@/content/site";
+import { chapters, closing, contact, experience, projects } from "@/content/site";
 import { onIndexOpen, openIndex, type IndexSection } from "./indexEvents";
 import { caseNav } from "@/components/case/caseNav";
 
@@ -136,6 +136,13 @@ export function TopBar({ inert }: { inert?: boolean }) {
                   Instagram
                 </a>
               </li>
+              {closing.cv && (
+                <li>
+                  <a href={closing.cv} target="_blank" rel="noopener">
+                    CV (PDF)
+                  </a>
+                </li>
+              )}
             </ul>
           </section>
 
