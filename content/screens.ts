@@ -3,7 +3,6 @@
  * 2026-11-14), shown in each case study in the order they were numbered.
  * Display files are WebP derivatives in public/projects/<id>/ (n.webp and
  * n-thumb.webp). Captions describe only what each screen shows.
- * WiniOS has no screenshots yet: add a "winios" entry when they arrive.
  */
 
 export type ProjectScreen = { title: string; caption: string; width: number; height: number };
@@ -11,6 +10,9 @@ export type ProjectScreen = { title: string; caption: string; width: number; hei
 const W = 1238;
 
 export const projectScreens: Record<string, ProjectScreen[]> = {
+  winios: [
+    { title: "Settings: General", caption: "The WiniOS Settings window on Windows, connected: it keeps running in the notification area, can start with Windows, and has Connection, Clipboard, Images, Privacy and About tabs.", width: 1600, height: 865 },
+  ],
   jobseek: [
     { title: "Landing page", caption: "“Find Jobs. Build Careers. Grow Smarter.”, with Get Started and Meet SeekBot.", width: W, height: 658 },
     { title: "SeekBot", caption: "The SeekBot assistant: recent chats, a new-chat button and suggested prompts for job search, résumé review, skills and interview prep.", width: W, height: 658 },

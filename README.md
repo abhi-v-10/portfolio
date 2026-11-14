@@ -71,7 +71,7 @@ These are not shown on the site until supplied. Nothing is invented in their pla
 | The origin of your curiosity (Curiosity chapter) | `content/site.ts` → `curiosity.anecdotePlaceholder` (render it in `components/chapters/Chapters.tsx`) |
 | CV link | `content/site.ts` → `closing.cv` (the CV link appears in Next Chapter when set) |
 | Per project: your role, key decisions and lessons | `content/projects.ts` (add a `sections` entry) |
-| WiniOS screenshots (the other five projects have theirs); more ELI5 screens optional | `public/projects/<id>/n.webp` + `n-thumb.webp`, captions in `content/screens.ts` |
+| Optional: more WiniOS and ELI5 screens (each has one) | `public/projects/<id>/n.webp` + `n-thumb.webp`, captions in `content/screens.ts` |
 | Per project: repository / live links | `content/projects.ts` → `links` |
 | Confirm: hero CGPA 9.3, the J.A.R.V.I.S. line wording | `content/site.ts` |
 | Optional: more gallery photos (4:5, at least 1200×1500) | `public/photos/` + `content/gallery.ts` |
