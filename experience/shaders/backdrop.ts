@@ -24,6 +24,7 @@ export const backdropFragment = /* glsl */ `
   uniform float uProj;
   uniform float uNexus;
   uniform float uDawn;
+  uniform float uFinale;
   varying vec3 vDir;
 
   float hash(vec3 p) {
@@ -140,12 +141,18 @@ export const backdropFragment = /* glsl */ `
     nexus += vec3(0.49, 0.96, 0.77) * wisp * 0.12 + jade * horizon * 0.08;
     col = mix(col, nexus, uNexus * 0.9);
 
-    // Next Chapter: an airy dawn. Lavender sky, warm ivory and coral at the horizon.
-    vec3 lav = vec3(0.56, 0.50, 0.80);
-    vec3 dawn = mix(lav * 0.62, vec3(0.94, 0.85, 0.75) * 0.8, smoothstep(0.35, -0.15, d.y) * 0.8);
-    dawn = mix(dawn, coral * 0.75, horizon * smoothstep(0.45, 0.85, w) * 0.45);
-    dawn += vec3(1.0, 0.95, 0.88) * exp(-pow((d.y - 0.12) * 4.0, 2.0)) * 0.12;
-    col = mix(col, dawn, uDawn * 0.88);
+    // Next Chapter (refined 2026-11-14): a dimensional dawn, not a white-out.
+    // Deep indigo above, lavender air, a controlled gold-coral horizon band with
+    // a crisp light line, warm haze below. The post-credits finale dims it all.
+    vec3 lav = vec3(0.44, 0.38, 0.68);
+    vec3 sky = mix(vec3(0.07, 0.06, 0.16), lav * 0.6, smoothstep(0.65, 0.02, d.y));
+    vec3 band = mix(vec3(0.98, 0.76, 0.52), vec3(1.0, 0.58, 0.44), smoothstep(0.2, 0.9, w));
+    sky = mix(sky, band * 0.72, exp(-pow((d.y - 0.06) * 5.0, 2.0)) * 0.7);
+    sky += vec3(1.0, 0.86, 0.66) * exp(-pow((d.y - 0.07) * 16.0, 2.0)) * 0.16;
+    sky = mix(sky, vec3(0.16, 0.11, 0.22), smoothstep(-0.02, -0.45, d.y));
+    sky += lav * wisp * 0.05;
+    col = mix(col, sky, uDawn * 0.92);
+    col *= 1.0 - 0.88 * uFinale;
 
     // Intro: the world starts in the loader's darkness and blooms open.
     col = mix(vec3(0.012, 0.027, 0.055), col, smoothstep(0.0, 0.85, uIntro));

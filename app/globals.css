@@ -1279,8 +1279,28 @@ html.cursor-visible .cursor-ring {
   margin: 0.35rem 0 0;
 }
 .timeline-item:hover,
-.timeline-item:focus-visible {
-  background: rgb(124 245 196 / 0.07);
+.timeline-item:focus-visible,
+.timeline-item[data-active] {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--strand, #7cf5c4) 14%, transparent), transparent 85%);
+}
+/* The active milestone is tied to its strand: a lit rule in the strand colour. */
+.timeline-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--strand, #7cf5c4);
+  box-shadow: 0 0 12px var(--strand, #7cf5c4);
+  opacity: 0;
+  transform: scaleY(0.4);
+  transition: opacity 0.35s ease, transform 0.45s var(--ease-out-expo);
+}
+.timeline-item[data-active]::after {
+  opacity: 1;
+  transform: none;
 }
 .timeline-date {
   font-family: var(--font-mono), monospace;
@@ -1328,7 +1348,6 @@ html.cursor-visible .cursor-ring {
 .closing {
   position: relative;
   overflow-x: clip;
-  min-height: 150svh;
   padding: 56svh var(--gutter) 0;
 }
 .closing-card {
@@ -1404,32 +1423,109 @@ html.cursor-visible .cursor-ring {
   color: var(--ink-muted) !important;
   text-decoration: none !important;
 }
-/* Post-credits: after a full screen of quiet, a centred end card. */
-.post-credits {
-  margin-top: 70svh;
-  padding: 0 0 18svh;
+/* Post-credits (refined 2026-11-14): a deliberate title card. The section dims
+   the world, holds a beat, then the title arrives word by word with tracking
+   settling in, and the punchline follows late and small. */
+.credits {
+  position: relative;
+  min-height: 100svh;
+  margin: 34svh calc(var(--gutter) * -1) 0;
+  display: grid;
+  place-items: center;
+  padding: 12svh var(--gutter);
   text-align: center;
+  background: radial-gradient(120% 90% at 50% 55%, rgb(6 5 14 / 0), rgb(3 3 8 / 0));
+  transition: background 1.2s ease;
 }
-.post-credits-meta {
+.credits[data-state="playing"] {
+  background: radial-gradient(120% 90% at 50% 55%, rgb(10 8 22 / 0.78), rgb(3 3 8 / 0.97));
+}
+.credits-inner {
+  max-width: 64rem;
+}
+.credits-meta {
   margin: 0;
   font-family: var(--font-mono), monospace;
   font-size: 0.6875rem;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: #d9cfee;
+  color: #cfc4e8;
 }
-.post-credits-title {
-  margin: 0.9rem 0 0;
+.credits-title {
+  margin: 1.4rem 0 0;
   font-family: var(--font-display), sans-serif;
-  font-weight: 700;
-  font-size: clamp(1.25rem, 0.9rem + 1.6vw, 2rem);
-  letter-spacing: -0.01em;
+  font-weight: 800;
+  font-size: clamp(1.9rem, 0.6rem + 5.6vw, 5.6rem);
+  line-height: 1.02;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-wrap: balance;
   color: var(--soft-white);
+  text-shadow: 0 0 40px rgb(255 214 170 / 0.18);
 }
-.post-credits-line {
-  margin: 0.6rem 0 0;
-  font-size: 0.9375rem;
+.credits-word {
+  display: inline-block;
+}
+.credits-line {
+  margin: 1.6rem auto 0;
+  max-width: 40ch;
+  font-size: clamp(0.95rem, 0.9rem + 0.3vw, 1.1rem);
   color: #e6def5;
+}
+.credits-after {
+  margin-top: 2.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.25rem;
+}
+/* Choreography (only when motion is allowed and the scene is playing). */
+@media (prefers-reduced-motion: no-preference) {
+  .credits .credits-meta,
+  .credits .credits-word,
+  .credits .credits-line,
+  .credits .credits-after {
+    opacity: 0;
+  }
+  .credits[data-state="playing"] .credits-meta {
+    animation: credits-fade 1.2s ease 1.3s both;
+  }
+  .credits[data-state="playing"] .credits-word {
+    animation: credits-word 1.5s var(--ease-out-expo) both;
+    animation-delay: calc(2.1s + var(--w) * 0.16s);
+  }
+  .credits[data-state="playing"] .credits-line {
+    animation: credits-fade 1s ease 4.4s both;
+  }
+  .credits[data-state="playing"] .credits-after {
+    animation: credits-fade 0.8s ease 5.6s both;
+  }
+}
+@keyframes credits-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes credits-word {
+  from {
+    opacity: 0;
+    letter-spacing: 0.3em;
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.02em;
+    filter: blur(0);
+  }
+}
+.credits-cue span {
+  display: inline-block;
+  margin-left: 0.35rem;
 }
 
 /* No-WebGL colour story for the new chapters. */
@@ -2156,8 +2252,8 @@ html.cursor-visible .cursor-ring {
   .closing {
     padding-top: 48svh;
   }
-  .post-credits {
-    margin-top: 55svh;
+  .credits {
+    margin-top: 26svh;
   }
 
   /* Portrait: the world sits in the upper frame; copy owns the lower frame. */

@@ -4,13 +4,18 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo } from "react";
 import {
   AdditiveBlending,
+  BufferGeometry,
   CatmullRomCurve3,
   Color,
   Group,
   IcosahedronGeometry,
   Material,
+  Float32BufferAttribute,
   Mesh,
   PlaneGeometry,
+  Points,
+  PointsMaterial,
+  TorusGeometry,
   ShaderMaterial,
   TubeGeometry,
   Vector3,
@@ -19,8 +24,18 @@ import { timeline, strands as strandList } from "@/content/timeline";
 import { story } from "../director/store";
 import { glowFragment, glowVertex, signalFragment, signalVertex } from "../shaders/signal";
 import { shellFragment, shellVertex, strandFragment } from "../shaders/universe";
+
+const shellMatOf = (c: string) =>
+  new ShaderMaterial({
+    vertexShader: shellVertex,
+    fragmentShader: shellFragment,
+    uniforms: { uColor: { value: new Color(c) }, uIntensity: { value: 0 }, uFill: { value: 0.35 } },
+    transparent: true,
+    depthWrite: false,
+    blending: AdditiveBlending,
+  });
 import { smoothstep } from "../world/paths";
-import { HORIZON, NEXUS, WINDOW } from "./layout";
+import { HORIZON, NEXUS, WINDOW, mulberry32 } from "./layout";
 import { faceCamera } from "./UniverseWorld";
 
 const v = (x: number, y: number, z: number) => new Vector3(x, y, z);
@@ -41,6 +56,8 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
     const root = new Group();
     root.position.copy(NEXUS);
     const strandMats: ShaderMaterial[] = [];
+    /** Plies per strand, so a focused event can light its whole strand. */
+    const strandGroups: ShaderMaterial[][] = ORIGINS.map(() => []);
     const bases: CatmullRomCurve3[] = [];
     const seg = lowPower ? 90 : 150;
 
@@ -73,6 +90,7 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
           ...additive,
         });
         strandMats.push(mat);
+        strandGroups[s].push(mat);
         root.add(new Mesh(new TubeGeometry(new CatmullRomCurve3(pts, false, "centripetal"), seg, p === 0 ? 0.03 : 0.016, 6, false), mat));
       }
     });
@@ -105,7 +123,7 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
       const halo = new Mesh(sprite, glowMat(ev.placeholder ? "#c8d6e6" : "#9dffd6"));
       halo.position.copy(p);
       root.add(node, halo);
-      return { node, halo, shellMat, u, i };
+      return { node, halo, shellMat, u, i, s, major: !!ev.major };
     });
 
     // The present: a living point where every strand meets.
@@ -139,13 +157,51 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
       root.add(new Mesh(new TubeGeometry(curve, lowPower ? 80 : 140, 0.035, 6, false), mat));
       return mat;
     });
-    const sunMat = glowMat("#ffe7cf");
+    // The horizon (refined): a warm, controlled light with visible form. A gold
+    // halo, a smaller ivory heart, three gateway arcs standing around it, a
+    // horizon band and warm motes rising from the converged threads.
+    const sunMat = glowMat("#ffae78");
     const sun = new Mesh(sprite, sunMat);
     sun.position.copy(rel);
-    root.add(sun);
+    const heartMat = glowMat("#ffe0b8");
+    const heart = new Mesh(sprite, heartMat);
+    heart.position.copy(rel);
+    const arcCols = ["#b9a6ff", "#ffcf8a", "#f17e98"];
+    const arcMats = arcCols.map((c) => shellMatOf(c));
+    const arcs = arcMats.map((m, k) => {
+      const a = new Mesh(new TorusGeometry(3.2 + k * 1.15, 0.035 - k * 0.006, 8, 120, Math.PI * (1.1 - k * 0.12)), m);
+      a.position.copy(rel);
+      a.rotation.z = Math.PI * (k * 0.06 - 0.05) - 0.03;
+      root.add(a);
+      return a;
+    });
+    const bandMat = glowMat("#ffc796");
+    const band = new Mesh(sprite, bandMat);
+    band.position.copy(rel).add(v(0, -1.6, -2));
+    band.scale.set(60, 1.4, 1);
+    const moteCount = lowPower ? 90 : 180;
+    const motePos = new Float32Array(moteCount * 3);
+    const moteSeed = new Float32Array(moteCount);
+    const rand = mulberry32(2026);
+    for (let k = 0; k < moteCount; k++) {
+      const a = rand() * Math.PI * 2;
+      const rr = 2 + rand() * 9;
+      motePos.set([rel.x * 0.5 + Math.cos(a) * rr, rand() * rel.y, rel.z * 0.6 + Math.sin(a) * rr * 0.5], k * 3);
+      moteSeed[k] = rand();
+    }
+    const moteGeo = new BufferGeometry();
+    moteGeo.setAttribute("position", new Float32BufferAttribute(motePos, 3));
+    const moteMat = new PointsMaterial({ color: new Color("#ffd2a8"), size: 0.09, transparent: true, opacity: 0, depthWrite: false, blending: AdditiveBlending });
+    const motes = new Points(moteGeo, moteMat);
+    root.add(band, sun, heart, motes);
+
+    // A spark that runs from the focused event along its strand into the present.
+    const sparkMat = glowMat("#dffff2");
+    const spark = new Mesh(sprite, sparkMat);
+    root.add(spark);
 
     root.visible = false;
-    return { root, strandMats, events, core, coreMat, pathMats, sun, sunMat };
+    return { root, strandMats, strandGroups, bases, events, core, coreMat, pathMats, sun, sunMat, heart, heartMat, arcs, arcMats, band, bandMat, motes, moteMat, motePos, moteSeed, rel, spark, sparkMat };
   }, [lowPower]);
 
   useEffect(
@@ -159,7 +215,9 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
     [r],
   );
 
-  useFrame((state) => {
+  const lightState = useMemo(() => ({ strand: ORIGINS.map(() => 1), major: 0 }), []);
+
+  useFrame((state, dt) => {
     const tr = story.view.track;
     const inside = tr > WINDOW.nexus[0] && tr < WINDOW.nexus[1];
     r.root.visible = inside;
@@ -173,16 +231,32 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
     const gather = smoothstep(9.9, 10.95, tr);
     const dawn = smoothstep(10.95, 11.55, tr);
 
-    r.strandMats.forEach((m) => {
-      m.uniforms.uTime.value = t;
-      m.uniforms.uReveal.value = reveal * 1.001;
-      m.uniforms.uIntensity.value = presence * (1 - dawn * 0.45);
-      m.uniforms.uGather.value = gather;
-      m.uniforms.uDawn.value = dawn;
+    // Focus: the focused event's whole strand lights, the others step back.
+    const focus = story.nexusFocus;
+    const fe = focus >= 0 ? r.events[focus] : undefined;
+    const kf = 1 - Math.exp(-Math.min(dt, 0.1) * (reduced ? 40 : 5));
+    r.strandGroups.forEach((mats, s) => {
+      const goal = fe ? (fe.s === s ? 1.7 : 0.4) : 1;
+      lightState.strand[s] += (goal - lightState.strand[s]) * kf;
+      mats.forEach((m) => {
+        m.uniforms.uTime.value = t;
+        m.uniforms.uReveal.value = reveal * 1.001;
+        m.uniforms.uIntensity.value = presence * (1 - dawn * 0.45) * lightState.strand[s];
+        m.uniforms.uGather.value = gather;
+        m.uniforms.uDawn.value = dawn;
+      });
     });
+    lightState.major += ((fe?.major ? 1 : 0) - lightState.major) * kf;
+    if (fe) {
+      const u = reduced ? 1 : Math.min(1, ((t * 0.45) % 1.25));
+      const along = fe.u + (1 - fe.u) * u;
+      r.bases[fe.s].getPointAt(Math.min(1, along), r.spark.position);
+      faceCamera(r.spark, cam.quaternion);
+      r.spark.scale.setScalar(0.7);
+      r.sparkMat.uniforms.uIntensity.value = presence * (1 - dawn) * (reduced ? 0 : Math.sin(Math.PI * Math.min(1, u)) * 1.2);
+    } else r.sparkMat.uniforms.uIntensity.value = 0;
 
     // Event nodes appear as the strands reach them; the focused event answers.
-    const focus = story.nexusFocus;
     r.events.forEach((e) => {
       const on = smoothstep(e.u - 0.05, e.u + 0.05, reveal) * presence * (1 - dawn * 0.6);
       const f = e.i === focus ? 1 : 0;
@@ -196,17 +270,43 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
 
     faceCamera(r.core, cam.quaternion);
     r.core.scale.setScalar(1.4 + gather * 2.2 + (reduced ? 0 : Math.sin(t * 2) * 0.15 * gather));
-    r.coreMat.uniforms.uIntensity.value = presence * (0.4 + gather * 1.1) * (1 - dawn * 0.5);
+    // Major events (degree, internship, council, WiniOS) make the present answer.
+    r.coreMat.uniforms.uIntensity.value = presence * (0.4 + gather * 1.1 + lightState.major * 0.6) * (1 - dawn * 0.5);
 
+    // Post-credits finale: the threads withdraw toward the present, the light lowers.
+    const fin = story.finale;
     const rise = smoothstep(10.85, 11.6, tr);
     r.pathMats.forEach((m) => {
       m.uniforms.uTime.value = t;
-      m.uniforms.uReveal.value = rise * 1.001;
-      m.uniforms.uIntensity.value = rise * 1.1;
+      m.uniforms.uReveal.value = rise * (1 - fin) * 1.001;
+      m.uniforms.uIntensity.value = rise * 1.1 * (1 - fin * 0.7);
     });
+    const warm = dawn * (1 - fin);
     faceCamera(r.sun, cam.quaternion);
-    r.sun.scale.setScalar(14 + dawn * 8);
-    r.sunMat.uniforms.uIntensity.value = dawn * 1.0;
+    faceCamera(r.heart, cam.quaternion);
+    faceCamera(r.band, cam.quaternion);
+    r.sun.scale.setScalar(11 + dawn * 4);
+    r.sunMat.uniforms.uIntensity.value = warm * 0.42;
+    r.heart.scale.setScalar(3.2 + (reduced ? 0 : Math.sin(t * 0.8) * 0.15));
+    r.heartMat.uniforms.uIntensity.value = warm * 0.55;
+    r.bandMat.uniforms.uIntensity.value = warm * 0.35;
+    r.arcs.forEach((a, k) => {
+      faceCamera(a, cam.quaternion);
+      a.rotateZ(Math.PI * (k * 0.06 - 0.05) - 0.03 + (reduced ? 0 : Math.sin(t * 0.15 + k) * 0.04));
+      const grow = smoothstep(11.0 + k * 0.12, 11.55 + k * 0.12, tr);
+      a.scale.setScalar(0.85 + 0.15 * grow);
+      r.arcMats[k].uniforms.uIntensity.value = warm * grow * (0.9 - k * 0.15);
+    });
+    r.moteMat.opacity = warm * 0.85;
+    if (!reduced && warm > 0.01) {
+      const pa = r.motes.geometry.attributes.position;
+      const arr = pa.array as Float32Array;
+      for (let k = 0; k < r.moteSeed.length; k++) {
+        arr[k * 3 + 1] += Math.min(dt, 0.1) * (0.25 + r.moteSeed[k] * 0.5);
+        if (arr[k * 3 + 1] > r.rel.y + 2) arr[k * 3 + 1] = -2;
+      }
+      pa.needsUpdate = true;
+    }
   });
 
   return <primitive object={r.root} />;

@@ -36,11 +36,11 @@ Note: the brief lists different filenames (`nestafar-internship.pdf`, …); the 
 - [x] Editorial case-study layout with SVG architecture hero
 
 ### Pass D — Timeline Nexus
-- [ ] Evidence buttons, strand illumination on focus, camera/light response, mobile spacing
+- [x] Evidence buttons, strand illumination on focus, camera/light response, mobile spacing
 
 ### Pass E — ending
-- [ ] Closing environment (no blown-out sun), stronger nexus→dawn transition
-- [ ] Post-credits as triggered title-card sequence
+- [x] Closing environment (no blown-out sun), stronger nexus→dawn transition
+- [x] Post-credits as triggered title-card sequence
 
 ### Pass F — regression, docs, screenshots, recording
 - [ ] lint / typecheck / build, QA scripts at 1440/1280/820/390/320
@@ -51,4 +51,4 @@ Note: the brief lists different filenames (`nestafar-internship.pdf`, …); the 
 - [x] Four more photos supplied by path (garden café, floral backdrop, festival lights, beach at night), cropped 4:5 into `public/photos/`; gallery now has five photos
 
 ## Next action
-Pass D (Timeline Nexus: strand illumination on focus, camera/light response, mobile spacing).
+Pass F (full regression at five widths, reduced motion, no-WebGL, docs, screenshots, recording).

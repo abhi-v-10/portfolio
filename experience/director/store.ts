@@ -58,6 +58,8 @@ export const story = {
     caseAmt: 0,
   },
   nexusFocus: -1,
+  /** Post-credits finale (0 → 1): the world dims and the signal withdraws. */
+  finale: 0,
 };
 
 /** Imperative writer for DOM-side owners (keeps React lint rules satisfied). */
