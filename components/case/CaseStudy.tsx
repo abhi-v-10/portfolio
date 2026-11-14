@@ -23,7 +23,8 @@ export function CaseStudy({
   next: React.ReactNode;
 }) {
   const nn = String(index + 1).padStart(2, "0");
-  const hasLinks = Boolean(p.links.repo || p.links.live);
+  const { repo, live, download } = p.links;
+  const hasLinks = Boolean(repo || live || download);
   // Defensive: content edited mid-session (or an older cache) may lack `flow`.
   const flow = p.flow ?? [];
   let n = 0;
@@ -81,6 +82,38 @@ export function CaseStudy({
               <li key={s}>{s}</li>
             ))}
           </ul>
+          {hasLinks && (
+            <div className="cs-cta cs-in" style={{ "--i": 5 } as React.CSSProperties}>
+              {download && (
+                <a className="action action--primary action--download" href={download.href} rel="noopener">
+                  <svg viewBox="0 0 16 16" aria-hidden focusable="false">
+                    <path d="M8 2v8M4.5 6.8 8 10.3l3.5-3.5M3 13h10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  {download.label}
+                </a>
+              )}
+              {live && (
+                <a className={download ? "action" : "action action--primary"} href={live} target="_blank" rel="noopener noreferrer">
+                  Try it live <span aria-hidden>↗</span>
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+              )}
+              {repo && (
+                <a className="action" href={repo} target="_blank" rel="noopener noreferrer">
+                  Source on GitHub <span aria-hidden>↗</span>
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+              )}
+              {download && (
+                <p className="cs-cta-note">
+                  {download.note} ·{" "}
+                  <a href={download.page} target="_blank" rel="noopener noreferrer">
+                    Release notes
+                  </a>
+                </p>
+              )}
+            </div>
+          )}
         </div>
         {overlay ? (
           <div className="cs-window" aria-hidden />
@@ -189,26 +222,6 @@ export function CaseStudy({
                 </li>
               ))}
             </ol>
-          </section>
-        )}
-
-        {hasLinks && (
-          <section className="cs-block">
-            <h2>
-              <span>{num()}</span> Links
-            </h2>
-            <ul className="cs-links">
-              {p.links.repo && (
-                <li>
-                  <a href={p.links.repo}>Repository</a>
-                </li>
-              )}
-              {p.links.live && (
-                <li>
-                  <a href={p.links.live}>Live</a>
-                </li>
-              )}
-            </ul>
           </section>
         )}
 

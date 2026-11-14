@@ -35,8 +35,13 @@ export type ProjectStory = {
    * Only components and relations stated in the sources are used.
    */
   flow: { step: string; detail: string }[];
-  /** EDIT: add real URLs when supplied (null renders a placeholder). */
-  links: { repo: string | null; live: string | null };
+  /** Source and live URLs (null: not shown). */
+  links: {
+    repo: string | null;
+    live: string | null;
+    /** A downloadable build, e.g. an installer. */
+    download?: { href: string; page: string; label: string; note: string };
+  };
   /** Visible placeholders for material that has not been supplied. */
   placeholders: string[];
 };
@@ -95,7 +100,16 @@ export const projectStories: ProjectStory[] = [
       { step: "Axum API", detail: "Authenticated text and image endpoints on Tokio" },
       { step: "Win32 clipboard", detail: "One message-loop thread, WM_CLIPBOARDUPDATE" },
     ],
-    links: { repo: null, live: null },
+    links: {
+      repo: "https://github.com/abhi-v-10/WiniOS",
+      live: null,
+      download: {
+        href: "https://github.com/abhi-v-10/WiniOS/releases/download/v0.1.3/WiniOS-Setup.exe",
+        page: "https://github.com/abhi-v-10/WiniOS/releases/tag/v0.1.3",
+        label: "Download for Windows",
+        note: "WiniOS 0.1.3 pre-release · Windows installer, 4.6 MB · no admin rights needed",
+      },
+    },
     placeholders: ["[SCREENSHOTS / RECORDING]", "[ROLE]", "[REPOSITORY OR DOWNLOAD LINK]"],
   },
   {
@@ -130,7 +144,7 @@ export const projectStories: ProjectStory[] = [
       { step: "FastAPI", detail: "Runs alongside the main API" },
       { step: "SeekBot AI", detail: "Résumé review, job matching, skill gaps" },
     ],
-    links: { repo: null, live: null },
+    links: { repo: "https://github.com/abhi-v-10/JobSeek", live: null },
     placeholders: ["[PROJECT SCREENSHOTS]", "[ROLE]", "[LINKS]", "[MEASURED RESULTS]"],
   },
   {
@@ -164,7 +178,7 @@ export const projectStories: ProjectStory[] = [
       { step: "Extract + check", detail: "Vendor, date, items, tax, total; arithmetic verified" },
       { step: "Flask dashboard", detail: "Spending at a glance" },
     ],
-    links: { repo: null, live: null },
+    links: { repo: "https://github.com/abhi-v-10/IRIS", live: "https://iris-amdd.onrender.com/" },
     placeholders: ["[SCREENSHOTS]", "[ROLE]", "[LINKS]"],
   },
   {
@@ -195,7 +209,7 @@ export const projectStories: ProjectStory[] = [
       { step: "OpenAI", detail: "Persona and format applied" },
       { step: "Plain explanation", detail: "Back in the page" },
     ],
-    links: { repo: null, live: null },
+    links: { repo: "https://github.com/abhi-v-10/eli5", live: null },
     placeholders: ["[SCREENSHOTS]", "[ROLE]", "[LINKS]"],
   },
   {
@@ -227,7 +241,7 @@ export const projectStories: ProjectStory[] = [
       { step: "OpenAI", detail: "Generates the CBSE-compliant paper" },
       { step: "Next.js editor", detail: "Streams in, finalise and export" },
     ],
-    links: { repo: null, live: null },
+    links: { repo: "https://github.com/Paardhu22/qp-gen", live: null },
     placeholders: ["[SCREENSHOTS]", "[ROLE]", "[LINKS]"],
   },
   {
@@ -258,7 +272,7 @@ export const projectStories: ProjectStory[] = [
       { step: "PostgreSQL", detail: "Classes, attendance, exams, messages" },
       { step: "Four dashboards", detail: "Admin, Teacher, Student, Parent" },
     ],
-    links: { repo: null, live: null },
+    links: { repo: "https://github.com/abhi-v-10/Scholaroid", live: null },
     placeholders: ["[SCREENSHOTS]", "[ROLE]", "[LINKS]"],
   },
 ];

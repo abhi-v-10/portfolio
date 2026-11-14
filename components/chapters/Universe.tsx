@@ -70,6 +70,20 @@ function Exhibit({ p, index }: { p: ProjectStory; index: number }) {
         <Link className="action action--primary" href={`/work/${p.id}`} scroll={false} onClick={openCase}>
           View case study
         </Link>
+        {p.links.download && (
+          <a className="action action--download" href={p.links.download.href} rel="noopener">
+            <svg viewBox="0 0 16 16" aria-hidden focusable="false">
+              <path d="M8 2v8M4.5 6.8 8 10.3l3.5-3.5M3 13h10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {p.links.download.label}
+          </a>
+        )}
+        {p.links.live && (
+          <a className="action" href={p.links.live} target="_blank" rel="noopener noreferrer">
+            Try it live <span aria-hidden>↗</span>
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        )}
         {p.id === "eli5" && (
           <button type="button" className="action exhibit-try" aria-pressed={explained} onClick={toggleEli5}>
             {explained ? universe.eli5.reset : universe.eli5.button}
@@ -81,6 +95,14 @@ function Exhibit({ p, index }: { p: ProjectStory; index: number }) {
           </button>
         )}
       </div>
+      {p.links.download && (
+        <p className="exhibit-download rv">
+          {p.links.download.note} ·{" "}
+          <a href={p.links.download.page} target="_blank" rel="noopener noreferrer">
+            Release notes
+          </a>
+        </p>
+      )}
       {p.id === "winios" && (
         <p className="exhibit-note rv" aria-live="polite">
           {sent === 1 ? universe.bridge.doneToPhone : sent === -1 ? universe.bridge.doneToPc : universe.aside}
