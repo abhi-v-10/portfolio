@@ -18,6 +18,7 @@ import {
   Material,
   Mesh,
   MeshBasicMaterial,
+  PointLight,
   MeshPhysicalMaterial,
   Object3D,
   PlaneGeometry,
@@ -234,6 +235,9 @@ type PanelMesh = Mesh<PlaneGeometry, ShaderMaterial>;
 export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
   const r = useMemo(() => {
     const root = new Group();
+    const key = new PointLight("#fff1e2", 0, 18, 2);
+    const rim = new PointLight("#d6dde2", 0, 14, 2);
+    root.add(key, rim);
     const sprite = new PlaneGeometry(1, 1);
     const groups: Group[] = [];
     const lit: Lit[][] = [];
@@ -604,6 +608,8 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     redrawWhenFontsReady();
     root.visible = false;
     return {
+      key,
+      rim,
       root, groups, lit, projectors,
       // WiniOS
       laptop, phone, pcScreen, phScreen, pcIdle, pcSending, pcReceived, phIdle, phSending, phReceived,
@@ -671,6 +677,18 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
       const l = enter[i] * (1 - exit[i]);
       return caseFocus === i ? Math.max(l, caseAmt) : l * (1 - caseAmt);
     });
+    // One warm studio key follows the artifact in view (2026-11-25), above and
+    // in front of it, plus a cool rim behind: metal bodies read as metal
+    // instead of only reflecting the dark room. Always present; intensity fades.
+    let best = 0;
+    level.forEach((l, i) => {
+      if (l > level[best]) best = i;
+    });
+    const ab = ARTIFACTS[best];
+    r.key.position.set(ab.pos.x - 2.2 * ab.scale, ab.pos.y + 3.2 * ab.scale, ab.pos.z + 4.5 * ab.scale);
+    r.key.intensity = 70 * level[best];
+    r.rim.position.set(ab.pos.x + 3 * ab.scale, ab.pos.y + 1.5 * ab.scale, ab.pos.z - 3.5 * ab.scale);
+    r.rim.intensity = 35 * level[best];
     // Portrait screens: recompose a little smaller so artifacts clear the copy.
     const aspect = (cam as { aspect?: number }).aspect ?? 1.6;
     const fit = aspect < 0.8 ? 0.9 : 1;

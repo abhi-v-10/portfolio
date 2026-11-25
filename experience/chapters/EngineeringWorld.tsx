@@ -16,6 +16,7 @@ import {
   Matrix4,
   Mesh,
   PlaneGeometry,
+  PointLight,
   Quaternion,
   ShaderMaterial,
   Texture,
@@ -136,6 +137,7 @@ export function EngineeringWorld() {
   const root = useRef<Group>(null);
   const modules = useRef<InstancedMesh>(null);
   const hwGroup = useRef<Group>(null);
+  const keyLight = useRef<PointLight>(null);
   const labels = useRef<(Mesh | null)[]>([]);
   const gl = useThree((s) => s.gl);
 
@@ -322,6 +324,7 @@ export function EngineeringWorld() {
     r.hardware.hwMat.opacity = r.hardware.collarMat.opacity = hw;
     r.hardware.axisMat.opacity = hw * 0.55;
     if (hwGroup.current) hwGroup.current.visible = hw > 0.001;
+    if (keyLight.current) keyLight.current.intensity = 55 * presence * (1 - smoothstep(0, 0.6, morph));
     r.moduleMat.depthWrite = r.moduleMat.opacity > 0.98;
 
     const flow = smoothstep(2.2, 2.55, tr);
@@ -347,6 +350,10 @@ export function EngineeringWorld() {
   });
 
   return (
+    <>
+    {/* Studio key above and in front of the assembly (2026-11-25). Outside the
+        gated group: a light that toggles visibility changes every lit shader. */}
+    <pointLight ref={keyLight} color="#fff1e2" position={[E.x - 3.5, E.y + 7, E.z + 6]} intensity={0} distance={22} decay={2} />
     <group ref={root} visible={false}>
       <mesh
         geometry={r.gridGeo}
@@ -386,6 +393,7 @@ export function EngineeringWorld() {
         ))}
       </group>
     </group>
+    </>
   );
 }
 

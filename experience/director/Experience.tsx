@@ -440,7 +440,7 @@ export function Experience() {
         },
       );
       gsap.fromTo(
-        ".scroll-cue-wrap",
+        "#origin .scroll-cue-wrap",
         { autoAlpha: 1 },
         { autoAlpha: 0, ease: "none", scrollTrigger: { trigger: "#origin", start: "top top", end: "18% top", scrub: true } },
       );

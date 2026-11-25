@@ -44,11 +44,31 @@ function reducedHold(track: number) {
   return 11.5;
 }
 
+/**
+ * Critically damped follow (Game Programming Gems 4, "SmoothDamp"): position
+ * and velocity toward a target with no overshoot and continuous velocity.
+ */
+function smoothDamp(current: number, target: number, velocity: number, smoothTime: number, dt: number): [number, number] {
+  const omega = 2 / Math.max(1e-4, smoothTime);
+  const x = omega * dt;
+  const exp = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+  const change = current - target;
+  const temp = (velocity + omega * change) * dt;
+  const v = (velocity - omega * temp) * exp;
+  let out = target + (change + temp) * exp;
+  // No overshoot past the target.
+  if ((target - current > 0) === (out > target)) {
+    out = target;
+    return [out, 0];
+  }
+  return [out, v];
+}
+
 export function CameraDirector() {
   const camera = useThree((s) => s.camera) as PerspectiveCamera;
   const size = useThree((s) => s.size);
 
-  const sm = useRef({ scroll: 0, track: 0, px: 0, py: 0 });
+  const sm = useRef({ scroll: 0, vScroll: 0, track: 0, vTrack: 0, px: 0, py: 0 });
   const tmp = useMemo(
     () => ({
       heroPos: new Vector3(),
@@ -85,13 +105,32 @@ export function CameraDirector() {
     const k = 1 - Math.exp(-Math.min(dt, 0.1) * 5.5);
     const reduced = story.reducedMotion;
     // Damped follow of document scroll: smooth, but converges exactly, so reversal is deterministic.
-    sm.current.scroll += (story.scroll - sm.current.scroll) * k;
-    if (Math.abs(story.scroll - sm.current.scroll) < 1e-5) sm.current.scroll = story.scroll;
+    // 2026-11-25: a critically damped second-order follow (SmoothDamp) instead
+    // of a first-order one, so travel eases in and out with no velocity jump
+    // when scrolling starts or stops; still converges exactly and reverses
+    // deterministically.
+    const dtc = Math.min(dt, 0.1);
+    const sd = smoothDamp(sm.current.scroll, story.scroll, sm.current.vScroll, 0.22, dtc);
+    sm.current.scroll = sd[0];
+    sm.current.vScroll = sd[1];
+    if (Math.abs(story.scroll - sm.current.scroll) < 1e-5) {
+      sm.current.scroll = story.scroll;
+      sm.current.vScroll = 0;
+    }
     // Reduced motion: no travel. The camera cuts between chapter holds instead.
     const goal = reduced ? reducedHold(story.track) : story.track;
-    const kt = reduced ? 1 : 1 - Math.exp(-Math.min(dt, 0.1) * 4.2);
-    sm.current.track += (goal - sm.current.track) * kt;
-    if (Math.abs(goal - sm.current.track) < 1e-4) sm.current.track = goal;
+    if (reduced) {
+      sm.current.track = goal;
+      sm.current.vTrack = 0;
+    } else {
+      const td = smoothDamp(sm.current.track, goal, sm.current.vTrack, 0.3, dtc);
+      sm.current.track = td[0];
+      sm.current.vTrack = td[1];
+    }
+    if (Math.abs(goal - sm.current.track) < 1e-4) {
+      sm.current.track = goal;
+      sm.current.vTrack = 0;
+    }
     sm.current.px += ((reduced ? 0 : story.pointer.x) - sm.current.px) * k * 0.6;
     sm.current.py += ((reduced ? 0 : story.pointer.y) - sm.current.py) * k * 0.6;
 

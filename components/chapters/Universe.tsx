@@ -242,7 +242,7 @@ export function TimelineNexus() {
 
 /**
  * Post-credits scene: a deliberate end card. When the visitor continues past
- * the contact (or presses "Stay for the post-credits scene"), the world dims,
+ * the contact (or follows its scroll cue), the world dims,
  * the threads withdraw, a pause, then the title card and a delayed punchline.
  * Leaving it (scrolling back up) resets it, so it replays on return. All text
  * is real HTML from the start; the choreography is CSS + one GSAP value.
@@ -325,7 +325,11 @@ function PostCredits() {
   );
 }
 
-/** Chapter 06: the close. Contact first, then a small post-credits scene. */
+/**
+ * Chapter 06: the close. One viewport of contact: heading, description, email,
+ * CV, the work and every professional link. The same scroll cue as the hero
+ * points on to the post-credits scene below.
+ */
 export function Closing() {
   return (
     <section id="next" className="closing" aria-labelledby="next-title">
@@ -349,27 +353,37 @@ export function Closing() {
           <button type="button" className="action" onClick={() => openIndex("work")}>
             See the work
           </button>
-          <a className="action credits-cue" href="#post-credits">
-            Stay for the post-credits scene <span aria-hidden>↓</span>
+        </div>
+        {/* Compact footer: every professional link in one row. */}
+        <footer className="closing-footer rv">
+          <ul className="closing-links" aria-label="Elsewhere">
+            <li>
+              <a href={contact.github} target="_blank" rel="noreferrer">
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href={contact.linkedin} target="_blank" rel="noreferrer">
+                LinkedIn
+              </a>
+            </li>
+            <li>
+              <a href={contact.instagram} target="_blank" rel="noreferrer">
+                Instagram
+              </a>
+            </li>
+            <li>
+              <a href={`mailto:${contact.email}`}>Email</a>
+            </li>
+          </ul>
+        </footer>
+        {/* The hero's scroll cue, leading on to the post-credits scene. */}
+        <div className="scroll-cue-wrap closing-cue">
+          <a href="#post-credits" className="scroll-cue">
+            <span>Scroll</span>
+            <span className="scroll-cue-line" aria-hidden />
           </a>
         </div>
-        <ul className="closing-links rv" aria-label="Elsewhere">
-          <li>
-            <a href={contact.linkedin} target="_blank" rel="noreferrer">
-              LinkedIn
-            </a>
-          </li>
-          <li>
-            <a href={contact.github} target="_blank" rel="noreferrer">
-              GitHub
-            </a>
-          </li>
-          <li>
-            <a href={contact.instagram} target="_blank" rel="noreferrer">
-              Instagram
-            </a>
-          </li>
-        </ul>
       </div>
       <PostCredits />
     </section>

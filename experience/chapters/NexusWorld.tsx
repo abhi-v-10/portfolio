@@ -286,18 +286,18 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
     faceCamera(r.heart, cam.quaternion);
     faceCamera(r.band, cam.quaternion);
     r.sun.scale.setScalar(11 + dawn * 4);
-    r.sunMat.uniforms.uIntensity.value = warm * 0.16;
+    r.sunMat.uniforms.uIntensity.value = warm * 0.08;
     r.heart.scale.setScalar(3.2 + (reduced ? 0 : Math.sin(t * 0.8) * 0.15));
-    r.heartMat.uniforms.uIntensity.value = warm * 0.3;
-    r.bandMat.uniforms.uIntensity.value = warm * 0.12;
+    r.heartMat.uniforms.uIntensity.value = warm * 0.14;
+    r.bandMat.uniforms.uIntensity.value = 0; // horizon glow band retired (2026-11-25)
     r.arcs.forEach((a, k) => {
       faceCamera(a, cam.quaternion);
       a.rotateZ(Math.PI * (k * 0.06 - 0.05) - 0.03 + (reduced ? 0 : Math.sin(t * 0.15 + k) * 0.04));
       const grow = smoothstep(11.0 + k * 0.12, 11.55 + k * 0.12, tr);
       a.scale.setScalar(0.85 + 0.15 * grow);
-      r.arcMats[k].uniforms.uIntensity.value = warm * grow * (0.45 - k * 0.1);
+      r.arcMats[k].uniforms.uIntensity.value = warm * grow * (0.18 - k * 0.05);
     });
-    r.moteMat.opacity = warm * 0.25;
+    r.moteMat.opacity = 0; // rising motes retired (2026-11-25)
     if (!reduced && warm > 0.01) {
       const pa = r.motes.geometry.attributes.position;
       const arr = pa.array as Float32Array;

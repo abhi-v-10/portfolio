@@ -1413,10 +1413,17 @@ html.cursor-visible .cursor-dot {
 .closing {
   position: relative;
   overflow-x: clip;
-  padding: 56svh var(--gutter) 0;
+  padding: 24svh var(--gutter) 0;
 }
+/* One viewport of contact (2026-11-25): sizes and gaps follow the height too,
+   so 1366x768 through 1920x1080 hold everything without scrolling. */
 .closing-card {
-  max-width: 36rem;
+  max-width: 40rem;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(5rem, 11svh, 7.5rem) clamp(1.5rem, 4svh, 2.5rem);
 }
 .closing-card::before {
   background: radial-gradient(closest-side, rgb(32 26 22 / 0.6), rgb(32 26 22 / 0.28) 62%, transparent);
@@ -1425,30 +1432,30 @@ html.cursor-visible .cursor-dot {
   margin: 0.5rem 0 0;
   font-family: var(--font-display), sans-serif;
   font-weight: 900;
-  font-size: clamp(3.5rem, 1.2rem + 9vw, 9rem);
+  font-size: clamp(3rem, min(1.2rem + 9vw, 15svh), 9rem);
   line-height: 0.86;
   letter-spacing: -0.005em;
   color: var(--soft-white);
 }
 .closing-lead {
-  margin: 1.6rem 0 0;
+  margin: clamp(0.9rem, 2.4svh, 1.6rem) 0 0;
   font-family: var(--font-serif), Georgia, serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(1.4rem, 1.05rem + 1.2vw, 2rem);
+  font-size: clamp(1.3rem, min(1.05rem + 1.2vw, 3.6svh), 2rem);
   line-height: 1.18;
-  color: #efe7e0;
+  color: var(--ink-tinted);
   text-wrap: balance;
 }
 .closing-copy {
-  margin: 1rem 0 0;
+  margin: clamp(0.6rem, 1.6svh, 1rem) 0 0;
   max-width: 52ch;
   font-size: 1.0625rem;
-  line-height: 1.65;
-  color: #f0ebe7;
+  line-height: 1.6;
+  color: var(--ink-tinted);
 }
 .closing-actions {
-  margin-top: 1.75rem;
+  margin-top: clamp(1rem, 3svh, 1.75rem);
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem 1.25rem;
@@ -1459,13 +1466,36 @@ html.cursor-visible .cursor-dot {
   letter-spacing: 0.04em;
   overflow-wrap: anywhere;
 }
+.closing-footer {
+  margin-top: clamp(1.25rem, 4svh, 2.5rem);
+  padding-top: clamp(0.5rem, 1.4svh, 0.9rem);
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+}
 .closing-links {
   list-style: none;
-  margin: 1.25rem 0 0;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 0 1.5rem;
+}
+/* Contact panel: the hero's scroll cue sits at the bottom of the viewport. */
+.closing-card {
+  position: relative;
+  max-width: none;
+}
+/* The panel spans the page so the cue centres on the viewport, like the
+   hero's; the copy keeps its own measure. */
+.closing-card > :not(.closing-cue) {
+  max-width: 40rem;
+}
+.closing-cue {
+  bottom: max(1.5rem, env(safe-area-inset-bottom));
 }
 .closing-links a,
 .closing-links span {
@@ -1670,10 +1700,6 @@ html.cursor-visible .cursor-dot {
     opacity: 0;
     transform: translate(0, 0) rotate(0deg) scale(0.6);
   }
-}
-.credits-cue span {
-  display: inline-block;
-  margin-left: 0.35rem;
 }
 
 /* No-WebGL colour story for the new chapters. */

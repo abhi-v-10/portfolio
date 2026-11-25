@@ -226,9 +226,11 @@ export function CuriosityWorld({ lowPower }: { lowPower: boolean }) {
   });
 
   return (
+    <>
+    {/* Outside the gated group, so toggling the chapter never changes the light count. */}
+    <pointLight ref={light} color="#fff1e2" position={[C.x - 1.5, C.y + 3.2, C.z + 3.5]} intensity={0} distance={14} decay={2} />
     <group ref={root} visible={false}>
       <group ref={stage} position={C.toArray() as [number, number, number]} rotation={[0.32, -0.38, 0]} scale={1.3}>
-        <pointLight ref={light} color="#fff1e2" position={[-1.5, 3.2, 3.5]} intensity={0} distance={12} decay={2} />
         {/* Deployment: the plinth everything runs on. */}
         <mesh geometry={r.geo.shadow} material={r.mat.shadow} position={[0, PLINTH_Y - 0.08, 0]} />
         <mesh geometry={r.geo.plinth} material={r.mat.plinth} position={[0, PLINTH_Y, 0]} />
@@ -286,6 +288,7 @@ export function CuriosityWorld({ lowPower }: { lowPower: boolean }) {
         ))}
       </group>
     </group>
+    </>
   );
 }
 
