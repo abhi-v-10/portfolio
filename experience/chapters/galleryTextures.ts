@@ -2,10 +2,10 @@ import { CanvasTexture, LinearFilter, LinearMipmapLinearFilter, NoColorSpace, Te
 import type { GalleryPhoto } from "@/content/gallery";
 
 const TONES: Record<GalleryPhoto["tone"], [string, string, string]> = {
-  lavender: ["#2b2350", "#7e6bc9", "#d9cff7"],
-  cyan: ["#132a45", "#3f8fb8", "#bfefff"],
-  peach: ["#3a2433", "#c47b6d", "#ffd7c2"],
-  violet: ["#221a46", "#6750c8", "#cbbcff"],
+  lavender: ["#302a26", "#a16f5c", "#ded4cb"],
+  cyan: ["#2e2823", "#7c888d", "#eae5dd"],
+  peach: ["#312b26", "#c47b6d", "#ffd7c2"],
+  violet: ["#27221d", "#8e5a46", "#d6c4b5"],
 };
 
 /**
@@ -64,7 +64,7 @@ function placeholder(photo: GalleryPhoto) {
     ctx.restore();
 
     ctx.textAlign = "center";
-    ctx.fillStyle = "#f6f4fa";
+    ctx.fillStyle = "#f6f5f3";
     ctx.font = `700 46px ${display}`;
     ctx.fillText(photo.title.split("·")[0].trim().toUpperCase(), W / 2, H * 0.66);
     ctx.fillStyle = hi;

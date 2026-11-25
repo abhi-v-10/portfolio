@@ -86,7 +86,7 @@ export function CaseScreens({ project, name }: { project: string; name: string }
             intensity={0.5}
             aberration={0.4}
             drift={0.3}
-            overlayColor="#05050c"
+            overlayColor="#070504"
             label={`${name} screenshots. Drag, swipe or use the arrow keys.`}
             onIndexChange={setIndex}
             controlRef={controls}

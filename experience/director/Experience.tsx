@@ -12,8 +12,8 @@ import { Closing, ProjectUniverse, TimelineNexus } from "@/components/chapters/U
 import { projectStories } from "@/content/projects";
 import { Human } from "@/components/human/Human";
 import { TRACK_MAX } from "@/experience/chapters/layout";
-import { EnergyCore } from "@/components/loader/EnergyCore";
 import { Loader, type LoaderPhase, type LoaderSteps } from "@/components/loader/Loader";
+import { SIGNATURE_MS } from "@/components/loader/signature";
 import { TopBar } from "@/components/navigation/TopBar";
 import { Cursor } from "@/components/cursor/Cursor";
 import { hasWebGL, onSceneReady, setStory, story } from "./store";
@@ -54,10 +54,13 @@ function exhibitStop(id: string) {
 
 const WorldCanvas = dynamic(() => import("@/experience/world/WorldCanvas"), { ssr: false });
 
-/** Normal presentation time for the intro on fast loads (master plan §2.1). */
-const MIN_PRESENTATION_MS = 1700;
+/**
+ * The signature plays in full on every full page load (cached or not), then
+ * holds a beat before the sheet splits. Internal navigation never replays it.
+ */
+const MIN_PRESENTATION_MS = SIGNATURE_MS + 280;
 /** If the scene is not ready by then, offer entry with the static scene. */
-const SCENE_TIMEOUT_MS = 10000;
+const SCENE_TIMEOUT_MS = 7000;
 
 type Stage = "pre" | "entering" | "entered";
 
@@ -75,7 +78,6 @@ function useClientValue<T>(get: () => T, server: T) {
 export function Experience() {
   const rootRef = useRef<HTMLDivElement>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
-  const exploreRef = useRef<HTMLButtonElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const timeline = useRef<gsap.core.Timeline | null>(null);
@@ -115,11 +117,6 @@ export function Experience() {
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
 
-    const measureCore = () => {
-      const el = loaderRef.current?.querySelector(".loader-core");
-      if (el) setStory({ coreSizePx: el.getBoundingClientRect().width });
-      measureText();
-    };
     // Hero copy bounds at rest (scroll 0, lines in place): text widths, not box widths.
     const measureText = () => {
       const root = contentRef.current;
@@ -134,9 +131,9 @@ export function Experience() {
       const y = window.scrollY;
       setStory({ textRightPx: right, textTopPx: box.top + y, textBottomPx: box.bottom + y });
     };
-    measureCore();
+    measureText();
     document.fonts.ready.then(measureText);
-    window.addEventListener("resize", measureCore);
+    window.addEventListener("resize", measureText);
 
     const wait = story.reducedMotion ? 0 : Math.max(0, MIN_PRESENTATION_MS - performance.now());
     const minTimer = window.setTimeout(() => setMinElapsed(true), wait);
@@ -148,7 +145,7 @@ export function Experience() {
 
     return () => {
       alive = false;
-      window.removeEventListener("resize", measureCore);
+      window.removeEventListener("resize", measureText);
       window.clearTimeout(minTimer);
       window.clearTimeout(sceneTimer);
       offScene();
@@ -166,9 +163,13 @@ export function Experience() {
     return () => window.removeEventListener("pointermove", onMove);
   }, []);
 
-  // Hand focus to Explore the moment it exists; the status region announces readiness.
+  // Enter on its own: the signature has landed and every asset is ready.
+  const enterRef = useRef<() => void>(() => {});
   useEffect(() => {
-    if (phase === "ready") exploreRef.current?.focus({ preventScroll: true });
+    // Next frame: the latest onExplore (which sees allReady) is in the ref by then.
+    if (phase !== "ready") return;
+    const id = requestAnimationFrame(() => enterRef.current());
+    return () => cancelAnimationFrame(id);
   }, [phase]);
 
   // Prepare the hero beneath the loader: composed, but held for the entrance.
@@ -235,33 +236,30 @@ export function Experience() {
       return;
     }
 
-    const core = q(".loader-core-wrap");
     timeline.current = gsap
       .timeline()
-      // 1. One restrained pulse; the UI steps aside.
-      .to(q(".loader-ui"), { autoAlpha: 0, duration: 0.32, ease: "power2.in" }, 0)
-      .to(core, { scale: 1.06, filter: "brightness(1.75)", duration: 0.38, ease: "power2.out" }, 0.04)
-      .to(story, { pulse: 1, duration: 0.38, ease: "power2.out" }, 0.04)
-      // 2. The seam lights across the centre.
-      .fromTo(q(".loader-seam"), { scaleX: 0, autoAlpha: 1 }, { scaleX: 1, duration: 0.62, ease: "expo.out" }, 0.28)
-      .to(core, { scale: 1, filter: "brightness(1.2)", duration: 0.6, ease: "power2.inOut" }, 0.46)
-      .to(story, { pulse: 0, duration: 1.1, ease: "power2.inOut" }, 0.46)
-      // 3. The halves open; the core is cut at the seam and leaves with them.
-      .to(q(".loader-panel--top"), { yPercent: -52, duration: 1.4, ease: "power4.inOut" }, 0.72)
-      .to(q(".loader-panel--bottom"), { yPercent: 52, duration: 1.4, ease: "power4.inOut" }, 0.72)
-      .to(q(".loader-seam"), { autoAlpha: 0, duration: 0.3 }, 0.84)
-      // 4. The world behind opens from the same core (single camera owner reads story.intro).
-      .to(story, { intro: 1, duration: 2.9, ease: "none" }, 0.76)
-      // 5. Identity arrives.
-      .to(lines, { yPercent: 0, duration: 1.25, ease: "expo.out", stagger: 0.12 }, 1.5)
-      // 6. With the name in place, the hologram ignites around the heart.
-      .to(story, { build: 1, duration: 2.6, ease: "none" }, 2.05)
-      .to(roles, { yPercent: 0, duration: 0.9, ease: "expo.out", stagger: 0.09 }, 1.78)
-      .to(reveals, { autoAlpha: 1, y: 0, duration: 1.0, ease: "expo.out", stagger: 0.12 }, 2.05)
-      .to(chrome, { autoAlpha: 1, duration: 0.8, ease: "power2.out" }, 2.25)
+      // 1. The UI steps aside and a vermilion seam draws along the signature's baseline.
+      .to(q(".loader-ui"), { autoAlpha: 0, duration: 0.25, ease: "power2.in" }, 0)
+      .fromTo(q(".loader-seam"), { scaleX: 0, autoAlpha: 1 }, { scaleX: 1, duration: 0.45, ease: "expo.out" }, 0.05)
+      // 2. The sheet splits at the seam; the signature leaves with its halves.
+      .to(q(".loader-panel--top"), { yPercent: -52, duration: 1.0, ease: "power4.inOut" }, 0.3)
+      .to(q(".loader-panel--bottom"), { yPercent: 52, duration: 1.0, ease: "power4.inOut" }, 0.3)
+      .to(q(".loader-seam"), { autoAlpha: 0, duration: 0.25 }, 0.42)
+      // 3. The world behind opens (single camera owner reads story.intro).
+      .to(story, { intro: 1, duration: 2.2, ease: "none" }, 0.3)
+      // 4. Identity arrives.
+      .to(lines, { yPercent: 0, duration: 1.0, ease: "expo.out", stagger: 0.1 }, 0.85)
+      .to(roles, { yPercent: 0, duration: 0.8, ease: "expo.out", stagger: 0.08 }, 1.0)
+      .to(story, { build: 1, duration: 2.0, ease: "none" }, 1.2)
+      .to(reveals, { autoAlpha: 1, y: 0, duration: 0.9, ease: "expo.out", stagger: 0.1 }, 1.2)
+      .to(chrome, { autoAlpha: 1, duration: 0.7, ease: "power2.out" }, 1.4)
       // Panels are off-screen: release the loader and scroll. Intro keeps easing the camera.
-      .call(finish, [], 2.2);
+      .call(finish, [], 1.3);
   };
+
+  useEffect(() => {
+    enterRef.current = onExplore;
+  });
 
   const onSkip = () => {
     if (stage === "entered") return;
@@ -440,9 +438,7 @@ export function Experience() {
   return (
     <div ref={rootRef} className="experience" data-stage={stage}>
       <div className="world" aria-hidden>
-        <div className="world-fallback">
-          <EnergyCore className="fallback-core" />
-        </div>
+        <div className="world-fallback" />
         {webgl && (
           <div className="world-canvas-wrap" data-ready={sceneReady || undefined}>
             <WorldCanvas lowPower={lowPower} />
@@ -469,10 +465,8 @@ export function Experience() {
           phase={phase}
           steps={steps}
           degraded={degraded}
-          onExplore={onExplore}
           onSkip={onSkip}
           rootRef={loaderRef}
-          exploreRef={exploreRef}
         />
       )}
       <Cursor />

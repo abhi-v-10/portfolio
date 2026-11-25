@@ -1,26 +1,19 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useRef, type ReactNode } from "react";
-import type { Group } from "three";
+import { useRef } from "react";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
 import { story } from "../director/store";
 import { CameraDirector } from "./CameraDirector";
-import { AICore } from "./AICore";
-import { DataNetwork } from "./DataNetwork";
 import { Backdrop, Lights, ReadySignal, SceneSetup } from "./Environment";
-import { Instruments } from "./Instruments";
-import { Projection } from "./Projection";
 import { CAMERA_FOV } from "./paths";
-import { Signal } from "./Signal";
-import { Atmosphere, ChapterGate } from "../chapters/Atmosphere";
+import { Atmosphere } from "../chapters/Atmosphere";
 import { CuriosityWorld } from "../chapters/CuriosityWorld";
 import { HumanWorld } from "../chapters/HumanWorld";
 import { NetworkWorld } from "../chapters/NetworkWorld";
 import { NexusWorld } from "../chapters/NexusWorld";
 import { UniverseWorld } from "../chapters/UniverseWorld";
 import { EngineeringWorld } from "../chapters/EngineeringWorld";
-import { WINDOW } from "../chapters/layout";
 
 /**
  * QualityController (tiers, 2026-11-14): starts at the device's native
@@ -55,13 +48,6 @@ function QualityController() {
   return null;
 }
 
-/** Scales the core assembly (core, network, emitter) by the camera director's framing. */
-function CoreRig({ children }: { children: ReactNode }) {
-  const g = useRef<Group>(null);
-  useFrame(() => g.current?.scale.setScalar(story.view.coreScale));
-  return <group ref={g}>{children}</group>;
-}
-
 export default function WorldCanvas({ lowPower }: { lowPower: boolean }) {
   // Sharp on high-density desktops without rendering above what the screen shows.
   const native = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
@@ -77,7 +63,7 @@ export default function WorldCanvas({ lowPower }: { lowPower: boolean }) {
         gl.toneMapping = ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.05;
         gl.outputColorSpace = SRGBColorSpace;
-        gl.setClearColor("#03070E");
+        gl.setClearColor("#080605");
       }}
     >
       <SceneSetup />
@@ -85,22 +71,15 @@ export default function WorldCanvas({ lowPower }: { lowPower: boolean }) {
       <Backdrop />
       <Lights />
       <Atmosphere />
-      {/* Chapter 00: the workspace. Hidden (not unmounted) once the story has left it. */}
-      <ChapterGate from={WINDOW.origin[0]} to={WINDOW.origin[1]}>
-        <CoreRig>
-          <Projection />
-          <DataNetwork lowPower={lowPower} />
-          <AICore />
-        </CoreRig>
-        <Instruments />
-      </ChapterGate>
+      {/* Chapter 00 is typography-led (2026-11-25): the holographic workspace
+          (core, rings, callouts, grid, data network) is retired. A sculpture
+          may take this slot once one is approved in /lab/sculpture. */}
       <HumanWorld lowPower={lowPower} />
       <CuriosityWorld lowPower={lowPower} />
       <EngineeringWorld />
       <NetworkWorld lowPower={lowPower} />
       <UniverseWorld lowPower={lowPower} />
       <NexusWorld lowPower={lowPower} />
-      <Signal segments={lowPower ? 360 : 640} />
       <QualityController />
       <ReadySignal />
     </Canvas>

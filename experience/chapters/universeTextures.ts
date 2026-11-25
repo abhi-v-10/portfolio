@@ -111,8 +111,8 @@ function wrap(ctx: CanvasRenderingContext2D, s: string, x: number, y: number, ma
 /** A soft card: dark glass with a hairline and an accent tick. */
 function card(ctx: CanvasRenderingContext2D, w: number, h: number, accent: string, r = 28) {
   const g = ctx.createLinearGradient(0, 0, 0, h);
-  g.addColorStop(0, "rgba(22,26,48,0.94)");
-  g.addColorStop(1, "rgba(10,12,26,0.94)");
+  g.addColorStop(0, "rgba(32,27,22,0.94)");
+  g.addColorStop(1, "rgba(16,13,9,0.94)");
   fillRR(ctx, 3, 3, w - 6, h - 6, r, g);
   strokeRR(ctx, 3, 3, w - 6, h - 6, r, hexA(accent, 0.55), 3);
 }
@@ -128,31 +128,31 @@ export type DeviceState = "idle" | "sending" | "received";
 export function laptopScreen(state: DeviceState) {
   return make(1024, 640, (ctx, w, h, f) => {
     const bg = ctx.createLinearGradient(0, 0, w, h);
-    bg.addColorStop(0, "#0b1f4a");
-    bg.addColorStop(0.55, "#16357a");
-    bg.addColorStop(1, "#0e5a78");
+    bg.addColorStop(0, "#27211c");
+    bg.addColorStop(0.55, "#303d43");
+    bg.addColorStop(1, "#4b5458");
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
     // Soft abstract bloom (original wallpaper).
     const bl = ctx.createRadialGradient(w * 0.72, h * 0.32, 10, w * 0.72, h * 0.32, w * 0.55);
-    bl.addColorStop(0, "rgba(115,223,255,0.55)");
-    bl.addColorStop(1, "rgba(115,223,255,0)");
+    bl.addColorStop(0, "rgba(215,205,189,0.55)");
+    bl.addColorStop(1, "rgba(215,205,189,0)");
     ctx.fillStyle = bl;
     ctx.fillRect(0, 0, w, h);
     // Window.
     const wx = 150, wy = 70, ww = 600, wh = 420;
-    fillRR(ctx, wx, wy, ww, wh, 14, "rgba(24,28,44,0.96)");
-    fillRR(ctx, wx, wy, ww, 44, 14, "rgba(36,41,62,1)");
+    fillRR(ctx, wx, wy, ww, wh, 14, "rgba(32,28,25,0.96)");
+    fillRR(ctx, wx, wy, ww, 44, 14, "rgba(47,41,37,1)");
     ctx.fillRect(wx, wy + 30, ww, 14);
-    text(ctx, "WiniOS · Settings", wx + 22, wy + 29, `600 19px ${f.sans}`, "#e8ecff");
-    ["—", "▢", "✕"].forEach((s, i) => text(ctx, s, wx + ww - 90 + i * 32, wy + 29, `500 17px ${f.sans}`, "#9aa6c8"));
+    text(ctx, "WiniOS · Settings", wx + 22, wy + 29, `600 19px ${f.sans}`, "#f1ece8");
+    ["—", "▢", "✕"].forEach((s, i) => text(ctx, s, wx + ww - 90 + i * 32, wy + 29, `500 17px ${f.sans}`, "#b6a29b"));
     const items = ["General", "Connection", "Clipboard", "Images", "Privacy", "About"];
     items.forEach((it, i) => {
-      if (i === 2) fillRR(ctx, wx + 12, wy + 62 + i * 46, 160, 36, 8, "rgba(115,223,255,0.16)");
-      text(ctx, it, wx + 28, wy + 87 + i * 46, `500 18px ${f.sans}`, i === 2 ? "#bff4ff" : "#aab3d4");
+      if (i === 2) fillRR(ctx, wx + 12, wy + 62 + i * 46, 160, 36, 8, "rgba(215,205,189,0.16)");
+      text(ctx, it, wx + 28, wy + 87 + i * 46, `500 18px ${f.sans}`, i === 2 ? "#eee8e0" : "#bbb3ab");
     });
     const cx = wx + 200;
-    text(ctx, "Clipboard", cx, wy + 92, `700 26px ${f.sans}`, "#f6f4fa");
+    text(ctx, "Clipboard", cx, wy + 92, `700 26px ${f.sans}`, "#f6f5f3");
     const rows: [string, string][] = [
       ["Agent", "Running"],
       ["Transport", "HTTPS · TLS 1.3"],
@@ -164,45 +164,45 @@ export function laptopScreen(state: DeviceState) {
       const y = wy + 140 + i * 50;
       ctx.fillStyle = "rgba(255,255,255,0.06)";
       ctx.fillRect(cx, y + 14, 370, 1);
-      text(ctx, k, cx, y, `500 18px ${f.sans}`, "#aab3d4");
-      text(ctx, v, cx + 370, y, `600 18px ${f.sans}`, i === 0 ? "#7cf5c4" : "#e8ecff", "right");
+      text(ctx, k, cx, y, `500 18px ${f.sans}`, "#bbb3ab");
+      text(ctx, v, cx + 370, y, `600 18px ${f.sans}`, i === 0 ? "#d6dfb7" : "#f1ece8", "right");
     });
     // Taskbar: centred, generic icons.
-    ctx.fillStyle = "rgba(14,18,34,0.92)";
+    ctx.fillStyle = "rgba(23,18,15,0.92)";
     ctx.fillRect(0, h - 54, w, 54);
-    const icons = ["#73dfff", "#ffc861", "#9a86ff", "#7cf5c4", "#f17e98"];
+    const icons = ["#d7cdbd", "#ffc861", "#c58d77", "#d6dfb7", "#f3836b"];
     const start = w / 2 - (icons.length * 46) / 2;
     icons.forEach((c, i) => fillRR(ctx, start + i * 46 + 6, h - 44, 34, 34, 9, i === 0 ? "rgba(255,255,255,0.9)" : hexA(c, 0.85)));
     // Tray: the WiniOS agent mark (an original bridge glyph) + clock.
-    ctx.strokeStyle = "#73dfff";
+    ctx.strokeStyle = "#d7cdbd";
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(w - 150, h - 20, 10, Math.PI, 0);
     ctx.stroke();
-    text(ctx, "9:41", w - 40, h - 20, `600 17px ${f.sans}`, "#e8ecff", "right");
+    text(ctx, "9:41", w - 40, h - 20, `600 17px ${f.sans}`, "#f1ece8", "right");
 
     if (state !== "idle") {
       const tx = w - 360, ty = h - 170;
-      fillRR(ctx, tx, ty, 340, 100, 14, "rgba(30,36,58,0.98)");
-      strokeRR(ctx, tx, ty, 340, 100, 14, state === "received" ? "rgba(124,245,196,0.9)" : "rgba(115,223,255,0.9)", 2.5);
-      text(ctx, state === "received" ? "Received from iPhone" : "Sending to iPhone…", tx + 22, ty + 40, `700 20px ${f.sans}`, "#f6f4fa");
-      text(ctx, state === "received" ? "Text pasted to clipboard · encrypted" : "Clipboard text · over HTTPS", tx + 22, ty + 72, `500 16px ${f.sans}`, "#aab3d4");
+      fillRR(ctx, tx, ty, 340, 100, 14, "rgba(42,36,32,0.98)");
+      strokeRR(ctx, tx, ty, 340, 100, 14, state === "received" ? "rgba(214,223,183,0.9)" : "rgba(215,205,189,0.9)", 2.5);
+      text(ctx, state === "received" ? "Received from iPhone" : "Sending to iPhone…", tx + 22, ty + 40, `700 20px ${f.sans}`, "#f6f5f3");
+      text(ctx, state === "received" ? "Text pasted to clipboard · encrypted" : "Clipboard text · over HTTPS", tx + 22, ty + 72, `500 16px ${f.sans}`, "#bbb3ab");
     }
   });
 }
 
 export function keyboardTexture() {
   return make(1024, 640, (ctx, w, h) => {
-    ctx.fillStyle = "#151a2c";
+    ctx.fillStyle = "#1f1a16";
     ctx.fillRect(0, 0, w, h);
     const cols = 14, rows = 5, kx = 70, ky = 40, kw = (w - 140) / cols, kh = 58;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        fillRR(ctx, kx + c * kw + 4, ky + r * (kh + 8), kw - 8, kh, 8, "#262c44");
+        fillRR(ctx, kx + c * kw + 4, ky + r * (kh + 8), kw - 8, kh, 8, "#322c28");
       }
     }
-    fillRR(ctx, kx + 4 * kw, ky + rows * (kh + 8), 6 * kw, kh, 8, "#262c44");
-    fillRR(ctx, w / 2 - 170, h - 210, 340, 190, 16, "#1e2338");
+    fillRR(ctx, kx + 4 * kw, ky + rows * (kh + 8), 6 * kw, kh, 8, "#322c28");
+    fillRR(ctx, w / 2 - 170, h - 210, 340, 190, 16, "#29231f");
     strokeRR(ctx, w / 2 - 170, h - 210, 340, 190, 16, "rgba(255,255,255,0.08)", 2);
   });
 }
@@ -214,9 +214,9 @@ export function phoneScreen(state: DeviceState) {
     rr(ctx, 0, 0, w, h, 70);
     ctx.clip();
     const bg = ctx.createLinearGradient(0, 0, 0, h);
-    bg.addColorStop(0, "#1b1340");
-    bg.addColorStop(0.6, "#2a1d63");
-    bg.addColorStop(1, "#0f2850");
+    bg.addColorStop(0, "#211b17");
+    bg.addColorStop(0.6, "#312b26");
+    bg.addColorStop(1, "#2e2823");
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
     fillRR(ctx, w / 2 - 70, 26, 140, 40, 20, "#000");
@@ -224,25 +224,25 @@ export function phoneScreen(state: DeviceState) {
     fillRR(ctx, w - 92, 38, 44, 20, 6, "rgba(255,255,255,0.85)");
     text(ctx, "Shortcuts", 36, 180, `700 46px ${f.sans}`, "#fff");
     const tiles: [string, string][] = [
-      ["Send to PC", "#2fb7e0"],
-      ["Get from PC", "#7a5cff"],
-      ["Send image", "#e05a8a"],
-      ["Clipboard type", "#2f9e7a"],
+      ["Send to PC", "#9ba9b1"],
+      ["Get from PC", "#a6715c"],
+      ["Send image", "#e46046"],
+      ["Clipboard type", "#868d6c"],
     ];
     tiles.forEach(([label, c], i) => {
       const x = 32 + (i % 2) * 230, y = 230 + Math.floor(i / 2) * 230;
       const active = state === "sending" && i === 0;
-      fillRR(ctx, x, y, 214, 210, 32, active ? "#bff4ff" : c);
+      fillRR(ctx, x, y, 214, 210, 32, active ? "#eee8e0" : c);
       fillRR(ctx, x + 24, y + 24, 54, 54, 14, "rgba(255,255,255,0.3)");
-      text(ctx, label, x + 24, y + 182, `700 26px ${f.sans}`, active ? "#0b1f4a" : "#fff");
-      if (active) text(ctx, "Running…", x + 24, y + 146, `600 22px ${f.sans}`, "#0b1f4a");
+      text(ctx, label, x + 24, y + 182, `700 26px ${f.sans}`, active ? "#27211c" : "#fff");
+      if (active) text(ctx, "Running…", x + 24, y + 146, `600 22px ${f.sans}`, "#27211c");
     });
     if (state === "received") {
-      fillRR(ctx, 20, 84, w - 40, 128, 30, "rgba(245,246,252,0.96)");
-      fillRR(ctx, 40, 106, 50, 50, 12, "#2fb7e0");
-      text(ctx, "WINIOS", 106, 124, `700 20px ${f.sans}`, "#56607a");
-      text(ctx, "Received from PC", 106, 156, `700 26px ${f.sans}`, "#0b1020");
-      text(ctx, "Copied to clipboard", 106, 188, `500 22px ${f.sans}`, "#56607a");
+      fillRR(ctx, 20, 84, w - 40, 128, 30, "rgba(248,246,245,0.96)");
+      fillRR(ctx, 40, 106, 50, 50, 12, "#9ba9b1");
+      text(ctx, "WINIOS", 106, 124, `700 20px ${f.sans}`, "#665f59");
+      text(ctx, "Received from PC", 106, 156, `700 26px ${f.sans}`, "#14100c");
+      text(ctx, "Copied to clipboard", 106, 188, `500 22px ${f.sans}`, "#665f59");
     }
     fillRR(ctx, w / 2 - 70, h - 26, 140, 8, 4, "rgba(255,255,255,0.8)");
     ctx.restore();
@@ -252,36 +252,36 @@ export function phoneScreen(state: DeviceState) {
 /** A clipboard packet in transit: text or image, sealed. */
 export function packetTexture(kind: "text" | "image") {
   return make(512, 300, (ctx, w, h, f) => {
-    card(ctx, w, h, "#73dfff", 34);
+    card(ctx, w, h, "#d7cdbd", 34);
     if (kind === "text") {
-      text(ctx, "Aa", 40, 120, `700 72px ${f.sans}`, "#bff4ff");
-      text(ctx, "Clipboard · text", 170, 86, `700 28px ${f.sans}`, "#f6f4fa");
-      fillRR(ctx, 170, 110, 260, 14, 7, "rgba(191,244,255,0.5)");
-      fillRR(ctx, 170, 136, 190, 14, 7, "rgba(191,244,255,0.35)");
+      text(ctx, "Aa", 40, 120, `700 72px ${f.sans}`, "#eee8e0");
+      text(ctx, "Clipboard · text", 170, 86, `700 28px ${f.sans}`, "#f6f5f3");
+      fillRR(ctx, 170, 110, 260, 14, 7, "rgba(238,232,224,0.5)");
+      fillRR(ctx, 170, 136, 190, 14, 7, "rgba(238,232,224,0.35)");
     } else {
-      fillRR(ctx, 40, 50, 110, 90, 14, "#2a3d74");
+      fillRR(ctx, 40, 50, 110, 90, 14, "#394348");
       ctx.fillStyle = "#ffc861";
       ctx.beginPath();
       ctx.arc(120, 78, 12, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = "#7cf5c4";
+      ctx.fillStyle = "#d6dfb7";
       ctx.beginPath();
       ctx.moveTo(48, 132);
       ctx.lineTo(90, 88);
       ctx.lineTo(140, 132);
       ctx.fill();
-      text(ctx, "Clipboard · image", 170, 86, `700 28px ${f.sans}`, "#f6f4fa");
-      text(ctx, "PNG", 170, 130, `600 24px ${f.mono}`, "#bff4ff");
+      text(ctx, "Clipboard · image", 170, 86, `700 28px ${f.sans}`, "#f6f5f3");
+      text(ctx, "PNG", 170, 130, `600 24px ${f.mono}`, "#eee8e0");
     }
     // Seal: lock + transport.
-    fillRR(ctx, 40, 196, w - 80, 64, 32, "rgba(115,223,255,0.14)");
-    ctx.strokeStyle = "#bff4ff";
+    fillRR(ctx, 40, 196, w - 80, 64, 32, "rgba(215,205,189,0.14)");
+    ctx.strokeStyle = "#eee8e0";
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.arc(80, 222, 11, Math.PI, 0);
     ctx.stroke();
-    fillRR(ctx, 64, 222, 32, 26, 5, "#bff4ff");
-    text(ctx, "HTTPS · Bearer · private network", 112, 238, `600 22px ${f.mono}`, "#bff4ff");
+    fillRR(ctx, 64, 222, 32, 26, 5, "#eee8e0");
+    text(ctx, "HTTPS · Bearer · private network", 112, 238, `600 22px ${f.mono}`, "#eee8e0");
   });
 }
 
@@ -290,7 +290,7 @@ export function profileCard() {
   return make(512, 640, (ctx, w, h, f) => {
     card(ctx, w, h, "#ffc861");
     text(ctx, "CANDIDATE · SAMPLE", 40, 66, `600 20px ${f.mono}`, "#ffd98a");
-    ctx.fillStyle = "#3a3320";
+    ctx.fillStyle = "#37332f";
     ctx.beginPath();
     ctx.arc(84, 140, 44, 0, Math.PI * 2);
     ctx.fill();
@@ -301,8 +301,8 @@ export function profileCard() {
     ctx.beginPath();
     ctx.arc(84, 178, 30, Math.PI, 0);
     ctx.fill();
-    text(ctx, "Your profile", 148, 132, `700 32px ${f.sans}`, "#fff6dc");
-    text(ctx, "Résumé · uploaded", 148, 168, `500 22px ${f.sans}`, "#c9bf9f");
+    text(ctx, "Your profile", 148, 132, `700 32px ${f.sans}`, "#fcf5ef");
+    text(ctx, "Résumé · uploaded", 148, 168, `500 22px ${f.sans}`, "#c6bdb7");
     [300, 260, 330, 220].forEach((len, i) => fillRR(ctx, 40, 236 + i * 34, len, 14, 7, "rgba(255,217,138,0.28)"));
     text(ctx, "SKILLS", 40, 420, `600 20px ${f.mono}`, "#ffd98a");
     const chips = ["Python", "Django", "React", "SQL", "REST"];
@@ -325,15 +325,15 @@ export function jobCard(title: string, state: "open" | "match") {
   return make(512, 256, (ctx, w, h, f) => {
     card(ctx, w, h, state === "match" ? "#fff1c9" : "#ffc861", 26);
     fillRR(ctx, 32, 36, 64, 64, 16, state === "match" ? "#ffc861" : "#4a3f22");
-    text(ctx, title, 116, 66, `700 30px ${f.sans}`, "#fff6dc");
-    text(ctx, "Sample Co. · Hyderabad", 116, 100, `500 21px ${f.sans}`, "#c9bf9f");
+    text(ctx, title, 116, 66, `700 30px ${f.sans}`, "#fcf5ef");
+    text(ctx, "Sample Co. · Hyderabad", 116, 100, `500 21px ${f.sans}`, "#c6bdb7");
     const pills = state === "match" ? ["Strong match", "Applied"] : ["Open", "Full-time"];
     let x = 32;
     ctx.font = `600 20px ${f.sans}`;
     pills.forEach((p, i) => {
       const pw = ctx.measureText(p).width + 32;
       fillRR(ctx, x, 150, pw, 40, 20, state === "match" && i === 0 ? "#ffc861" : "rgba(255,200,97,0.14)");
-      text(ctx, p, x + 16, 177, `600 20px ${f.sans}`, state === "match" && i === 0 ? "#2a2008" : "#ffe6b3");
+      text(ctx, p, x + 16, 177, `600 20px ${f.sans}`, state === "match" && i === 0 ? "#26201c" : "#ffe6b3");
       x += pw + 10;
     });
   });
@@ -344,9 +344,9 @@ export function seekBotCard() {
     card(ctx, w, h, "#fff1c9", 30);
     text(ctx, "SEEKBOT", 36, 58, `700 20px ${f.mono}`, "#ffd98a");
     fillRR(ctx, 36, 80, w - 72, 74, 18, "rgba(255,200,97,0.14)");
-    text(ctx, "Best fit: Backend Developer", 56, 126, `600 24px ${f.sans}`, "#fff6dc");
+    text(ctx, "Best fit: Backend Developer", 56, 126, `600 24px ${f.sans}`, "#fcf5ef");
     fillRR(ctx, 36, 170, w - 72, 74, 18, "rgba(255,200,97,0.14)");
-    text(ctx, "Skill gap: Docker, CI/CD", 56, 216, `600 24px ${f.sans}`, "#fff6dc");
+    text(ctx, "Skill gap: Docker, CI/CD", 56, 216, `600 24px ${f.sans}`, "#fcf5ef");
   });
 }
 
@@ -356,7 +356,7 @@ export const RECEIPT_ROWS = { vendor: 0.885, date: 0.815, items: 0.6, tax: 0.355
 
 export function receiptTexture() {
   return make(512, 896, (ctx, w, h, f) => {
-    ctx.fillStyle = "#f1efe6";
+    ctx.fillStyle = "#f1eeec";
     ctx.fillRect(0, 0, w, h);
     // Torn edge at the bottom.
     ctx.fillStyle = "#000";
@@ -370,7 +370,7 @@ export function receiptTexture() {
     }
     ctx.globalCompositeOperation = "source-over";
     const y = (u: number) => h * (1 - u);
-    const ink = "#2a2c33", soft = "#6c6f7a";
+    const ink = "#2e2c2a", soft = "#726f6c";
     text(ctx, "DEMO MART", w / 2, y(RECEIPT_ROWS.vendor), `800 44px ${f.mono}`, ink, "center");
     text(ctx, "SAMPLE RECEIPT · NOT REAL DATA", w / 2, y(RECEIPT_ROWS.vendor) + 34, `600 17px ${f.mono}`, soft, "center");
     text(ctx, "Date 14/03/2026   10:24", 40, y(RECEIPT_ROWS.date) + 20, `600 22px ${f.mono}`, ink);
@@ -415,24 +415,24 @@ export const IRIS_FIELDS: [string, string][] = [
 ];
 export function fieldChip(k: string, v: string) {
   return make(512, 104, (ctx, w, h, f) => {
-    card(ctx, w, h, "#8ff0d0", 22);
-    text(ctx, k, 30, 64, `600 26px ${f.mono}`, "#8ff0d0");
-    text(ctx, v, w - 30, 64, `700 28px ${f.sans}`, "#ecfff8", "right");
+    card(ctx, w, h, "#d6debe", 22);
+    text(ctx, k, 30, 64, `600 26px ${f.mono}`, "#d6debe");
+    text(ctx, v, w - 30, 64, `700 28px ${f.sans}`, "#fdf9f5", "right");
   });
 }
 export function verifiedChip() {
   return make(512, 104, (ctx, w, h, f) => {
-    fillRR(ctx, 3, 3, w - 6, h - 6, 50, "rgba(143,240,208,0.95)");
-    text(ctx, "✓ Arithmetic checks out", w / 2, 64, `700 30px ${f.sans}`, "#06261c", "center");
+    fillRR(ctx, 3, 3, w - 6, h - 6, 50, "rgba(214,222,190,0.95)");
+    text(ctx, "✓ Arithmetic checks out", w / 2, 64, `700 30px ${f.sans}`, "#241f1a", "center");
   });
 }
 
 /* ───────── ELI5 ───────── */
 export function eli5Dense() {
   return make(1024, 384, (ctx, w, h, f) => {
-    card(ctx, w, h, "#f17e98", 30);
-    text(ctx, "SELECTED TEXT", 44, 62, `600 22px ${f.mono}`, "#f7a8bb");
-    fillRR(ctx, 40, 86, w - 80, 250, 10, "rgba(241,126,152,0.12)");
+    card(ctx, w, h, "#f3836b", 30);
+    text(ctx, "SELECTED TEXT", 44, 62, `600 22px ${f.mono}`, "#f9ab9a");
+    fillRR(ctx, 40, 86, w - 80, 250, 10, "rgba(243,131,107,0.12)");
     wrap(
       ctx,
       "Transformer models compute contextual token representations through multi-head self-attention, weighting every token's relevance across the sequence with scaled dot-product attention over learned query, key and value projections.",
@@ -441,14 +441,14 @@ export function eli5Dense() {
       w - 112,
       40,
       `500 27px ${f.sans}`,
-      "#f3dce4",
+      "#e7e2de",
     );
   });
 }
 export function eli5Simple() {
   return make(1024, 384, (ctx, w, h, f) => {
-    card(ctx, w, h, "#c9b8ff", 30);
-    text(ctx, "EXPLAINED SIMPLY", 44, 62, `600 22px ${f.mono}`, "#c9b8ff");
+    card(ctx, w, h, "#d3c1b1", 30);
+    text(ctx, "EXPLAINED SIMPLY", 44, 62, `600 22px ${f.mono}`, "#d3c1b1");
     wrap(ctx, "It reads every word, then works out which other words matter most for understanding it.", 44, 150, w - 88, 62, `700 46px ${f.sans}`, "#ffffff");
   });
 }
@@ -456,14 +456,14 @@ export function eli5Simple() {
 /* ───────── QP-Gen ───────── */
 export function chapterCard(label: string, selected: boolean) {
   return make(512, 200, (ctx, w, h, f) => {
-    card(ctx, w, h, selected ? "#dfe8ff" : "#9db8ff", 24);
-    text(ctx, "CHAPTER", 32, 60, `600 20px ${f.mono}`, "#9db8ff");
-    text(ctx, label, 32, 120, `700 34px ${f.sans}`, "#eef2ff");
+    card(ctx, w, h, selected ? "#ede7e2" : "#c3b9aa", 24);
+    text(ctx, "CHAPTER", 32, 60, `600 20px ${f.mono}`, "#c3b9aa");
+    text(ctx, label, 32, 120, `700 34px ${f.sans}`, "#f5f2ef");
     if (selected) {
-      fillRR(ctx, w - 88, 36, 52, 52, 14, "#9db8ff");
-      text(ctx, "✓", w - 62, 75, `800 32px ${f.sans}`, "#0d1430", "center");
+      fillRR(ctx, w - 88, 36, 52, 52, 14, "#c3b9aa");
+      text(ctx, "✓", w - 62, 75, `800 32px ${f.sans}`, "#1b1611", "center");
     }
-    text(ctx, selected ? "Selected" : "Available", 32, 166, `500 22px ${f.sans}`, selected ? "#dfe8ff" : "#8892b0");
+    text(ctx, selected ? "Selected" : "Available", 32, 166, `500 22px ${f.sans}`, selected ? "#ede7e2" : "#a08f88");
   });
 }
 export const QP_CHIPS = ["MCQ · 1 mark", "1 mark", "Short · 3 marks", "3 marks", "Long · 5 marks", "Case-based · 4"];
@@ -471,17 +471,17 @@ export const QP_CHIPS = ["MCQ · 1 mark", "1 mark", "Short · 3 marks", "3 marks
 export const QP_SLOTS = [0.7, 0.64, 0.5, 0.44, 0.3, 0.16];
 export function questionChip(label: string) {
   return make(512, 96, (ctx, w, h, f) => {
-    card(ctx, w, h, "#9db8ff", 20);
-    fillRR(ctx, 24, 28, 40, 40, 10, "rgba(157,184,255,0.3)");
-    text(ctx, "Q", 44, 58, `800 24px ${f.sans}`, "#dfe8ff", "center");
-    text(ctx, label, 84, 60, `600 28px ${f.sans}`, "#eef2ff");
+    card(ctx, w, h, "#c3b9aa", 20);
+    fillRR(ctx, 24, 28, 40, 40, 10, "rgba(195,185,170,0.3)");
+    text(ctx, "Q", 44, 58, `800 24px ${f.sans}`, "#ede7e2", "center");
+    text(ctx, label, 84, 60, `600 28px ${f.sans}`, "#f5f2ef");
   });
 }
 export function examPaper() {
   return make(768, 1024, (ctx, w, h, f) => {
     ctx.fillStyle = "#f4f6fb";
     ctx.fillRect(0, 0, w, h);
-    const ink = "#1d2235", soft = "#8a90a6";
+    const ink = "#27221e", soft = "#96908b";
     text(ctx, "SAMPLE QUESTION PAPER", w / 2, 70, `800 34px ${f.sans}`, ink, "center");
     text(ctx, "Science · Class X · CBSE pattern", w / 2, 108, `500 24px ${f.sans}`, soft, "center");
     text(ctx, "Time: 3 hours", 50, 160, `600 22px ${f.sans}`, ink);
@@ -489,12 +489,12 @@ export function examPaper() {
     ctx.fillStyle = ink;
     ctx.fillRect(50, 178, w - 100, 3);
     const section = (label: string, top: number, n: number) => {
-      fillRR(ctx, 50, top, w - 100, 40, 6, "#e4e9f7");
+      fillRR(ctx, 50, top, w - 100, 40, 6, "#ece8e5");
       text(ctx, label, 66, top + 28, `700 22px ${f.sans}`, ink);
       for (let i = 0; i < n; i++) {
         const y = top + 72 + i * 58;
         text(ctx, `${i + 1}.`, 60, y, `600 20px ${f.sans}`, ink);
-        ctx.fillStyle = "#c9cfe0";
+        ctx.fillStyle = "#d3cecb";
         ctx.fillRect(96, y - 12, (w - 230) * (0.65 + ((i * 37) % 30) / 100), 10);
         ctx.fillRect(96, y + 8, (w - 230) * 0.45, 10);
       }
@@ -525,12 +525,12 @@ export function rolePanel(role: (typeof ROLES)[number]) {
     ctx.beginPath();
     ctx.arc(65, 92, 22, Math.PI, 0);
     ctx.fill();
-    text(ctx, role.label, 122, 78, `700 38px ${f.sans}`, "#fff3ea");
+    text(ctx, role.label, 122, 78, `700 38px ${f.sans}`, "#f8f5f2");
     text(ctx, "DASHBOARD", 124, 104, `600 17px ${f.mono}`, role.color);
     role.lines.forEach((l, i) => {
       const y = 150 + i * 74;
       fillRR(ctx, 30, y, w - 60, 58, 14, "rgba(255,170,106,0.12)");
-      text(ctx, l, 52, y + 38, `600 26px ${f.sans}`, "#ffe5d4");
+      text(ctx, l, 52, y + 38, `600 26px ${f.sans}`, "#f0e9e3");
       fillRR(ctx, w - 110, y + 21, 58, 16, 8, hexA(role.color, 0.6));
     });
   });

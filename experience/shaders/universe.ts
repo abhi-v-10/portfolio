@@ -132,8 +132,8 @@ export const strandFragment = /* glsl */ `
     if (u > uReveal) discard;
     float facing = pow(abs(dot(normalize(vN), normalize(vV))), 1.4);
     float flow = pow(0.5 + 0.5 * sin(u * 34.0 - uTime * 1.6 + uSeed * 6.0), 10.0);
-    vec3 cold = vec3(0.86, 0.95, 1.0);
-    vec3 green = mix(vec3(0.25, 0.88, 0.63), vec3(0.49, 0.96, 0.77), u);
+    vec3 cold = vec3(0.952, 0.929, 0.91);
+    vec3 green = mix(vec3(0.742, 0.78, 0.609), vec3(0.839, 0.875, 0.717), u);
     vec3 warm = mix(vec3(0.96, 0.86, 0.74), vec3(1.0, 0.67, 0.42), u);
     float g = smoothstep(0.0, 1.0, uGather * 1.3 - (1.0 - u) * 0.3);
     vec3 col = mix(cold * 0.7, green, g);
@@ -205,8 +205,8 @@ export const bodyFragment = /* glsl */ `
     float sheen = pow(nh, 14.0) * 0.22 + pow(nh, 90.0) * 0.55;
     float fres = pow(1.0 - max(dot(n, v), 0.0), 4.0);
     vec3 col = uBase * (0.42 + 0.9 * dk + 0.25 * df);
-    col += vec3(1.0, 0.97, 0.92) * sheen * (0.35 + 0.65 * length(uBase) * 2.0);
-    col += mix(vec3(0.7, 0.74, 0.82), uRim, 0.55) * fres * 0.35;
+    col += vec3(0.985, 0.971, 0.959) * sheen * (0.35 + 0.65 * length(uBase) * 2.0);
+    col += mix(vec3(0.757, 0.734, 0.715), uRim, 0.55) * fres * 0.35;
     gl_FragColor = vec4(col, uIntensity);
   }
 `;

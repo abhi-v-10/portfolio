@@ -114,26 +114,26 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
       const shellMat = new ShaderMaterial({
         vertexShader: shellVertex,
         fragmentShader: shellFragment,
-        uniforms: { uColor: { value: new Color(ev.placeholder ? "#9fb3c8" : "#7cf5c4") }, uIntensity: { value: 0 }, uFill: { value: 0.25 } },
+        uniforms: { uColor: { value: new Color(ev.placeholder ? "#b6afa9" : "#d6dfb7") }, uIntensity: { value: 0 }, uFill: { value: 0.25 } },
         ...additive,
         premultipliedAlpha: false,
       });
       const node = new Mesh(nodeGeo, shellMat);
       node.position.copy(p);
-      const halo = new Mesh(sprite, glowMat(ev.placeholder ? "#c8d6e6" : "#9dffd6"));
+      const halo = new Mesh(sprite, glowMat(ev.placeholder ? "#d8d3cf" : "#e4ecca"));
       halo.position.copy(p);
       root.add(node, halo);
       return { node, halo, shellMat, u, i, s, major: !!ev.major };
     });
 
     // The present: a living point where every strand meets.
-    const coreMat = glowMat("#7cf5c4");
+    const coreMat = glowMat("#d6dfb7");
     const core = new Mesh(sprite, coreMat);
     root.add(core);
 
     // Closing: several paths rise from the nexus to the horizon.
     const rel = HORIZON.clone().sub(NEXUS);
-    const pathCols: [string, string][] = [["#7cf5c4", "#f0dabf"], ["#b9a6ff", "#ffaa6a"], ["#73dfff", "#f6f4fa"], ["#f17e98", "#ffd6c2"]];
+    const pathCols: [string, string][] = [["#d6dfb7", "#e4dcd5"], ["#c4b2a3", "#ffaa6a"], ["#d7cdbd", "#f6f5f3"], ["#f3836b", "#ffd6c2"]];
     const pathMats = pathCols.map(([a, b], k) => {
       const side = (k - 1.5) * 2.4;
       const curve = new CatmullRomCurve3(
@@ -166,7 +166,7 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
     const heartMat = glowMat("#ffe0b8");
     const heart = new Mesh(sprite, heartMat);
     heart.position.copy(rel);
-    const arcCols = ["#b9a6ff", "#ffcf8a", "#f17e98"];
+    const arcCols = ["#c4b2a3", "#ffcf8a", "#f3836b"];
     const arcMats = arcCols.map((c) => shellMatOf(c));
     const arcs = arcMats.map((m, k) => {
       const a = new Mesh(new TorusGeometry(3.2 + k * 1.15, 0.035 - k * 0.006, 8, 120, Math.PI * (1.1 - k * 0.12)), m);
@@ -196,7 +196,7 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
     root.add(band, sun, heart, motes);
 
     // A spark that runs from the focused event along its strand into the present.
-    const sparkMat = glowMat("#dffff2");
+    const sparkMat = glowMat("#fcf5ef");
     const spark = new Mesh(sprite, sparkMat);
     root.add(spark);
 
@@ -286,18 +286,18 @@ export function NexusWorld({ lowPower }: { lowPower: boolean }) {
     faceCamera(r.heart, cam.quaternion);
     faceCamera(r.band, cam.quaternion);
     r.sun.scale.setScalar(11 + dawn * 4);
-    r.sunMat.uniforms.uIntensity.value = warm * 0.42;
+    r.sunMat.uniforms.uIntensity.value = warm * 0.16;
     r.heart.scale.setScalar(3.2 + (reduced ? 0 : Math.sin(t * 0.8) * 0.15));
-    r.heartMat.uniforms.uIntensity.value = warm * 0.55;
-    r.bandMat.uniforms.uIntensity.value = warm * 0.35;
+    r.heartMat.uniforms.uIntensity.value = warm * 0.3;
+    r.bandMat.uniforms.uIntensity.value = warm * 0.12;
     r.arcs.forEach((a, k) => {
       faceCamera(a, cam.quaternion);
       a.rotateZ(Math.PI * (k * 0.06 - 0.05) - 0.03 + (reduced ? 0 : Math.sin(t * 0.15 + k) * 0.04));
       const grow = smoothstep(11.0 + k * 0.12, 11.55 + k * 0.12, tr);
       a.scale.setScalar(0.85 + 0.15 * grow);
-      r.arcMats[k].uniforms.uIntensity.value = warm * grow * (0.9 - k * 0.15);
+      r.arcMats[k].uniforms.uIntensity.value = warm * grow * (0.45 - k * 0.1);
     });
-    r.moteMat.opacity = warm * 0.85;
+    r.moteMat.opacity = warm * 0.25;
     if (!reduced && warm > 0.01) {
       const pa = r.motes.geometry.attributes.position;
       const arr = pa.array as Float32Array;

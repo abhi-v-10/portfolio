@@ -4,8 +4,6 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import {
   AdditiveBlending,
-  BoxGeometry,
-  CapsuleGeometry,
   CatmullRomCurve3,
   Color,
   CustomBlending,
@@ -13,7 +11,6 @@ import {
   Group,
   Mesh,
   MeshBasicMaterial,
-  MeshStandardMaterial,
   OneFactor,
   OneMinusSrcAlphaFactor,
   PlaneGeometry,
@@ -21,8 +18,6 @@ import {
   Texture,
   RingGeometry,
   ShaderMaterial,
-  SphereGeometry,
-  TorusGeometry,
   Vector2,
   Vector3,
 } from "three";
@@ -31,8 +26,11 @@ import { AUTOPLAY_MS, autoplayDue, gallery, galleryActionDone, galleryStep, hold
 import { story } from "../director/store";
 import { frameFragment, frameVertex } from "../shaders/chapters";
 import { glowFragment, glowVertex } from "../shaders/signal";
-import { holoOn, smoothstep } from "../world/paths";
+import { smoothstep } from "../world/paths";
 import { GALLERY, WINDOW } from "./layout";
+import { PBR } from "../world/materials";
+import { alongX, alongZ, boltCircle, contactShadow, flange, housing, softRectShadow, turned } from "../world/parts";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 
 const N = galleryPhotos.length;
 const PHOTO_W = 1.6;
@@ -60,8 +58,8 @@ type Layout = {
   fadeFrom: number;
   fadeTo: number;
 };
-const DESK: Layout = { radius: 4.8, step: 0.36, forward: 0.6, robot: new Vector3(2.5, -1.95, 1.3), robotScale: 1, fadeFrom: 1.55, fadeTo: 2.05 };
-const MOBILE: Layout = { radius: 3.4, step: 0.46, forward: 0.45, robot: new Vector3(1.35, -2.15, 1.25), robotScale: 0.8, fadeFrom: 1.05, fadeTo: 1.45 };
+const DESK: Layout = { radius: 4.8, step: 0.36, forward: 0.6, robot: new Vector3(2.3, -2.15, 1.6), robotScale: 1.2, fadeFrom: 1.55, fadeTo: 2.05 };
+const MOBILE: Layout = { radius: 3.4, step: 0.46, forward: 0.45, robot: new Vector3(1.8, -2.55, 1.15), robotScale: 0.8, fadeFrom: 1.05, fadeTo: 1.45 };
 
 const smooth = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 const wrap = (r: number) => {
@@ -130,6 +128,7 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
   const fingerL = useRef<Mesh>(null);
   const fingerR = useRef<Mesh>(null);
   const robot = useRef<Group>(null);
+  const robotKey = useRef<PointLight>(null);
 
   const r = useMemo(() => {
     const planeW = PHOTO_W + MARGIN * 2;
@@ -149,8 +148,8 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
           uVis: { value: 0 },
           uReveal: { value: 0 },
           uTime: { value: 0 },
-          uEdgeA: { value: new Color(0.45, 0.88, 1.0) },
-          uEdgeB: { value: new Color(0.66, 0.5, 1.0) },
+          uEdgeA: { value: new Color("#e6e0d4") }, // matte paper mount
+          uEdgeB: { value: new Color(0.772, 0.554, 0.47) },
         },
         transparent: true,
         depthWrite: false,
@@ -166,7 +165,7 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
     const haloMat = new ShaderMaterial({
       vertexShader: glowVertex,
       fragmentShader: glowFragment,
-      uniforms: { uColor: { value: new Color(0.62, 0.52, 1.0) }, uIntensity: { value: 0 } },
+      uniforms: { uColor: { value: new Color(0.772, 0.554, 0.469) }, uIntensity: { value: 0 } },
       transparent: true,
       depthWrite: false,
       blending: AdditiveBlending,
@@ -175,30 +174,60 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
     // Projector ring beneath the gallery: where the frames are projected from.
     const ringGeo = new RingGeometry(1.25, 1.29, 96);
     ringGeo.rotateX(-Math.PI / 2);
-    const ringMat = new MeshBasicMaterial({ color: new Color(0.6, 0.82, 1.0), transparent: true, blending: AdditiveBlending, depthWrite: false });
+    const ringMat = new MeshBasicMaterial({ color: new Color(0.82, 0.788, 0.74), transparent: true, blending: AdditiveBlending, depthWrite: false });
 
-    // Robot: soft ceramic shell, graphite joints, a cyan lens head, two soft fingers.
-    const shell = new MeshStandardMaterial({ color: new Color("#e2e4f5"), roughness: 0.38, metalness: 0.08, transparent: true });
-    const joint = new MeshStandardMaterial({ color: new Color("#272c45"), roughness: 0.32, metalness: 0.7, transparent: true });
-    const eye = new MeshBasicMaterial({ color: new Color(0.55, 0.92, 1.0), transparent: true });
-    const glowRing = new MeshBasicMaterial({ color: new Color(1.0, 0.72, 0.6), transparent: true, blending: AdditiveBlending, depthWrite: false });
-    const geo = {
-      base: new CylinderGeometry(0.42, 0.48, 0.16, 40),
-      pad: new RingGeometry(0.55, 0.61, 64),
-      turret: new CylinderGeometry(0.22, 0.28, 0.26, 32),
-      cap: new SphereGeometry(0.15, 24, 16),
-      capSmall: new SphereGeometry(0.11, 20, 14),
-      upper: new CapsuleGeometry(0.085, L1 - 0.17, 6, 16),
-      fore: new CapsuleGeometry(0.068, L2 - 0.14, 6, 14),
-      head: new BoxGeometry(0.24, 0.2, 0.26),
-      lens: new TorusGeometry(0.06, 0.016, 10, 28),
-      pupil: new SphereGeometry(0.03, 12, 10),
-      finger: new BoxGeometry(0.04, 0.05, 0.16),
+    // Robot (rebuilt 2026-11-25): a small industrial arm. Hard-anodised joint
+    // housings, brushed aluminium links between chamfered flanges, cap-screw
+    // rings on every cover, a parallel gripper with nitrile pads, a camera
+    // module with cover glass and one copper status point. Physical materials
+    // under the studio HDRI; no glow, no ceramic shell.
+    const T = { transparent: true };
+    const mat = {
+      alu: PBR.aluminium({ ...T, repeat: [3, 1] }),
+      ano: PBR.anodised(T),
+      steel: PBR.gunmetal(T),
+      cu: PBR.copper(T),
+      rubber: PBR.rubber(T),
+      glass: PBR.glass(T),
+      led: PBR.statusLed(T),
+      shadow: contactShadow(0.6),
     };
-    geo.upper.rotateX(Math.PI / 2).translate(0, 0, L1 / 2);
-    geo.fore.rotateX(Math.PI / 2).translate(0, 0, L2 / 2);
-    geo.pad.rotateX(-Math.PI / 2);
-    return { frameGeo, mats, haloGeo, haloMat, ringGeo, ringMat, shell, joint, eye, glowRing, geo };
+    const jointCap = (rad: number) => alongX(flange(rad, 0.022, 0.006));
+    const geo = {
+      shadow: new PlaneGeometry(1.5, 1.5).rotateX(-Math.PI / 2),
+      foot: flange(0.5, 0.05, 0.012, 64),
+      footBolts: boltCircle(8, 0.44, 0.018, 0.012, Math.PI / 8),
+      pedestal: turned([[0, 0], [0.36, 0], [0.36, 0.02], [0.31, 0.05], [0.29, 0.16], [0, 0.16]], 64),
+      turret: housing(0.27, 0.28, 0.02, 64),
+      turretBand: flange(0.274, 0.012, 0.003, 64),
+      turretCap: flange(0.24, 0.02, 0.006, 64),
+      turretBolts: boltCircle(6, 0.2, 0.014, 0.008),
+      shoulder: alongX(housing(0.17, 0.44, 0.016)),
+      shoulderCap: jointCap(0.15),
+      shoulderBolts: alongX(boltCircle(6, 0.115, 0.011, 0.008)),
+      elbow: alongX(housing(0.13, 0.34, 0.012)),
+      elbowCap: jointCap(0.115),
+      elbowBolts: alongX(boltCircle(6, 0.085, 0.009, 0.007)),
+      wrist: alongX(housing(0.09, 0.24, 0.009)),
+      wristCap: jointCap(0.08),
+      upperTube: alongZ(new CylinderGeometry(0.072, 0.072, L1 - 0.3, 40)).translate(0, 0, L1 / 2),
+      upperFlange: alongZ(flange(0.1, 0.035, 0.008)),
+      foreTube: alongZ(new CylinderGeometry(0.058, 0.058, L2 - 0.24, 40)).translate(0, 0, L2 / 2),
+      foreFlange: alongZ(flange(0.082, 0.03, 0.007)),
+      roll: alongZ(housing(0.082, 0.12, 0.008)),
+      gripBody: new RoundedBoxGeometry(0.22, 0.11, 0.13, 3, 0.012),
+      gripRail: new RoundedBoxGeometry(0.2, 0.018, 0.03, 2, 0.004),
+      finger: new RoundedBoxGeometry(0.034, 0.05, 0.16, 2, 0.006),
+      pad: new RoundedBoxGeometry(0.008, 0.04, 0.08, 2, 0.003),
+      cam: new RoundedBoxGeometry(0.08, 0.05, 0.05, 2, 0.006),
+      lens: alongZ(new CylinderGeometry(0.016, 0.018, 0.012, 32)),
+      led: new CylinderGeometry(0.005, 0.005, 0.004, 12).rotateX(Math.PI / 2),
+    };
+    // Each print casts a soft rectangular shadow on the air behind it, offset
+    // down and right from the key light: paper with weight, not a projection.
+    const printShadowGeo = new PlaneGeometry(planeW * 0.92, planeH * 0.92);
+    const printShadows = galleryPhotos.map(() => softRectShadow());
+    return { frameGeo, mats, haloGeo, haloMat, ringGeo, ringMat, mat, geo, printShadowGeo, printShadows };
   }, []);
 
   useEffect(() => {
@@ -479,6 +508,7 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
     const lightOn = visible ? smoothstep(0.55, 1.0, tr) * (1 - smoothstep(1.55, 1.85, tr)) : 0;
     if (keyLight.current) keyLight.current.intensity = 10 * lightOn;
     if (fillLight.current) fillLight.current.intensity = 9 * lightOn;
+    if (robotKey.current) robotKey.current.intensity = 22 * lightOn;
 
     if (!visible || !root.current) return;
 
@@ -502,13 +532,14 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
       const rv = smoothstep(0.62 + i * 0.05, 0.98 + i * 0.05, tr);
       u2.uReveal.value = rv;
       u2.uFocus.value = tmp.f.focus;
-      u2.uVis.value = tmp.f.vis * presence * (0.35 + 0.65 * holoOn(rv, 0, 0.35, t, i + 3, reduced));
+      u2.uVis.value = tmp.f.vis * presence * smoothstep(0, 0.35, rv);
+      r.printShadows[i].opacity = u2.uVis.value * (0.35 + 0.35 * tmp.f.focus);
       u2.uTime.value = t;
       bestFocus = Math.max(bestFocus, tmp.f.focus);
     });
     if (halo.current) {
       halo.current.position.set(0, 0.05, L.forward - 0.45);
-      r.haloMat.uniforms.uIntensity.value = presence * 0.28 * (0.6 + 0.4 * bestFocus);
+      r.haloMat.uniforms.uIntensity.value = 0; // no back-light glow behind prints
     }
     r.ringMat.opacity = presence * 0.18;
 
@@ -518,8 +549,8 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
     R.position.copy(L.robot);
     R.scale.setScalar(sc);
     const opacity = smoothstep(0.6, 0.85, tr) * (1 - smoothstep(1.6, 1.82, tr));
-    r.shell.opacity = r.joint.opacity = r.eye.opacity = opacity;
-    r.glowRing.opacity = opacity * 0.8;
+    Object.values(r.mat).forEach((m) => (m.opacity = m === r.mat.shadow ? opacity * 0.6 : opacity));
+    R.visible = opacity > 0.001;
     if (turret.current) turret.current.rotation.y = S.yaw.x;
     if (shoulder.current) shoulder.current.rotation.x = -S.e1.x;
     if (elbow.current) elbow.current.rotation.x = -(S.e2.x - S.e1.x);
@@ -535,12 +566,14 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
     {/* Warm light for the human beat: peach key, lavender fill. Always present, faded by scroll. */}
     <group position={GALLERY.toArray() as [number, number, number]}>
       <pointLight ref={keyLight} color="#ffb89a" position={[-1.6, 2.4, 3.2]} intensity={0} distance={10} decay={2} />
-      <pointLight ref={fillLight} color="#b9a6ff" position={[3.4, 1.0, 2.2]} intensity={0} distance={9} decay={2} />
+      <pointLight ref={fillLight} color="#c4b2a3" position={[3.4, 1.0, 2.2]} intensity={0} distance={9} decay={2} />
+      {/* A warm key above and in front of the arm, so its anodised housings and
+          brushed links read against the dark room. */}
+      <pointLight ref={robotKey} color="#fff1e2" position={[2.2, 1.6, 4.2]} intensity={0} distance={8} decay={2} />
     </group>
     <group ref={root} position={GALLERY.toArray() as [number, number, number]} visible={false}>
 
       <mesh ref={halo} geometry={r.haloGeo} material={r.haloMat} renderOrder={1} />
-      <mesh geometry={r.ringGeo} material={r.ringMat} position={[0, -1.55, 0.2]} renderOrder={1} />
 
       {galleryPhotos.map((p, i) => (
         <mesh
@@ -551,28 +584,54 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
           geometry={r.frameGeo}
           material={r.mats[i].mat}
           frustumCulled={false}
-        />
+        >
+          <mesh geometry={r.printShadowGeo} material={r.printShadows[i]} position={[0.07, -0.09, -0.06]} renderOrder={-1} />
+        </mesh>
       ))}
 
       <group ref={robot}>
-        <mesh geometry={r.geo.pad} material={r.glowRing} position={[0, 0.01, 0]} />
-        <mesh geometry={r.geo.base} material={r.joint} position={[0, 0.08, 0]} />
+        <mesh geometry={r.geo.shadow} material={r.mat.shadow} position={[0, 0.002, 0]} renderOrder={1} />
+        <mesh geometry={r.geo.foot} material={r.mat.ano} />
+        <mesh geometry={r.geo.footBolts} material={r.mat.steel} position={[0, 0.05, 0]} />
+        <mesh geometry={r.geo.pedestal} material={r.mat.alu} position={[0, 0.05, 0]} />
         <group ref={turret} position={[0, 0.16, 0]}>
-          <mesh geometry={r.geo.turret} material={r.shell} position={[0, 0.13, 0]} />
+          <mesh geometry={r.geo.turret} material={r.mat.ano} position={[0, 0.05, 0]} />
+          <mesh geometry={r.geo.turretBand} material={r.mat.cu} position={[0, 0.07, 0]} />
+          <mesh geometry={r.geo.turretCap} material={r.mat.alu} position={[0, 0.33, 0]} />
+          <mesh geometry={r.geo.turretBolts} material={r.mat.steel} position={[0, 0.35, 0]} />
           <group ref={shoulder} position={[0, SHOULDER_Y - 0.16, 0]}>
-            <mesh geometry={r.geo.cap} material={r.joint} />
-            <mesh geometry={r.geo.upper} material={r.shell} />
+            <mesh geometry={r.geo.shoulder} material={r.mat.ano} position={[-0.22, 0, 0]} />
+            <mesh geometry={r.geo.shoulderCap} material={r.mat.alu} position={[0.22, 0, 0]} />
+            <mesh geometry={r.geo.shoulderBolts} material={r.mat.steel} position={[0.242, 0, 0]} />
+            <mesh geometry={r.geo.shoulderCap} material={r.mat.alu} position={[-0.242, 0, 0]} />
+            <mesh geometry={r.geo.upperFlange} material={r.mat.ano} position={[0, 0, 0.13]} />
+            <mesh geometry={r.geo.upperTube} material={r.mat.alu} />
+            <mesh geometry={r.geo.upperFlange} material={r.mat.ano} position={[0, 0, L1 - 0.165]} />
             <group ref={elbow} position={[0, 0, L1]}>
-              <mesh geometry={r.geo.capSmall} material={r.joint} />
-              <mesh geometry={r.geo.fore} material={r.shell} />
+              <mesh geometry={r.geo.elbow} material={r.mat.ano} position={[-0.17, 0, 0]} />
+              <mesh geometry={r.geo.elbowCap} material={r.mat.alu} position={[0.17, 0, 0]} />
+              <mesh geometry={r.geo.elbowBolts} material={r.mat.steel} position={[0.192, 0, 0]} />
+              <mesh geometry={r.geo.elbowCap} material={r.mat.alu} position={[-0.192, 0, 0]} />
+              <mesh geometry={r.geo.foreFlange} material={r.mat.ano} position={[0, 0, 0.1]} />
+              <mesh geometry={r.geo.foreTube} material={r.mat.alu} />
+              <mesh geometry={r.geo.foreFlange} material={r.mat.ano} position={[0, 0, L2 - 0.13]} />
               <group ref={wrist} position={[0, 0, L2]}>
-                <mesh geometry={r.geo.capSmall} material={r.joint} scale={0.8} />
+                <mesh geometry={r.geo.wrist} material={r.mat.ano} position={[-0.12, 0, 0]} />
+                <mesh geometry={r.geo.wristCap} material={r.mat.alu} position={[0.12, 0, 0]} />
+                <mesh geometry={r.geo.wristCap} material={r.mat.alu} position={[-0.142, 0, 0]} />
                 <group ref={head}>
-                  <mesh geometry={r.geo.head} material={r.shell} position={[0, 0.02, 0.15]} />
-                  <mesh geometry={r.geo.lens} material={r.eye} position={[0, 0.05, 0.285]} />
-                  <mesh geometry={r.geo.pupil} material={r.eye} position={[0, 0.05, 0.285]} />
-                  <mesh ref={fingerL} geometry={r.geo.finger} material={r.joint} position={[-0.05, -0.06, 0.33]} />
-                  <mesh ref={fingerR} geometry={r.geo.finger} material={r.joint} position={[0.05, -0.06, 0.33]} />
+                  <mesh geometry={r.geo.roll} material={r.mat.ano} position={[0, 0, 0.04]} />
+                  <mesh geometry={r.geo.gripBody} material={r.mat.ano} position={[0, -0.01, 0.2]} />
+                  <mesh geometry={r.geo.gripRail} material={r.mat.alu} position={[0, -0.07, 0.24]} />
+                  <mesh geometry={r.geo.cam} material={r.mat.alu} position={[0, 0.07, 0.22]} />
+                  <mesh geometry={r.geo.lens} material={r.mat.glass} position={[0, 0.07, 0.25]} />
+                  <mesh geometry={r.geo.led} material={r.mat.led} position={[0.028, 0.085, 0.246]} />
+                  <mesh ref={fingerL} geometry={r.geo.finger} material={r.mat.alu} position={[-0.05, -0.06, 0.33]}>
+                    <mesh geometry={r.geo.pad} material={r.mat.rubber} position={[0.019, 0, 0.03]} />
+                  </mesh>
+                  <mesh ref={fingerR} geometry={r.geo.finger} material={r.mat.alu} position={[0.05, -0.06, 0.33]}>
+                    <mesh geometry={r.geo.pad} material={r.mat.rubber} position={[-0.019, 0, 0.03]} />
+                  </mesh>
                 </group>
               </group>
             </group>

@@ -16,14 +16,14 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "flex-end",
           padding: "72px 80px",
-          color: "#f6f4fa",
+          color: "#f6f5f3",
           background:
-            "radial-gradient(60% 70% at 78% 30%, rgba(103,80,200,0.75), transparent 70%), radial-gradient(40% 40% at 90% 85%, rgba(241,126,152,0.35), transparent 70%), linear-gradient(180deg, #0b0f22, #111528)",
+            "radial-gradient(60% 70% at 78% 30%, rgba(142,90,70,0.75), transparent 70%), radial-gradient(40% 40% at 90% 85%, rgba(243,131,107,0.35), transparent 70%), linear-gradient(180deg, #15100b, #1b1511)",
         }}
       >
-        <div style={{ fontSize: 26, letterSpacing: 8, color: "#73dfff", textTransform: "uppercase" }}>Developer. Engineer. Creator. Gamer.</div>
+        <div style={{ fontSize: 26, letterSpacing: 8, color: "#d7cdbd", textTransform: "uppercase" }}>Developer. Engineer. Creator. Gamer.</div>
         <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1, marginTop: 24, letterSpacing: -3 }}>Abhishyanth Vemula</div>
-        <div style={{ fontSize: 34, marginTop: 24, color: "#dce3ff" }}>Backend systems, AI agents and creative 3D web.</div>
+        <div style={{ fontSize: 34, marginTop: 24, color: "#eae3dd" }}>Backend systems, AI agents and creative 3D web.</div>
       </div>
     ),
     size,

@@ -65,9 +65,6 @@ export function TopBar({ inert }: { inert?: boolean }) {
       <nav className="topbar-nav" aria-label="Quick access">
         {/* One control for the whole index: work, contact and the story chapters. */}
         <button type="button" className="topbar-menu" aria-haspopup="dialog" onClick={open("work")}>
-          <span className="topbar-menu-orbit" aria-hidden>
-            <span />
-          </span>
           <span className="topbar-menu-label">Menu</span>
           <span className="topbar-menu-lines" aria-hidden>
             <span />

@@ -1,426 +1,415 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-13T10:53:38.272075+00:00",
+  "generatedAt": "2026-11-25T09:48:57.912Z",
   "title": "Design System: Abhishyanth Vemula — Portfolio V2",
   "extensions": {
     "colorMeta": {
-      "loader-black": {
+      "ink": {
         "role": "neutral",
-        "displayName": "Loader Black",
-        "canonical": "oklch(12.7% 0.019 253.4)",
+        "displayName": "Ink",
+        "canonical": "oklch(16.4% 0.004 84.6)",
         "tonalRamp": [
-          "#0A0B0D",
-          "#222529",
-          "#3E4249",
-          "#5B626A",
-          "#7B838E",
-          "#9EA6AF",
-          "#C4CAD1",
-          "#EBEFF4"
+          "#0C0B0A",
+          "#252422",
+          "#40403E",
+          "#5F5D5B",
+          "#81807D",
+          "#A6A4A2",
+          "#CBCAC8",
+          "#EFEEEC"
         ]
       },
-      "space-navy": {
+      "ink-ground": {
         "role": "neutral",
-        "displayName": "Space Navy",
-        "canonical": "oklch(20.2% 0.038 273.5)",
+        "displayName": "Ink Ground",
+        "canonical": "oklch(18.5% 0.008 67.3)",
         "tonalRamp": [
-          "#0A0B0F",
-          "#22252D",
-          "#3E414F",
-          "#5B6074",
-          "#7B819A",
-          "#9EA4B9",
-          "#C4C8D9",
-          "#EBEEFA"
+          "#0C0B09",
+          "#262422",
+          "#423F3D",
+          "#605D5A",
+          "#837F7B",
+          "#A7A4A0",
+          "#CDCAC7",
+          "#F1EEEB"
         ]
       },
-      "panel-navy": {
+      "panel": {
         "role": "neutral",
-        "displayName": "Panel Navy",
-        "canonical": "oklch(17.0% 0.036 272.1)",
+        "displayName": "Panel",
+        "canonical": "oklch(21.0% 0.007 78.2)",
         "tonalRamp": [
-          "#0A0B0F",
-          "#22252D",
-          "#3E414E",
-          "#5B6173",
-          "#7B8198",
-          "#9EA4B8",
-          "#C4C9D8",
-          "#EBEEF9"
+          "#0C0B0A",
+          "#252422",
+          "#413F3D",
+          "#5F5D5A",
+          "#82807C",
+          "#A6A4A1",
+          "#CCCAC7",
+          "#F0EEEB"
         ]
       },
-      "core-energy": {
-        "role": "primary",
-        "displayName": "Core Energy",
-        "canonical": "oklch(85.1% 0.109 219.7)",
-        "tonalRamp": [
-          "#000E13",
-          "#002A35",
-          "#004A5B",
-          "#016C84",
-          "#1091AE",
-          "#61B2CA",
-          "#99D4E7",
-          "#CEF6FF"
-        ]
-      },
-      "ion-cyan": {
-        "role": "primary",
-        "displayName": "Ion Cyan",
-        "canonical": "oklch(82.3% 0.115 197.9)",
-        "tonalRamp": [
-          "#000F0F",
-          "#002C2E",
-          "#004D50",
-          "#007174",
-          "#00969B",
-          "#54B7BA",
-          "#92D8D9",
-          "#CAF9FA"
-        ]
-      },
-      "electric-blue": {
-        "role": "secondary",
-        "displayName": "Electric Blue",
-        "canonical": "oklch(60.0% 0.201 261.4)",
-        "tonalRamp": [
-          "#020A20",
-          "#0A224F",
-          "#173D84",
-          "#265BBD",
-          "#377AF7",
-          "#6AA3FF",
-          "#9CC9FF",
-          "#CFF0FF"
-        ]
-      },
-      "hologram-blue": {
-        "role": "secondary",
-        "displayName": "Hologram Blue",
-        "canonical": "oklch(62.4% 0.203 260.8)",
-        "tonalRamp": [
-          "#020A20",
-          "#08224F",
-          "#153D84",
-          "#235BBE",
-          "#347BF8",
-          "#68A3FF",
-          "#9BCAFF",
-          "#CFF0FF"
-        ]
-      },
-      "hologram-violet": {
-        "role": "tertiary",
-        "displayName": "Hologram Violet",
-        "canonical": "oklch(65.8% 0.197 290.3)",
-        "tonalRamp": [
-          "#0C061E",
-          "#261A4B",
-          "#44317E",
-          "#644AB4",
-          "#8565EC",
-          "#A591FF",
-          "#C8BCFF",
-          "#EDE6FF"
-        ]
-      },
-      "cosmic-violet": {
-        "role": "tertiary",
-        "displayName": "Cosmic Violet",
-        "canonical": "oklch(52.1% 0.178 287.3)",
-        "tonalRamp": [
-          "#0B071D",
-          "#241D48",
-          "#40357A",
-          "#5F4FAF",
-          "#7F6BE4",
-          "#A095F9",
-          "#C4BEFF",
-          "#EBE8FF"
-        ]
-      },
-      "nebula-pink": {
-        "role": "tertiary",
-        "displayName": "Nebula Pink",
-        "canonical": "oklch(72.9% 0.143 6.9)",
-        "tonalRamp": [
-          "#170509",
-          "#3D1620",
-          "#682A3A",
-          "#974056",
-          "#C65974",
-          "#E18699",
-          "#FBB2BF",
-          "#FFDFE8"
-        ]
-      },
-      "solar-coral": {
-        "role": "tertiary",
-        "displayName": "Solar Coral",
-        "canonical": "oklch(80.9% 0.128 56.7)",
-        "tonalRamp": [
-          "#150701",
-          "#391D05",
-          "#62350F",
-          "#8D4F1A",
-          "#BA6C2A",
-          "#D69464",
-          "#F1BD98",
-          "#FFE6CC"
-        ]
-      },
-      "warm-ivory": {
-        "role": "tertiary",
-        "displayName": "Warm Ivory",
-        "canonical": "oklch(89.9% 0.043 72.9)",
-        "tonalRamp": [
-          "#0E0A07",
-          "#2B241B",
-          "#4B4032",
-          "#6E5E4B",
-          "#927F66",
-          "#B3A28E",
-          "#D4C7B7",
-          "#F6EDE2"
-        ]
-      },
-      "soft-white": {
+      "bone": {
         "role": "neutral",
-        "displayName": "Soft White",
-        "canonical": "oklch(97.0% 0.008 301.4)",
+        "displayName": "Bone",
+        "canonical": "oklch(92.6% 0.017 84.6)",
         "tonalRamp": [
-          "#0B0B0C",
-          "#252527",
-          "#424144",
-          "#626064",
-          "#838186",
-          "#A6A4A8",
-          "#C9C8CC",
-          "#EFEEF0"
+          "#0D0B07",
+          "#26241E",
+          "#433F38",
+          "#625D54",
+          "#858075",
+          "#A9A49A",
+          "#CECAC1",
+          "#F2EEE7"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(95.4% 0.013 82.4)",
+        "tonalRamp": [
+          "#0D0B08",
+          "#262420",
+          "#423F3A",
+          "#615D56",
+          "#848078",
+          "#A8A49D",
+          "#CECAC4",
+          "#F1EEE8"
         ]
       },
       "ink-tinted": {
         "role": "neutral",
         "displayName": "Ink Tinted",
-        "canonical": "oklch(91.9% 0.039 274.5)",
+        "canonical": "oklch(87.6% 0.020 80.1)",
         "tonalRamp": [
-          "#0A0B0F",
-          "#22252E",
-          "#3E414F",
-          "#5B6074",
-          "#7B819A",
-          "#9FA4B9",
-          "#C4C8D9",
-          "#EBEEFA"
+          "#0D0B07",
+          "#27231D",
+          "#443F37",
+          "#635D53",
+          "#867F73",
+          "#AAA499",
+          "#CFCAC0",
+          "#F3EEE6"
         ]
       },
       "ink-muted": {
         "role": "neutral",
         "displayName": "Ink Muted",
-        "canonical": "oklch(78.1% 0.046 264.3)",
+        "canonical": "oklch(69.0% 0.021 77.3)",
         "tonalRamp": [
-          "#090B10",
-          "#20252F",
-          "#3A4252",
-          "#566177",
-          "#75829E",
-          "#9AA5BD",
-          "#C0C9DC",
-          "#E8EFFC"
+          "#0E0B06",
+          "#28231D",
+          "#453F36",
+          "#645C52",
+          "#887F72",
+          "#ABA398",
+          "#D0C9BF",
+          "#F4EEE5"
+        ]
+      },
+      "signal-copper": {
+        "role": "primary",
+        "displayName": "Signal Copper",
+        "canonical": "oklch(65.2% 0.117 50.3)",
+        "tonalRamp": [
+          "#1D0200",
+          "#3F1600",
+          "#632F0C",
+          "#8A4A22",
+          "#B7693A",
+          "#D89269",
+          "#F9BB98",
+          "#FFE1C4"
+        ]
+      },
+      "clay": {
+        "role": "secondary",
+        "displayName": "Clay",
+        "canonical": "oklch(52.0% 0.076 41.8)",
+        "tonalRamp": [
+          "#180501",
+          "#371C11",
+          "#593528",
+          "#7D5140",
+          "#A7715C",
+          "#C99885",
+          "#EBBFAF",
+          "#FFE5D7"
+        ]
+      },
+      "slate": {
+        "role": "secondary",
+        "displayName": "Slate",
+        "canonical": "oklch(57.2% 0.016 231.4)",
+        "tonalRamp": [
+          "#080C0E",
+          "#1F2528",
+          "#3A4145",
+          "#565F64",
+          "#778288",
+          "#9CA6AC",
+          "#C3CCD1",
+          "#E8F0F4"
+        ]
+      },
+      "brass": {
+        "role": "tertiary",
+        "displayName": "Brass",
+        "canonical": "oklch(71.1% 0.101 78.4)",
+        "tonalRamp": [
+          "#160700",
+          "#341F00",
+          "#553A03",
+          "#78571A",
+          "#A17832",
+          "#C39E64",
+          "#E5C594",
+          "#FFEAC0"
+        ]
+      },
+      "olive": {
+        "role": "tertiary",
+        "displayName": "Olive",
+        "canonical": "oklch(59.8% 0.053 117.0)",
+        "tonalRamp": [
+          "#0A0D02",
+          "#232613",
+          "#3E432A",
+          "#5C6143",
+          "#7E8561",
+          "#A2A988",
+          "#C8CEB2",
+          "#EDF2DA"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "The name only; uppercase masked lines."
+        "purpose": "The name only: Unbounded 800, uppercase, masked lines for the entrance."
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Chapter titles."
+        "purpose": "Chapter titles such as Curiosity."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Professional descriptor line."
+        "purpose": "Interface titles and leads in Geist."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Tagline and chapter copy."
+        "purpose": "Tagline and chapter copy, 54–62ch."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Identity mark, status, Index, Skip, Scroll cue."
+        "purpose": "Mono identity marks, the Menu label, chapter meta lines and the scroll cue. Never prose."
       },
       "action": {
         "displayName": "Action",
-        "purpose": "Explore button only."
+        "purpose": "Every button and text link, Explore included: IBM Plex Sans 500, sentence case."
+      },
+      "editorial": {
+        "displayName": "Editorial",
+        "purpose": "Fraunces italic: chapter leads, personal asides and the closing line only."
       }
     },
     "shadows": [
       {
-        "name": "seam-glow",
-        "value": "0 0 22px 2px rgb(115 223 255 / 0.55)",
-        "purpose": "Loader seam only: literal energy, not elevation."
-      },
-      {
-        "name": "edge-glow",
-        "value": "0 0 14px 1px rgb(115 223 255 / 0.45)",
-        "purpose": "Cut edges of the opening loader panels."
+        "name": "case-frame",
+        "value": "0 30px 80px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(244 239 230 / 0.08)",
+        "purpose": "The only offset shadow: the evidence viewer frame lifting off the blurred page."
       }
     ],
     "motion": [
       {
         "name": "ease-out-expo",
         "value": "cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Arrivals: Explore reveal, progress fill, name lines (GSAP expo.out)."
+        "purpose": "Default easing for state changes, reveals and cursor shape changes."
       },
       {
-        "name": "panel-open",
-        "value": "1.4s power4.inOut",
-        "purpose": "Loader halves opening at the seam."
+        "name": "pen-write",
+        "value": "cubic-bezier(0.5, 0.05, 0.3, 1)",
+        "purpose": "Signature strokes: a pen that starts slow, travels, and lifts."
       },
       {
-        "name": "intro-dolly",
-        "value": "2.9s linear driver, eased per element",
-        "purpose": "story.intro: camera dolly, ring unfold, workspace assembly."
+        "name": "signature-main",
+        "value": "950ms",
+        "purpose": "Main signature stroke; crossbars 180ms and 200ms, the i-dot 80ms, 40ms between strokes."
       },
       {
-        "name": "heartbeat",
-        "value": "3.2s ease-in-out infinite",
-        "purpose": "Loader core breathing; opacity-only under reduced motion."
+        "name": "loader-min-hold",
+        "value": "1100ms",
+        "purpose": "Shortest loader hold on a first load; 0 when returning in the same tab or under reduced motion."
       },
       {
-        "name": "state-change",
-        "value": "200ms ease",
-        "purpose": "Hover fills and border colour changes."
+        "name": "loader-split",
+        "value": "1000ms power4.inOut",
+        "purpose": "The two loader halves parting along the seam; the hero is released at 1.3s."
+      },
+      {
+        "name": "glyph-dwell",
+        "value": "140ms",
+        "purpose": "How long the pointer must rest on a corrupted hero word before it decodes."
+      },
+      {
+        "name": "cursor-shape",
+        "value": "320ms",
+        "purpose": "Cursor dot, lens and caret transitions."
       }
     ],
     "breakpoints": [
       {
-        "name": "portrait",
-        "value": "(max-aspect-ratio: 4/5), (max-width: 640px)"
+        "name": "tiny",
+        "value": "359px"
       },
       {
-        "name": "min-supported",
-        "value": "320px"
+        "name": "portrait",
+        "value": "max-aspect-ratio 4/5 or max-width 640px"
+      },
+      {
+        "name": "case-narrow",
+        "value": "820px"
+      },
+      {
+        "name": "wide-end-card",
+        "value": "760px"
       }
     ]
   },
   "components": [
     {
-      "name": "Explore Button",
-      "kind": "button",
-      "refersTo": "button-explore",
-      "description": "Primary action; appears only when the system is genuinely ready.",
-      "html": "<button class=\"ds-btn-explore\">Explore <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path d=\"M5 12h13M13 6.5 18.5 12 13 17.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
-      "css": ".ds-btn-explore{display:inline-flex;align-items:center;gap:.75rem;min-height:48px;padding:.85rem 1.35rem .85rem 1.6rem;font-family:Unbounded,sans-serif;font-weight:600;font-size:.78rem;letter-spacing:.24em;text-transform:uppercase;color:#EAFBFF;background:rgb(115 223 255 / .07);border:1px solid rgb(115 223 255 / .5);border-radius:2px;cursor:pointer;transition:background-color .2s ease,border-color .2s ease,transform .2s ease}.ds-btn-explore svg{transition:transform .25s cubic-bezier(.16,1,.3,1)}.ds-btn-explore:hover{background:rgb(115 223 255 / .16);border-color:#73DFFF}.ds-btn-explore:hover svg{transform:translateX(3px)}.ds-btn-explore:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}.ds-btn-explore:active{transform:scale(.98)}"
-    },
-    {
-      "name": "Index Pill",
-      "kind": "button",
-      "refersTo": "button-index",
-      "description": "Secondary navigation trigger in the top bar.",
-      "html": "<button class=\"ds-btn-index\">Index <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path d=\"M4 8h16M4 16h10\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></svg></button>",
-      "css": ".ds-btn-index{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.05rem;font-family:'Geist Mono',monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#F6F4FA;background:rgb(9 12 28 / .6);border:1px solid rgb(246 244 250 / .2);border-radius:999px;cursor:pointer;transition:border-color .2s ease,background-color .2s ease}.ds-btn-index:hover{border-color:#73DFFF;background:rgb(9 12 28 / .85)}.ds-btn-index:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}"
-    },
-    {
-      "name": "Quiet Link",
-      "kind": "button",
-      "refersTo": "link-quiet",
-      "description": "Skip intro / Close: low-emphasis mono actions.",
-      "html": "<button class=\"ds-link-quiet\">Skip intro</button>",
-      "css": ".ds-link-quiet{min-height:44px;padding:.5rem .25rem;font-family:'Geist Mono',monospace;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:#A9B8D6;background:none;border:0;cursor:pointer;text-decoration:underline;text-decoration-color:rgb(169 184 214 / .35);text-underline-offset:.4em}.ds-link-quiet:hover{color:#F6F4FA;text-decoration-color:#73DFFF}.ds-link-quiet:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}"
-    },
-    {
-      "name": "Top Bar",
+      "name": "Menu Pill",
       "kind": "nav",
       "refersTo": "button-index",
-      "description": "Identity mark left, Index pill right; transparent over the world.",
-      "html": "<header class=\"ds-topbar\"><a class=\"ds-mark\" href=\"#\">AV <span>/</span> Personal system</a><button class=\"ds-btn-index\">Index <svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" aria-hidden=\"true\"><path d=\"M4 8h16M4 16h10\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\"/></svg></button></header>",
-      "css": ".ds-topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;background:#03070E}.ds-mark{display:inline-flex;gap:.6em;font-family:'Geist Mono',monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#F6F4FA;text-decoration:none}.ds-mark span{color:#73DFFF}.ds-mark:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}.ds-btn-index{display:inline-flex;align-items:center;gap:.6rem;min-height:44px;padding:.6rem 1.05rem;font-family:'Geist Mono',monospace;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#F6F4FA;background:rgb(9 12 28 / .6);border:1px solid rgb(246 244 250 / .2);border-radius:999px;cursor:pointer;transition:border-color .2s ease,background-color .2s ease}.ds-btn-index:hover{border-color:#73DFFF;background:rgb(9 12 28 / .85)}.ds-btn-index:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}"
+      "description": "The top bar's one control: warm-ink pill with a travelling vermilion arc on its rim.",
+      "html": "<button class=\"ds-menu\"><span class=\"ds-menu-orbit\"></span>Menu<span class=\"ds-menu-lines\"><i></i><i></i></span></button>",
+      "css": "@property --ds-a{syntax:'<angle>';initial-value:0deg;inherits:false}.ds-menu{position:relative;isolation:isolate;display:inline-flex;align-items:center;gap:.75rem;min-height:44px;padding:.55rem 1rem .55rem .7rem;font:400 .75rem/1 var(--font-mono,'IBM Plex Mono',monospace);letter-spacing:.24em;text-transform:uppercase;color:#F4EFE6;background:rgb(15 11 7/.62);border:0;border-radius:999px;cursor:pointer;transition:background-color .3s ease}.ds-menu::before{content:'';position:absolute;inset:0;z-index:-1;padding:1px;border-radius:inherit;background:conic-gradient(from var(--ds-a),rgb(244 239 230/.16) 0deg,rgb(244 239 230/.16) 250deg,#C8794A 310deg,#F2C9A0 340deg,rgb(244 239 230/.16) 360deg);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);animation:ds-rim 7s linear infinite}.ds-menu:hover{background:rgb(20 15 11/.88)}.ds-menu:hover::before{animation-duration:2.4s}.ds-menu:focus-visible{outline:2px solid #C8794A;outline-offset:4px}.ds-menu-orbit{width:22px;height:22px;border-radius:50%;border:1px solid rgb(244 239 230/.3);position:relative}.ds-menu-orbit::after{content:'';position:absolute;width:5px;height:5px;border-radius:50%;background:#C8794A;right:1px;bottom:3px}.ds-menu-lines{display:grid;gap:4px}.ds-menu-lines i{display:block;height:1px;width:16px;background:currentColor;transition:width .3s cubic-bezier(.16,1,.3,1)}.ds-menu-lines i:last-child{width:10px}.ds-menu:hover .ds-menu-lines i{width:16px}@keyframes ds-rim{to{--ds-a:360deg}}"
     },
     {
-      "name": "Index Chapter Row",
-      "kind": "custom",
-      "refersTo": "index-panel",
-      "description": "Chapter list in the Index panel; live and in-production states.",
-      "html": "<ol class=\"ds-index\"><li><a href=\"#\"><span class=\"n\">00</span><span class=\"t\">The Origin</span></a></li><li class=\"next\"><span><span class=\"n\">01</span><span class=\"t\">Curiosity</span><span class=\"tag\">In production</span></span></li></ol>",
-      "css": ".ds-index{list-style:none;margin:0;padding:1rem 1.5rem;background:#0A0E1F;width:22rem}.ds-index li>*{display:grid;grid-template-columns:2.25rem 1fr auto;align-items:baseline;padding:.95rem 0;border-bottom:1px solid rgb(246 244 250 / .08);color:#F6F4FA;text-decoration:none}.ds-index .n{font-family:'Geist Mono',monospace;font-size:.75rem;color:#73DFFF}.ds-index .t{font-family:Unbounded,sans-serif;font-weight:600;font-size:.95rem}.ds-index a:hover .t{color:#73DFFF}.ds-index a:focus-visible{outline:2px solid #73DFFF;outline-offset:4px}.ds-index .next .t{color:#A9B8D6}.ds-index .next .n{color:#7F8BB3}.ds-index .tag{font-family:'Geist Mono',monospace;font-size:.6875rem;color:#9EA6CC}"
+      "name": "Primary Action Pill",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Post-threshold primary action (the email in Next Chapter): Paper pill, Ink text.",
+      "html": "<a class=\"ds-primary\" href=\"#\">Email me</a>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;min-height:46px;padding:.75rem 1.3rem;font:600 .9375rem/1 var(--font-sans,'IBM Plex Sans',system-ui,sans-serif);color:#0F0E0C;background:#F4EFE6;border-radius:999px;text-decoration:none;transition:background-color .2s ease,color .2s ease}.ds-primary:hover{background:#C8794A;color:#F4EFE6}.ds-primary:focus-visible{outline:2px solid #C8794A;outline-offset:4px}"
     },
     {
-      "name": "Loader Progress",
+      "name": "Text Link",
       "kind": "custom",
-      "refersTo": "button-explore",
-      "description": "Three-segment hairline readiness bar with status readout.",
-      "html": "<div class=\"ds-prog\"><p><span>Core assets</span><span>02/03 · Scene</span></p><div class=\"bar\"><i class=\"done\"></i><i class=\"done\"></i><i class=\"active\"></i></div></div>",
-      "css": ".ds-prog{width:16rem;padding:1.5rem;background:#03070E}.ds-prog p{display:flex;justify-content:space-between;margin:0 0 .85rem;font-family:'Geist Mono',monospace;font-size:.6875rem;letter-spacing:.2em;text-transform:uppercase;color:#D6F4FF}.ds-prog p span+span{color:#8EA3C7;letter-spacing:.08em}.ds-prog .bar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.ds-prog i{position:relative;height:1px;background:rgb(115 223 255 / .18);overflow:hidden}.ds-prog i.done{background:#73DFFF}.ds-prog i.active::after{content:'';position:absolute;inset:0 auto 0 0;width:40%;background:linear-gradient(90deg,transparent,rgb(191 243 255 / .9),transparent);animation:ds-glint 1.25s ease-in-out infinite}@keyframes ds-glint{from{transform:translateX(-100%)}to{transform:translateX(250%)}}"
+      "refersTo": "link-quiet",
+      "description": "Secondary actions: sentence-case sans with a drawn 1px underline that turns vermilion on hover.",
+      "html": "<a class=\"ds-link\" href=\"#\">See the work</a> <button class=\"ds-quiet\">Skip intro</button>",
+      "css": ".ds-link{font:500 .9375rem/1.4 var(--font-sans,'IBM Plex Sans',system-ui,sans-serif);color:#F4EFE6;text-decoration:underline;text-decoration-thickness:1px;text-decoration-color:rgb(244 239 230/.32);text-underline-offset:.35em;transition:text-decoration-color .2s ease}.ds-link:hover{text-decoration-color:#C8794A}.ds-link:focus-visible,.ds-quiet:focus-visible{outline:2px solid #C8794A;outline-offset:4px;border-radius:2px}.ds-quiet{min-height:44px;padding:.5rem .25rem;font:400 .8125rem/1 var(--font-sans,'IBM Plex Sans',system-ui,sans-serif);color:#A39A8D;background:none;border:0;cursor:pointer;text-decoration:underline;text-decoration-color:rgb(163 154 141/.4);text-underline-offset:.4em}.ds-quiet:hover{color:#F4EFE6;text-decoration-color:#C8794A}"
+    },
+    {
+      "name": "Signature Loader Readout",
+      "kind": "custom",
+      "description": "The signature writing itself over one hairline of real progress and a serif counter.",
+      "html": "<div class=\"ds-loader\"><svg class=\"ds-sig\" viewBox=\"0 0 420 150\"><path pathLength=\"1\" d=\"M16 104 C28 82 42 46 56 28 C61 21 65 24 64 33 C62 56 64 80 70 97 C74 104 81 97 85 88 C90 72 95 44 97 31 C98 23 92 24 90 34 C87 55 87 79 89 95 C91 104 101 101 104 92 C106 85 101 80 95 85 C104 89 110 88 114 82 C121 64 126 41 124 31 C122 24 116 28 116 39 C116 60 114 80 114 97 C118 84 124 75 131 75 C137 75 138 84 138 91 C138 100 143 102 149 95 C153 89 155 82 157 76 C157 86 156 95 160 98 C166 101 170 93 173 87\"/><path class=\"ds-dot\" pathLength=\"1\" d=\"M157.5 62 l0.6 -0.8\"/></svg><div class=\"ds-line\"><span></span></div><p class=\"ds-status\"><span>Scene</span><span class=\"ds-count\">02<span>/03</span></span></p></div>",
+      "css": ".ds-loader{width:min(30rem,90%);padding:2rem;background:#0F0E0C;display:grid;gap:.7rem}.ds-sig{width:100%;fill:none;stroke:#ECE6DA;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}.ds-sig path{stroke-dasharray:1 1;stroke-dashoffset:1;animation:ds-write 1.2s cubic-bezier(.5,.05,.3,1) .2s forwards}.ds-sig .ds-dot{stroke:#C8794A;stroke-width:3.2;animation-delay:1.45s;animation-duration:.08s}@keyframes ds-write{to{stroke-dashoffset:0}}.ds-line{height:1px;background:rgb(236 230 218/.14);position:relative;overflow:hidden}.ds-line span{position:absolute;inset:0;background:#ECE6DA;transform:scaleX(.66);transform-origin:left}.ds-status{margin:0;display:flex;justify-content:space-between;align-items:baseline;font:400 .8125rem/1 var(--font-sans,'IBM Plex Sans',system-ui,sans-serif);color:#DDD5C8}.ds-count{font:italic 400 1.125rem/1 var(--font-serif,Fraunces,Georgia,serif);color:#ECE6DA;font-variant-numeric:tabular-nums lining-nums}.ds-count span{font-size:.8125rem;color:#A39A8D}"
     },
     {
       "name": "Hero Identity",
       "kind": "custom",
-      "refersTo": "index-panel",
-      "description": "Display name, descriptor and tagline over the readability scrim.",
-      "html": "<div class=\"ds-hero\"><h1>Abhishyanth<br>Vemula</h1><p class=\"d\">Software Engineer <b>·</b> AI Developer <b>·</b> Creative Technologist</p><p class=\"t\">I build complete systems, then make them feel good to use.</p></div>",
-      "css": ".ds-hero{padding:2.5rem;background:linear-gradient(90deg,#050816,#111528 60%,#1b2350)}.ds-hero h1{margin:0;font-family:Unbounded,sans-serif;font-weight:800;text-transform:uppercase;font-size:3rem;line-height:.95;letter-spacing:-.025em;color:#F6F4FA}.ds-hero .d{margin:1.4rem 0 0;font-family:Geist,system-ui,sans-serif;font-weight:500;font-size:1.1rem;color:#DCE3FF}.ds-hero .d b{color:#73DFFF;font-weight:500}.ds-hero .t{margin:.7rem 0 0;font-family:Geist,system-ui,sans-serif;font-size:1rem;color:rgb(240 218 191 / .9);max-width:44ch}"
+      "description": "The name in display type over the identity stack with vermilion full stops, beside the tagline.",
+      "html": "<div class=\"ds-hero\"><h1>ABHISHYANTH<br>VEMULA</h1><div class=\"ds-sub\"><p class=\"ds-roles\">DEVELOPER<b>.</b><br>ENGINEER<b>.</b><br>CREATOR<b>.</b><br>GAMER<b>.</b></p><p class=\"ds-tag\">I build complete systems, then make them feel good to use.</p></div></div>",
+      "css": ".ds-hero{padding:2rem;background:#15120F}.ds-hero h1{margin:0;font:800 clamp(1.5rem,6vw,3.5rem)/.95 var(--font-display,'Big Shoulders',sans-serif);letter-spacing:-.025em;color:#F4EFE6}.ds-sub{margin-top:1.25rem;display:grid;grid-template-columns:max-content minmax(0,30ch);align-items:end;column-gap:2rem}.ds-roles{margin:0;font:700 1.1rem/1.02 var(--font-display,'Big Shoulders',sans-serif);color:#DDD5C8}.ds-roles b{color:#C8794A}.ds-tag{margin:0;font:400 1rem/1.5 var(--font-sans,'IBM Plex Sans',system-ui,sans-serif);color:rgb(236 230 218/.92)}"
+    },
+    {
+      "name": "Cursor",
+      "kind": "custom",
+      "description": "Fine pointers only: bone dot on the hotspot; a soft lens with a vermilion centre over links; a vermilion caret over corrupted words.",
+      "html": "<div class=\"ds-cur-demo\"><span class=\"ds-cur\"></span><span class=\"ds-cur ds-cur--link\"></span><span class=\"ds-cur ds-cur--reveal\"></span></div>",
+      "css": ".ds-cur-demo{display:flex;gap:3rem;align-items:center;padding:2rem 3rem;background:#15120F}.ds-cur{position:relative;display:block;width:8px;height:8px;border-radius:999px;background:#ECE6DA;transition:all .32s cubic-bezier(.16,1,.3,1)}.ds-cur--link{width:40px;height:40px;background:rgb(236 230 218/.16)}.ds-cur--link::after{content:'';position:absolute;left:18px;top:18px;width:4px;height:4px;border-radius:999px;background:#C8794A}.ds-cur--reveal{width:2px;height:26px;border-radius:1px;background:#C8794A}"
     }
   ],
   "narrative": {
-    "northStar": "The Living Signal",
-    "overview": "The whole system is one current of light that changes form between worlds. It begins as an engineered energy heart on near-black, splits open into a colourful dimensional space, becomes the AI core of a holographic workspace, and travels on into each chapter. Every colour, surface and motion either is the signal, is lit by it, or makes room for it. When a design choice cannot say how it relates to the signal, it probably does not belong.\n\nThe mood is cinematic, precise and optimistic: title-sequence staging, engineered micro-detail, and a palette that starts nocturnal and warms as the story moves toward its close. Density is deliberately uneven: the 3D world may be rich and layered, while the DOM interface stays sparse, quiet and instrument-grade so the person's name and the work always lead. The world is original; Marvel/JARVIS influence is energy and spectacle, never copied props, reactor geometry, logos or HUD layouts. Generic SaaS layouts, glass dashboards, noisy particle fields and a lone glowing sphere on black are rejected.",
+    "northStar": "Ink and Signal",
+    "overview": "The site is a signed piece of work. It opens on warm ink with a signature writing itself, splits along the signature's baseline into a dimensional space, and carries one copper signal through every chapter: the hero's current, the network's pulses, the dot of the i, the focus ring. Everything else is ink, bone and a handful of low-chroma warm neutrals that give each chapter its own air. When a colour cannot say whether it is ground, type, a chapter tone or the signal, it does not belong.\n\nThe mood is cinematic, precise and human: title-sequence staging and engineered micro-detail, held in an editorial, print-like palette rather than neon. Density is deliberately uneven: the 3D world may be rich and layered, while the DOM interface stays sparse, quiet and exact so the person's name and the work always lead. The world is original; Marvel/JARVIS influence is energy and pacing, never copied props, reactor geometry, logos or HUD layouts. Rejected: violet, lavender and electric-blue light, cyan glows, neon halos, generic SaaS layouts, glass dashboards, noisy particle fields and a lone glowing sphere on black.",
     "keyCharacteristics": [
-      "One continuous signal of electric-blue/cyan light connects every scene.",
+      "Warm ink ground, bone type, one copper signal; chapters vary by low-chroma clay, slate, brass and olive.",
+      "A handwritten signature, not a geometric emblem, is the first thing a visitor sees.",
       "Rich 3D world, quiet DOM: real HTML typography over a single WebGL canvas.",
       "Depth from light and space, never from drop shadows.",
-      "Hairline, instrument-grade controls with mono labels and cyan focus.",
-      "Navy depth first; violet as a controlled highlight; warmth reserved for later chapters."
+      "Quiet and exact controls: bone pills and hairline underlines; copper only on focus, hover and live state."
     ],
     "rules": [
       {
-        "name": "The Signal Colour Rule",
-        "body": "Core Energy marks the signal and interaction (focus, selection, primary action, live data). It is never used as a large flat fill or for body text.",
+        "name": "The One Signal Rule",
+        "body": "Copper is the only saturated colour on any screen, and it marks signal or interaction: focus, selection, live state, the current. Never a field, never prose.",
         "section": "colors"
       },
       {
-        "name": "The Held Warmth Rule",
-        "body": "Pink, coral and ivory stay below a trace in the Origin hero. Warm colour is a narrative reward for later chapters, not decoration.",
+        "name": "The Warm Neutral Rule",
+        "body": "Chapter identity comes from low-chroma warm neutrals (clay, slate, brass, olive, OKLCH chroma at most 0.08). Violet, lavender, electric or cobalt blue and cyan glows are retired everywhere: CSS, shaders, lights, canvas textures, favicon and social card.",
         "section": "colors"
       },
       {
         "name": "The Tinted Ink Rule",
-        "body": "Secondary text on coloured fields is tinted from the field's hue (Ink Tinted, Ink Muted), never neutral gray.",
+        "body": "Secondary text is tinted from the warm ground (Ink Tinted, Ink Muted), never a neutral or cool gray.",
         "section": "colors"
       },
       {
         "name": "The Name Wins Rule",
-        "body": "Nothing on screen, in DOM or WebGL, may compete with the display name. Holographic elements sit on the far side of the frame or behind a readability scrim.",
+        "body": "Nothing on screen, in DOM or WebGL, may compete with the display name. Holographic elements sit on the far side of the frame or behind a readability scrim. On wide layouts the camera measures the copy's right edge and frames the core so its outer ring stays clear of it.",
         "section": "typography"
       },
       {
         "name": "The Honest Mono Rule",
-        "body": "Geist Mono is for status, counts and labels, not as a costume for \"technical\" prose.",
+        "body": "IBM Plex Mono is for labels and technical status, not as a costume for \"technical\" prose.",
         "section": "typography"
       },
       {
+        "name": "The Counter Rule",
+        "body": "Counts and dates are data: IBM Plex Mono with tabular figures, the total in Ink Muted.",
+        "section": "typography"
+      },
+      {
+        "name": "The Selective Serif Rule",
+        "body": "Fraunces italic is for a sentence in the person's own voice, at most one per section. Lists, steps, specs and counters never use it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tight Tracking Rule",
+        "body": "Letter-spacing never exceeds 0.08em; wide-tracked mono reads as costume.",
+        "section": "typography"
+      },
+      {
+        "name": "The Made Object Rule",
+        "body": "If an object is meant to be a thing, it is built and lit like one: real construction, bevels, fasteners and physical materials. Unlit satin or additive \"hologram\" shading is for light itself, never for objects.",
+        "section": "elevation"
+      },
+      {
         "name": "The Light, Not Shadow Rule",
-        "body": "If something needs to feel closer, move it in space or light it; never add a box-shadow. Zero-offset glows are reserved for energy (seam, core, signal).",
+        "body": "If something needs to feel closer, move it in space or light it; never add a box-shadow. Zero-offset glows are reserved for energy in the 3D world (core, current, pulses), never for DOM controls.",
         "section": "elevation"
       }
     ],
     "dos": [
-      "**Do** keep the signal continuous: every new scene should receive the light from the previous one and hand it on.",
-      "**Do** use Core Energy (#73DFFF) for focus rings, selection, the primary action and live energy.",
-      "**Do** keep the name in real HTML at display size, with a scrim behind it whenever a scene sits beside it.",
-      "**Do** recompose layouts for portrait instead of shrinking the landscape frame.",
-      "**Do** give every holographic element an assembly state and a scroll-out state; both must reverse exactly.",
-      "**Do** ship a reduced-motion path that shows the fully composed hero without camera travel."
+      "Do keep the copper signal continuous: every new scene should receive the light from the previous one and hand it on.",
+      "Do keep copper to signal and interaction: focus rings, selection, live energy, the hover state of the primary action.",
+      "Do give each chapter its identity through a low-chroma warm neutral (clay, slate, brass, olive), not a new hue.",
+      "Do keep the loader honest: progress moves only on real checks, the full signature plays on every page load, and it enters on its own; never a mandatory click.",
+      "Do fit the hero (name, identity row, tagline) in one viewport from 1366x768 up, sizing with both vw and svh.",
+      "Do keep the name in real HTML at display size, with a scrim behind it whenever a scene sits beside it.",
+      "Do recompose layouts for portrait instead of shrinking the landscape frame.",
+      "Do give every holographic element an assembly state and a scroll-out state; both must reverse exactly.",
+      "Do ship a reduced-motion path that shows the fully composed hero without camera travel."
     ],
     "donts": [
-      "**Don't** use drop shadows, generic glass cards or blurred panels on the interface.",
-      "**Don't** copy Marvel/Stark props, reactor geometry, helmets, logos or HUD layouts.",
-      "**Don't** let instruments or rings cross in front of the name on landscape layouts.",
-      "**Don't** fill large areas with Core Energy or set body text in it.",
-      "**Don't** add eyebrow labels above headings or fake percentages to progress.",
-      "**Don't** use Geist Mono for prose, or Unbounded for body copy."
+      "Don't use drop shadows, generic glass cards, blurred panels, neon or copper glows, or gradient text.",
+      "Don't copy Marvel/Stark props, reactor geometry, helmets, logos or HUD layouts.",
+      "Don't let instruments or rings cross in front of the name on landscape layouts.",
+      "Don't fill large areas with copper or set body text in it.",
+      "Don't reintroduce violet, lavender, electric or cobalt blue, or cyan glows anywhere: CSS, shaders, lights, textures or images.",
+      "Don't put a geometric emblem (rings, rhombus, orbit) in the loader or the hero; the signature and the name are the entry.",
+      "Don't use ambient fog washes, wide glow halos or decorative particles; and never ship plastic-looking primitives as objects.",
+      "Don't give the cursor lag, a trail or a hollow ring.",
+      "Don't add eyebrow labels above headings or fake percentages to progress.",
+      "Don't use IBM Plex Mono for prose, Big Shoulders below 1.35rem, or Fraunces for lists and data.",
+      "Don't use more than one MCU line per chapter, put a quote in a heading, or reproduce Marvel props, emblems, portals or interfaces as visual nods."
     ]
   }
 }

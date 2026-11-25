@@ -65,7 +65,7 @@ export const terrainFragment = /* glsl */ `
     float lead = exp(-pow((dist - ring - 0.9) * 1.5, 2.0));
     float ang = atan(vWorld.z - uOrigin.y, vWorld.x - uOrigin.x);
     float glint = pow(0.5 + 0.5 * sin(ang * 96.0 + uTime * 5.0 + dist * 1.3), 14.0);
-    col += vec3(1.0, 0.56, 0.2) * (minor + major + 0.18) * lead * (0.3 + glint * 1.6) * 0.85;
+    col += vec3(0.971, 0.578, 0.282) * (minor + major + 0.18) * lead * (0.3 + glint * 1.6) * 0.85;
     gl_FragColor = vec4(col * found * fade * uIntensity, 1.0);
   }
 `;
@@ -153,10 +153,10 @@ export const moduleFragment = /* glsl */ `
     float spec = pow(max(dot(n, h), 0.0), 40.0);
     float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0);
     float top = smoothstep(0.6, 0.9, n.y);
-    vec3 col = uFace * (0.45 + 1.1 * dk) + vec3(0.45, 0.35, 0.95) * uFace * df * 1.2;
-    col += vec3(1.0, 0.95, 0.88) * spec * 0.28 + uFace * top * 0.35;
+    vec3 col = uFace * (0.45 + 1.1 * dk) + vec3(0.626, 0.418, 0.338) * uFace * df * 1.2;
+    col += vec3(0.974, 0.953, 0.936) * spec * 0.28 + uFace * top * 0.35;
     col += uEdge * rim * 0.22;
-    col += mix(vec3(0.75, 0.85, 1.0), uEdge, 0.5) * edge * (0.25 + 0.3 * dk);
+    col += mix(vec3(0.862, 0.839, 0.806), uEdge, 0.5) * edge * (0.25 + 0.3 * dk);
     col += uEdge * edge * vGlow * 1.6 + uEdge * vGlow * 0.1;
     float fog = smoothstep(uFogNear, uFogFar, distance(cameraPosition, vWorld));
     col = mix(col, uFogColor, fog);
@@ -222,6 +222,10 @@ export const frameVertex = /* glsl */ `
 `;
 
 export const frameFragment = /* glsl */ `
+  // Physical editorial print (2026-11-25): a photograph mounted on warm
+  // matte paper with an even border, lit by the room, not projected. No
+  // scanlines, edge light, bloom or corner brackets. The reveal is a clean
+  // top-down wipe; far prints simply sit in shadow.
   precision highp float;
   uniform sampler2D uMap;
   uniform vec2 uSize;     // plane size (world), photo + margin
@@ -229,63 +233,46 @@ export const frameFragment = /* glsl */ `
   uniform vec2 uCrop;     // uv scale for cover fit
   uniform float uFocus;   // 1 active → 0 far
   uniform float uVis;     // overall visibility
-  uniform float uReveal;  // holographic assembly 0..1
+  uniform float uReveal;  // wipe 0..1
   uniform float uTime;
-  uniform vec3 uEdgeA;
-  uniform vec3 uEdgeB;
+  uniform vec3 uEdgeA;    // paper tone
+  uniform vec3 uEdgeB;    // unused (kept for the uniform contract)
   varying vec2 vUv;
 
-  float sdRound(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
-  float h1(float x) { return fract(sin(x * 91.7) * 43758.5453); }
+  float sdBox(vec2 p, vec2 b) { vec2 q = abs(p) - b; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0); }
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 
   void main() {
     vec2 p = (vUv - 0.5) * uSize;
-    float d = sdRound(p, uPhoto, 0.06);
-    float aa = fwidth(d) * 1.2;
-    float inside = 1.0 - smoothstep(-aa, aa, d);
+    vec2 paperHalf = uPhoto + vec2(0.12, 0.12);
+    float dp = sdBox(p, paperHalf);
+    float dph = sdBox(p, uPhoto);
+    float aa = fwidth(dp) * 1.2;
+    float onPaper = 1.0 - smoothstep(-aa, aa, dp);
+    float onPhoto = 1.0 - smoothstep(-aa, aa, dph);
     float f = uFocus;
 
-    // Photo uv (cover-cropped), revealed bottom-up in holographic scan bands.
     vec2 puv = (p / (uPhoto * 2.0)) * uCrop + 0.5;
     vec3 photo = texture2D(uMap, puv).rgb;
-    float band = floor(puv.y * 48.0);
-    float scan = step(h1(band + floor(uTime * 14.0)) * 0.25 + puv.y * 0.75, uReveal * 1.08);
-    float lead = exp(-pow((puv.y - uReveal * 1.08 + 0.02) * 40.0, 2.0)) * step(uReveal, 0.999);
+    // A print, not a screen: slightly lifted blacks and a soft vignette.
+    photo = mix(vec3(0.035), photo, 0.96);
+    vec2 v = p / uPhoto;
+    photo *= 1.0 - 0.12 * dot(v, v) * 0.5;
 
-    // Depth: far frames are cooler, dimmer and more glass than picture.
-    float lum = dot(photo, vec3(0.299, 0.587, 0.114));
-    vec3 cool = mix(vec3(lum), photo, 0.5) * vec3(0.76, 0.85, 1.06);
-    vec3 img = mix(cool * 0.4, photo, f);
-    // Projection texture: fine scanlines, stronger on the secondary layers.
-    float lines = 0.5 + 0.5 * sin(puv.y * 340.0 - uTime * 5.0);
-    img *= 1.0 - lines * mix(0.12, 0.035, f);
-    // Glass: a slow diagonal sheen and a cool top light.
-    float sheen = smoothstep(0.0, 0.1, 0.05 - abs(fract((vUv.x + vUv.y) * 0.5 - uTime * 0.025) - 0.5)) * 0.06;
-    img += vec3(sheen) + vec3(0.05, 0.07, 0.11) * smoothstep(0.35, 1.0, puv.y) * 0.6;
+    // Matte paper: warm, with a faint fibre grain.
+    vec3 paper = uEdgeA * (0.94 + 0.06 * hash(floor(p * 220.0)));
+    // A fine bevel line where the photo meets the mount.
+    float lip = 1.0 - smoothstep(0.0, 0.004 + aa, abs(dph));
+    vec3 col = mix(paper, photo, onPhoto);
+    col *= 1.0 - lip * 0.35;
 
-    // Edge light: cyan → violet around the perimeter, brightest at the corners.
-    float t = clamp(p.x / (uPhoto.x * 2.0) + 0.5 + p.y * 0.1, 0.0, 1.0);
-    vec3 edgeCol = mix(uEdgeA, uEdgeB, t);
-    vec2 q = abs(p) / uPhoto;
-    float cornerBoost = smoothstep(0.75, 1.0, min(q.x, q.y));
-    float edge = 1.0 - smoothstep(0.0, 0.01 + aa, abs(d));
-    // Soft bloom around the active frame only.
-    float bloom = exp(-max(d, 0.0) * 9.0) * (1.0 - inside) * 0.42 * f * f * (1.0 - smoothstep(0.16, 0.3, d));
+    // Room light: a soft top-left key across the sheet; far prints fall into shadow.
+    float key = 0.86 + 0.14 * (vUv.y * 0.7 + (1.0 - vUv.x) * 0.3);
+    col *= key * mix(0.38, 1.0, f);
 
-    // Thin UI brackets outside the frame, on the active frame.
-    vec2 b = abs(p) - (uPhoto + 0.11);
-    float arm = 0.2;
-    float onH = step(abs(b.y), 0.006 + aa) * step(-arm, b.x) * step(b.x, 0.0);
-    float onV = step(abs(b.x), 0.006 + aa) * step(-arm, b.y) * step(b.y, 0.0);
-    float bracket = max(onH, onV) * f;
-
-    float photoA = inside * scan * mix(0.5, 0.97, f);
-    vec3 col = img * photoA;
-    float reveal = smoothstep(0.0, 0.3, uReveal);
-    col += edgeCol * edge * (0.45 + 0.8 * f + cornerBoost * 0.5 * f) * reveal;
-    col += edgeCol * bloom * uReveal;
-    col += mix(uEdgeA, vec3(1.0), 0.35) * bracket * 0.85 * reveal;
-    col += edgeCol * lead * inside * 0.9;
-    gl_FragColor = vec4(col * uVis, photoA * uVis);
+    // Reveal: a clean wipe from the top edge down.
+    float wipe = 1.0 - smoothstep(uReveal * 1.1 - 0.06, uReveal * 1.1, 1.0 - vUv.y);
+    float a = onPaper * wipe * uVis;
+    gl_FragColor = vec4(col * a, a);
   }
 `;

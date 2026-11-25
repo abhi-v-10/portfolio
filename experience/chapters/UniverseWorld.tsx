@@ -17,6 +17,8 @@ import {
   LineSegments,
   Material,
   Mesh,
+  MeshBasicMaterial,
+  MeshPhysicalMaterial,
   Object3D,
   PlaneGeometry,
   QuadraticBezierCurve3,
@@ -31,7 +33,6 @@ import { projectStories } from "@/content/projects";
 import { story } from "../director/store";
 import { glowFragment, glowVertex, signalFragment, signalVertex } from "../shaders/signal";
 import {
-  bodyFragment,
   lineFragment,
   lineVertex,
   morphLineFragment,
@@ -42,6 +43,9 @@ import {
   uvVertex,
 } from "../shaders/universe";
 import { smoothstep } from "../world/paths";
+import { brushedGrain, PBR } from "../world/materials";
+import { contactShadow } from "../world/parts";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { ARTIFACTS, NEXUS, WINDOW, artifactTrack } from "./layout";
 import {
   IRIS_FIELDS,
@@ -115,7 +119,7 @@ const lines = (color: string, lit: string) =>
     ...additive,
   });
 /** A textured surface (screen, card, paper). Drawn after bodies. */
-const panel = (tex: CanvasTexture, glowColor = "#73dfff") =>
+const panel = (tex: CanvasTexture, glowColor = "#d7cdbd") =>
   new ShaderMaterial({
     vertexShader: uvVertex,
     fragmentShader: panelFragment,
@@ -133,14 +137,71 @@ const panel = (tex: CanvasTexture, glowColor = "#73dfff") =>
     depthWrite: false,
     side: DoubleSide,
   });
-/** Solid device body / plinth: dark satin, coloured rim. */
-const body = (base: string, rim: string) =>
-  new ShaderMaterial({
-    vertexShader: shellVertex,
-    fragmentShader: bodyFragment,
-    uniforms: { uBase: { value: new Color(base) }, uRim: { value: new Color(rim) }, uIntensity: { value: 0 } },
+/**
+ * Solid device body / plinth (rebuilt 2026-11-25): a physical material under
+ * the studio HDRI instead of the satin shader. It still exposes
+ * `uniforms.uIntensity` (the artifact's reveal level, used as opacity), so the
+ * reveal choreography drives it like every other lit material.
+ */
+type Finish = { color: string; metalness: number; roughness: number; brushed?: boolean; clearcoat?: number };
+const FINISH = {
+  /** Bead-blasted space-grey aluminium unibody. */
+  aluminium: { color: "#6f6c68", metalness: 1, roughness: 0.36, brushed: true },
+  /** Polished graphite stainless frame. */
+  stainless: { color: "#3b3936", metalness: 1, roughness: 0.2, clearcoat: 0.3 },
+  /** Powder-coated plate in a chapter tone. */
+  powder: (color: string) => ({ color, metalness: 0.1, roughness: 0.62, clearcoat: 0.1 }),
+  /** Hard-anodised black. */
+  anodised: { color: "#1c1b1a", metalness: 0.7, roughness: 0.46, clearcoat: 0.25 },
+} as const;
+/** Gives any built-in material the artifact reveal (`uniforms.uIntensity` as opacity). */
+function revealable<T extends MeshPhysicalMaterial | MeshBasicMaterial>(m: T, key: string) {
+  m.transparent = true;
+  const uIntensity = { value: 0 };
+  (m as unknown as { uniforms: Record<string, { value: number }> }).uniforms = { uIntensity };
+  m.onBeforeCompile = (sh) => {
+    sh.uniforms.uIntensity = uIntensity;
+    sh.fragmentShader = sh.fragmentShader
+      .replace("#include <common>", `#include <common>
+uniform float uIntensity;`)
+      .replace("#include <dithering_fragment>", `#include <dithering_fragment>
+gl_FragColor.a *= clamp(uIntensity, 0.0, 1.0);`);
+  };
+  m.customProgramCacheKey = () => key;
+  return m as unknown as ShaderMaterial;
+}
+/** Soft contact shadow under a device: a radial falloff on the floor plane. */
+const deviceShadow = () => {
+  const src = contactShadow(0.7);
+  const m = new MeshBasicMaterial({ map: src.map, color: "#000000", depthWrite: false, opacity: 0.7 });
+  return revealable(m, "universe-shadow-v1");
+};
+const pbr = (m: MeshPhysicalMaterial, key: string) => revealable(m, key);
+
+const body = (f: Finish) => {
+  const grain = f.brushed ? brushedGrain() : null;
+  const m = new MeshPhysicalMaterial({
+    color: new Color(f.color),
+    metalness: f.metalness,
+    roughness: f.roughness,
+    clearcoat: f.clearcoat ?? 0,
+    clearcoatRoughness: 0.4,
+    roughnessMap: grain,
     transparent: true,
   });
+  const uIntensity = { value: 0 };
+  (m as unknown as { uniforms: Record<string, { value: number }> }).uniforms = { uIntensity };
+  m.onBeforeCompile = (sh) => {
+    sh.uniforms.uIntensity = uIntensity;
+    sh.fragmentShader = sh.fragmentShader
+      .replace("#include <common>", `#include <common>
+uniform float uIntensity;`)
+      .replace("#include <dithering_fragment>", `#include <dithering_fragment>
+gl_FragColor.a *= clamp(uIntensity, 0.0, 1.0);`);
+  };
+  m.customProgramCacheKey = () => "universe-body-v1";
+  return m as unknown as ShaderMaterial;
+};
 
 function roundedSlab(w: number, h: number, d: number, r: number) {
   const s = new Shape();
@@ -196,8 +257,8 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     // artifact as it materialises and back down as it leaves. Children of the
     // artifact's group, so they share its visibility gate.
     const ringGeo = new TorusGeometry(1, 0.012, 6, 128);
-    const projectors = ARTIFACTS.map((a, i) => {
-      const accent = projectStories.find((p) => p.id === a.id)?.accent ?? "#73dfff";
+    const projectors = ARTIFACTS.map((a) => {
+      const accent = projectStories.find((p) => p.id === a.id)?.accent ?? "#d7cdbd";
       const mat = shell(accent, 0.0);
       const ringA = new Mesh(ringGeo, mat);
       const ringB = new Mesh(ringGeo, mat);
@@ -208,57 +269,107 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
       const rig = new Group();
       rig.add(ringA, ringB, halo);
       rig.scale.setScalar(2.7);
-      groups[i].add(rig);
+      // Projection rings retired (2026-11-25): not added to the scene.
       return { rig, mat, halo: halo.material as ShaderMaterial };
     });
 
     /* ── 0 · WiniOS, The Bridge: a laptop and a phone joined by a private, sealed current. ── */
     const w = groups[0];
-    const deviceBody = body("#2a2d34", "#73dfff"); // space-grey aluminium
-    const phoneBody = body("#1f2026", "#b9a6ff"); // graphite
+    const deviceBody = body(FINISH.aluminium);
+    const phoneBody = body(FINISH.stainless);
     add(0, deviceBody);
     add(0, phoneBody);
-    // Laptop: base with keyboard, hinged lid with the WiniOS settings on screen.
+    // Laptop (rebuilt 2026-11-25): bead-blasted aluminium unibody with a
+    // recessed keyboard deck, a glass trackpad, a hinge barrel, a black glass
+    // bezel around the display and rubber feet. Lid opened to ~105 degrees and
+    // turned to a three-quarter view so the screen reads straight on.
+    const glassMat = pbr(PBR.glass(), "universe-glass-v1");
+    const darkMat = pbr(PBR.anodised(), "universe-anodised-v1");
+    const rubberMat = pbr(PBR.rubber(), "universe-rubber-v1");
+    const camMat = pbr(PBR.glass(), "universe-cam-v1");
+    add(0, glassMat);
+    add(0, darkMat);
+    add(0, rubberMat);
+    add(0, camMat);
     const laptop = new Group();
-    laptop.position.set(-1.45, -0.05, 0);
-    laptop.rotation.y = 0.34;
+    laptop.position.set(-1.35, -0.05, 0.1);
+    laptop.rotation.y = 0.42;
     const base = new Mesh(roundedSlab(2.3, 1.5, 0.07, 0.08), deviceBody);
     base.rotation.x = -Math.PI / 2;
     base.position.y = -0.75;
-    const keys = mkPanel(0, keyboardTexture(), 2.12, 1.32, "#73dfff", 0.9);
+    // Deck recess: a slightly darker inset where the keys sit.
+    const deck = new Mesh(new RoundedBoxGeometry(2.14, 0.006, 0.86, 2, 0.003), darkMat);
+    deck.position.set(0, -0.7, -0.17);
+    const keys = mkPanel(0, keyboardTexture(), 2.08, 0.82, "#d7cdbd", 0.9);
     keys.rotation.x = -Math.PI / 2;
-    keys.position.set(0, -0.69, 0.02);
+    keys.position.set(0, -0.695, -0.17);
+    const pad = new Mesh(new RoundedBoxGeometry(0.86, 0.004, 0.44, 2, 0.002), glassMat);
+    pad.position.set(0, -0.705, 0.45);
+    const feet = [-0.95, 0.95].flatMap((x) => [-0.6, 0.6].map((z) => {
+      const f = new Mesh(new CylinderGeometry(0.05, 0.05, 0.012, 16), rubberMat);
+      f.position.set(x, -0.795, z);
+      return f;
+    }));
     const hinge = new Group();
     hinge.position.set(0, -0.72, -0.72);
-    hinge.rotation.x = -0.16;
-    const lid = new Mesh(roundedSlab(2.3, 1.48, 0.05, 0.08), deviceBody);
+    hinge.rotation.x = -0.26;
+    const barrel = new Mesh(new CylinderGeometry(0.035, 0.035, 1.9, 24).rotateZ(Math.PI / 2), darkMat);
+    barrel.position.set(0, 0.0, -0.01);
+    const lid = new Mesh(roundedSlab(2.3, 1.48, 0.045, 0.08), deviceBody);
     lid.position.y = 0.74;
+    const bezel = new Mesh(new RoundedBoxGeometry(2.22, 1.4, 0.004, 2, 0.002), glassMat);
+    bezel.position.set(0, 0.75, 0.048);
     const pcIdle = laptopScreen("idle");
     const pcSending = laptopScreen("sending");
     const pcReceived = laptopScreen("received");
-    const pcScreen = mkPanel(0, pcIdle, 2.16, 1.35, "#73dfff");
-    pcScreen.position.set(0, 0.75, 0.052);
-    hinge.add(lid, pcScreen);
-    laptop.add(base, keys, hinge);
-    // Phone: rounded body, island, a Shortcuts-style screen.
+    const pcScreen = mkPanel(0, pcIdle, 2.1, 1.31, "#d7cdbd");
+    pcScreen.position.set(0, 0.755, 0.052);
+    const webcam = new Mesh(new CylinderGeometry(0.014, 0.014, 0.004, 16).rotateX(Math.PI / 2), camMat);
+    webcam.position.set(0, 1.43, 0.051);
+    hinge.add(barrel, lid, bezel, pcScreen, webcam);
+    laptop.add(base, deck, keys, pad, ...feet, hinge);
+    const laptopShadow = new Mesh(new PlaneGeometry(3.4, 2.4).rotateX(-Math.PI / 2), deviceShadow());
+    laptopShadow.position.set(0, -0.8, 0);
+    laptop.add(laptopShadow);
+    add(0, laptopShadow.material as ShaderMaterial, 0.9);
+    // Phone (rebuilt 2026-11-25): graphite stainless frame, black glass front,
+    // a camera plateau with two lenses, side buttons; standing at a slight turn.
     const phone = new Group();
-    phone.position.set(1.95, -0.12, 0.25);
-    phone.rotation.set(0.04, -0.4, 0.02);
+    phone.position.set(1.95, -0.12, 0.3);
+    phone.rotation.set(0.02, -0.5, 0.02);
     const pBody = new Mesh(roundedSlab(0.76, 1.56, 0.07, 0.12), phoneBody);
+    const front = new Mesh(new RoundedBoxGeometry(0.74, 1.54, 0.004, 3, 0.1), glassMat);
+    front.position.z = 0.062;
+    const plateau = new Mesh(new RoundedBoxGeometry(0.3, 0.3, 0.02, 3, 0.06), darkMat);
+    plateau.position.set(-0.18, 0.55, -0.07);
+    const lenses = [0.08, -0.06].map((dy) => {
+      const l = new Mesh(new CylinderGeometry(0.045, 0.05, 0.03, 24).rotateX(Math.PI / 2), camMat);
+      l.position.set(-0.2, 0.55 + dy, -0.085);
+      return l;
+    });
+    const buttons = [0.35, 0.18].map((y) => {
+      const b = new Mesh(new RoundedBoxGeometry(0.012, 0.12, 0.03, 2, 0.005), phoneBody);
+      b.position.set(0.385, y, 0);
+      return b;
+    });
     const phIdle = phoneScreen("idle");
     const phSending = phoneScreen("sending");
     const phReceived = phoneScreen("received");
-    const phScreen = mkPanel(0, phIdle, 0.7, 1.45, "#b9a6ff");
+    const phScreen = mkPanel(0, phIdle, 0.68, 1.43, "#c4b2a3");
     phScreen.position.z = 0.066;
-    phone.add(pBody, phScreen);
+    phone.add(pBody, front, plateau, ...lenses, ...buttons, phScreen);
+    const phoneShadow = new Mesh(new PlaneGeometry(1.4, 0.7).rotateX(-Math.PI / 2), deviceShadow());
+    phoneShadow.position.set(0, -0.86, 0);
+    phone.add(phoneShadow);
+    add(0, phoneShadow.material as ShaderMaterial, 0.6);
     // The bridge: an arched current through a TLS ring.
     const bridgeCurve = new QuadraticBezierCurve3(v(-0.5, 0.55, -0.05), v(0.35, 2.05, 0.45), v(1.8, 0.55, 0.32));
-    const bridgeMat = current("#73dfff", "#b9a6ff", 2.4);
+    const bridgeMat = current("#d7cdbd", "#c4b2a3", 2.4);
     const bridge = new Mesh(new TubeGeometry(bridgeCurve, 72, 0.026, 8, false), bridgeMat);
-    const bridgeHalo = new Mesh(new TubeGeometry(bridgeCurve, 72, 0.075, 8, false), current("#2a6aa8", "#4a3b8a", 1.2));
+    const bridgeHalo = new Mesh(new TubeGeometry(bridgeCurve, 72, 0.075, 8, false), current("#5d6a70", "#683f2f", 1.2));
     add(0, bridgeMat, 1.1);
     add(0, bridgeHalo.material as ShaderMaterial, 0.35);
-    const ringMat = shell("#73dfff", 0.05);
+    const ringMat = shell("#d7cdbd", 0.05);
     const ring = new Mesh(new TorusGeometry(0.3, 0.012, 8, 64), ringMat);
     const ring2 = new Mesh(new TorusGeometry(0.38, 0.006, 6, 64), ringMat);
     const mid = bridgeCurve.getPoint(0.5);
@@ -267,7 +378,7 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     ring2.position.copy(mid);
     ring2.quaternion.copy(ring.quaternion);
     // Ambient packets keep the link visibly alive in both directions.
-    const ambientMats = [glow("#bff4ff"), glow("#d9ccff"), glow("#bff4ff"), glow("#d9ccff")];
+    const ambientMats = [glow("#eee8e0"), glow("#e0d2c7"), glow("#eee8e0"), glow("#e0d2c7")];
     const ambient = ambientMats.map((m) => {
       const p = new Mesh(sprite, m);
       p.scale.setScalar(0.22);
@@ -276,13 +387,15 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     // The sent packet: a sealed clipboard card (text or image).
     const packetText = packetTexture("text");
     const packetImage = packetTexture("image");
-    const packet = mkPanel(0, packetText, 0.62, 0.36, "#bff4ff", 0);
-    const packetGlowMat = glow("#bff4ff");
+    const packet = mkPanel(0, packetText, 0.62, 0.36, "#eee8e0", 0);
+    const packetGlowMat = glow("#eee8e0");
     const packetGlow = new Mesh(sprite, packetGlowMat);
     // Acknowledgement ripple at the receiving device.
-    const ackMat = shell("#7cf5c4", 0.0);
+    const ackMat = shell("#d6dfb7", 0.0);
     const ack = new Mesh(new TorusGeometry(0.5, 0.012, 6, 64), ackMat);
-    w.add(laptop, phone, bridgeHalo, bridge, ring, ring2, packetGlow, packet, ack, ...ambient);
+    // 2026-11-25: the glowing TLS rings, the bridge halo and the acknowledgement
+    // ring are retired; the thin current and its packet carry the story.
+    w.add(laptop, phone, bridge, packetGlow, packet, ...ambient);
 
     /* ── 1 · JobSeek, The Navigator: a profile, openings, matching lines and SeekBot. ── */
     const j = groups[1];
@@ -328,25 +441,25 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
 
     /* ── 2 · IRIS, The Vision: receipt → OCR scan → fields → validated record. ── */
     const ir = groups[2];
-    const receipt = mkPanel(2, receiptTexture(), 1.2, 2.1, "#8ff0d0");
+    const receipt = mkPanel(2, receiptTexture(), 1.2, 2.1, "#d6debe");
     receipt.position.set(-1.0, 0, 0);
     receipt.rotation.y = 0.24;
-    const scanBarMat = glow("#bfffe9");
+    const scanBarMat = glow("#edf2dc");
     const scanBar = new Mesh(sprite, scanBarMat);
     scanBar.scale.set(1.7, 0.12, 1);
     receipt.add(scanBar);
     const fields = IRIS_FIELDS.map(([k, val]) => {
-      const m = mkPanel(2, fieldChip(k, val), 1.1, 0.223, "#8ff0d0", 0);
+      const m = mkPanel(2, fieldChip(k, val), 1.1, 0.223, "#d6debe", 0);
       ir.add(m);
       return m;
     });
     const rowUv = [RECEIPT_ROWS.vendor, RECEIPT_ROWS.date, RECEIPT_ROWS.items, RECEIPT_ROWS.tax, RECEIPT_ROWS.total];
     // The structured record is a physical card the fields land on (corrective
     // pass), not an outline rectangle: satin jade body, fields drawn on top.
-    const recordMat = body("#0d2a25", "#8ff0d0");
+    const recordMat = body(FINISH.powder("#4a4d3a"));
     const record = new Mesh(roundedSlab(1.3, 1.62, 0.05, 0.1), recordMat);
     record.position.set(1.15, 0.12, 0.2);
-    const verified = mkPanel(2, verifiedChip(), 1.1, 0.223, "#8ff0d0", 0);
+    const verified = mkPanel(2, verifiedChip(), 1.1, 0.223, "#d6debe", 0);
     verified.position.set(1.15, -0.95, 0.35);
     ir.add(receipt, record, verified);
 
@@ -378,8 +491,8 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
         uMorph: { value: 0 },
         uTime: { value: 0 },
         uIntensity: { value: 0 },
-        uColor: { value: new Color("#f17e98") },
-        uColor2: { value: new Color("#a58bff") },
+        uColor: { value: new Color("#f3836b") },
+        uColor2: { value: new Color("#ca927d") },
       },
       ...additive,
     });
@@ -388,7 +501,7 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     knot2.scale.setScalar(1.012);
     knotGroup.add(knot, knot2);
     add(3, knotMat, 1.2);
-    const eliText = mkPanel(3, eli5Dense(), 3.0, 1.125, "#c9b8ff");
+    const eliText = mkPanel(3, eli5Dense(), 3.0, 1.125, "#d3c1b1");
     eliText.material.uniforms.uTexB.value = eli5Simple();
     eliText.position.set(0, -1.25, 0.3);
     e.add(knotGroup, eliText);
@@ -396,17 +509,17 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     /* ── 4 · QP-Gen, The Architect: chapters → question modules → a structured exam paper. ── */
     const q = groups[4];
     const chapters = ["Light", "Human Eye", "Electricity"].map((c, k) => {
-      const m = mkPanel(4, chapterCard(`Ch. ${10 + k} · ${c}`, k === 0), 1.0, 0.39, "#9db8ff");
+      const m = mkPanel(4, chapterCard(`Ch. ${10 + k} · ${c}`, k === 0), 1.0, 0.39, "#c3b9aa");
       m.position.set(-1.75, 0.75 - k * 0.5, 0.1);
       m.rotation.y = 0.25;
       q.add(m);
       return m;
     });
-    const paper = mkPanel(4, examPaper(), 1.65, 2.2, "#9db8ff");
+    const paper = mkPanel(4, examPaper(), 1.65, 2.2, "#c3b9aa");
     paper.position.set(0.75, 0, 0);
     paper.rotation.y = -0.12;
     const qChips = QP_CHIPS.map((c) => {
-      const m = mkPanel(4, questionChip(c), 0.82, 0.154, "#9db8ff", 0);
+      const m = mkPanel(4, questionChip(c), 0.82, 0.154, "#c3b9aa", 0);
       q.add(m);
       return m;
     });
@@ -414,7 +527,7 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
 
     /* ── 5 · Scholaroid, The Ecosystem: one school, four role dashboards, linked. ── */
     const sc = groups[5];
-    const schoolBody = body("#2a1a14", "#ffaa6a");
+    const schoolBody = body(FINISH.powder("#2a2724"));
     add(5, schoolBody);
     const sShape = new Shape();
     sShape.moveTo(-0.6, -0.4);
@@ -429,7 +542,7 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     const door = new Mesh(sprite, doorMat);
     door.scale.set(0.3, 0.45, 1);
     door.position.set(0, -0.2, 0.27);
-    const plinth = new Mesh(new CylinderGeometry(2.3, 2.38, 0.06, 64, 1), body("#120b09", "#6a3f24"));
+    const plinth = new Mesh(new CylinderGeometry(2.3, 2.38, 0.06, 64, 1), body(FINISH.anodised));
     plinth.position.y = -0.48;
     add(5, plinth.material as ShaderMaterial, 0.85);
     const ringLineMat = shell("#ffaa6a", 0.1);
@@ -470,7 +583,7 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
       sc.add(p);
       return p;
     });
-    sc.add(plinth, campusRing, school, door);
+    sc.add(plinth, school, door); // campus ring retired (2026-11-25)
     sc.rotation.x = 0.12;
 
     /* ── The living signal, reborn: it leaves the Intelligence network, threads every artifact, runs on to the Nexus. ── */
@@ -485,7 +598,7 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
       false,
       "centripetal",
     );
-    const signalMat = current("#c7b6ff", "#5fe6a8", 1.6);
+    const signalMat = current("#d2bfb0", "#c5cfa3", 1.6);
     root.add(new Mesh(new TubeGeometry(path, lowPower ? 260 : 420, 0.04, 6, false), signalMat));
 
     redrawWhenFontsReady();

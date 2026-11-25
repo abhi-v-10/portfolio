@@ -23,10 +23,10 @@ import { holoVertex, ringFragment, shellFragment } from "../shaders/hologram";
 import { glowFragment, glowVertex } from "../shaders/signal";
 import { easeInOutCubic, holoOn, smoothstep } from "./paths";
 
-export const HOLO_CYAN = new Color(0.45, 0.87, 1.0);
-export const HOLO_BLUE = new Color(0.22, 0.5, 1.0);
-export const HOLO_VIOLET = new Color(0.58, 0.46, 1.0);
-export const HOLO_WHITE = new Color(0.86, 0.97, 1.0);
+export const HOLO_CYAN = new Color(0.84, 0.799, 0.738);
+export const HOLO_BLUE = new Color(0.479, 0.541, 0.573);
+export const HOLO_VIOLET = new Color(0.784, 0.475, 0.29); // copper accent
+export const HOLO_WHITE = new Color(0.966, 0.942, 0.923);
 
 export function additive(fragmentShader: string, uniforms: Record<string, { value: unknown }>, vertexShader = holoVertex) {
   return new ShaderMaterial({
@@ -88,14 +88,14 @@ export function AICore() {
     const diamondGeo = new OctahedronGeometry(0.5, 0);
     diamondGeo.scale(0.62, 1, 0.62);
     const diamondMat = new MeshPhysicalMaterial({
-      color: new Color("#1d2a6e"),
+      color: new Color("#2a1a12"),
       metalness: 0.55,
       roughness: 0.06,
       clearcoat: 1,
       clearcoatRoughness: 0.04,
       iridescence: 1,
       iridescenceIOR: 1.8,
-      emissive: new Color("#73DFFF"),
+      emissive: new Color("#D7CDBD"),
       emissiveIntensity: 3,
       flatShading: true,
     });

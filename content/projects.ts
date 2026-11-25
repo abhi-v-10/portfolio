@@ -58,7 +58,7 @@ export const projectStories: ProjectStory[] = [
       "Copy on the PC, paste on the phone, and the other way round, without a cloud relay. A native Rust agent watches the Windows clipboard, serves it over HTTPS on the private network only, and iPhone Shortcuts send and receive through it.",
     artifact:
       "A laptop showing the WiniOS settings and a phone showing Shortcuts, joined by an arched, sealed current through a TLS ring. Sending a packet lights the source screen, carries a sealed clipboard card (text or image) across the bridge, and the other device shows it as received.",
-    accent: "#73dfff",
+    accent: "#c8794a",
     featured: true,
     status: "Private beta (0.1.x)",
     sections: [
@@ -123,7 +123,7 @@ export const projectStories: ProjectStory[] = [
       "Discover openings, manage applications and message recruiters in one place, with SeekBot giving career guidance: résumé review, job matching and skill-gap checks.",
     artifact:
       "A candidate profile card with skills, four job openings, and matching lines that sweep the openings before settling on the best fit, which turns into an applied match. SeekBot, a small agent orb, answers with the best fit and a skill gap. All data is a fictional sample.",
-    accent: "#ffc861",
+    accent: "#c99a4e",
     sections: [
       {
         heading: "What it does",
@@ -158,7 +158,7 @@ export const projectStories: ProjectStory[] = [
       "Photos, scans and PDFs of invoices and receipts go in; vendor, date, line items, tax and total come out, the arithmetic is checked, and spending shows up in a dashboard.",
     artifact:
       "A sample receipt (fictional Demo Mart data) passes under an OCR scan line. Vendor, date, items, tax and total lift off the page into a structured record, and a final chip confirms the arithmetic checks out.",
-    accent: "#8ff0d0",
+    accent: "#9ba37a",
     sections: [
       {
         heading: "What it does",
@@ -192,7 +192,7 @@ export const projectStories: ProjectStory[] = [
       "Select confusing text or snip part of the screen, pick a persona and a format, and get it explained simply.",
     artifact:
       "A tangled knot of light above a block of dense technical text. Explain it, and the knot relaxes into one clean loop while the text becomes one plain sentence.",
-    accent: "#f17e98",
+    accent: "#c9785a",
     sections: [
       {
         heading: "What it does",
@@ -223,7 +223,7 @@ export const projectStories: ProjectStory[] = [
       "A teacher picks a textbook chapter, the marks, sections and question mix; a CBSE-compliant paper streams into an editor to finalise and export.",
     artifact:
       "Three chapter cards, one selected; question modules with their marks flow into a sample question paper that builds section by section, A to D, as you arrive.",
-    accent: "#9db8ff",
+    accent: "#8c9aa3",
     sections: [
       {
         heading: "What it does",
@@ -255,7 +255,7 @@ export const projectStories: ProjectStory[] = [
       "One school system, four dashboards: Admin, Teacher, Student and Parent. Classes, attendance, messaging, exams and announcements, each seen from the role that needs it.",
     artifact:
       "A small campus: a school building on a round plinth with Admin, Teacher, Student and Parent dashboards around it, linked by arcs that carry information to and from the school and between roles.",
-    accent: "#ffaa6a",
+    accent: "#e0a577",
     sections: [
       {
         heading: "What it does",

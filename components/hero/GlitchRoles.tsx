@@ -6,15 +6,18 @@ import { roles } from "@/content/site";
 // Glyphs of similar width in the display face, so the stack does not jitter.
 const GLYPHS = "ABCDEFGHKNOPRSTUXYZ0123456789#/%";
 const DECODE_MS = 720;
+/** The pointer must rest on the glyphs this long; a pass across them does nothing. */
+const DWELL_MS = 140;
 
 const rand = () => GLYPHS[(Math.random() * GLYPHS.length) | 0];
 const scramble = (n: number) => Array.from({ length: n }, rand).join("");
 
 /**
  * DEVELOPER. ENGINEER. CREATOR. GAMER. — held as corrupted signal until the
- * visitor reaches for it. Hover (fine pointers), tap (touch) or the keyboard
- * decodes a word left to right; decoded words stay. Screen readers always get
- * the real words; reduced motion shows them plainly.
+ * visitor reaches for it. Only the word's own glyph box is live (not the row),
+ * and the pointer has to rest there for a beat. Hover (fine pointers), tap
+ * (touch) or the keyboard decodes a word left to right; decoded words stay.
+ * Screen readers always get the real words; reduced motion shows them plainly.
  */
 export function GlitchRoles() {
   const root = useRef<HTMLParagraphElement>(null);
@@ -29,6 +32,7 @@ export function GlitchRoles() {
       return;
     }
 
+    const targets = items.map((i) => i.querySelector<HTMLElement>(".hero-role-inner")!);
     const words = items.map((i) => i.dataset.word ?? "");
     const glitch = items.map((i) => i.querySelector<HTMLElement>(".role-glitch")!);
     const state = items.map(() => "glitch" as "glitch" | "decoding" | "clear");
@@ -73,13 +77,18 @@ export function GlitchRoles() {
     };
     const decodeAll = () => items.forEach((_, i) => decode(i, i * 140));
 
+    const dwell = items.map(() => 0);
     const onEnter = (e: PointerEvent) => {
-      const i = items.indexOf(e.currentTarget as HTMLElement);
-      if (e.pointerType === "mouse" || e.pointerType === "pen") decode(i);
+      const i = targets.indexOf(e.currentTarget as HTMLElement);
+      if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+      window.clearTimeout(dwell[i]);
+      dwell[i] = window.setTimeout(() => decode(i), DWELL_MS);
     };
-    const onDown = (e: PointerEvent) => decode(items.indexOf(e.currentTarget as HTMLElement));
-    items.forEach((it) => {
+    const onLeave = (e: PointerEvent) => window.clearTimeout(dwell[targets.indexOf(e.currentTarget as HTMLElement)]);
+    const onDown = (e: PointerEvent) => decode(targets.indexOf(e.currentTarget as HTMLElement));
+    targets.forEach((it) => {
       it.addEventListener("pointerenter", onEnter);
+      it.addEventListener("pointerleave", onLeave);
       it.addEventListener("pointerdown", onDown);
     });
 
@@ -89,17 +98,17 @@ export function GlitchRoles() {
     };
     window.addEventListener("keydown", onKey);
 
-    // Decode on its own after a beat, everywhere (2026-11-14): a visitor who
-    // never hovers still reads the roles. Hover screens get a longer beat so
-    // the pointer can find it first.
-    const hoverable = window.matchMedia("(hover: hover)").matches;
+    // Touch screens cannot hover, so there the words decode on their own after
+    // a beat. Hover screens never self-decode (2026-11-25): only the visitor's
+    // pointer on a word, a tap, or the keyboard reveals it.
+    const hoverable = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     let touchTimer = 0;
     let io: IntersectionObserver | null = null;
     let mo: MutationObserver | null = null;
-    {
+    if (!hoverable) {
       io = new IntersectionObserver(([entry]) => {
         if (entry.isIntersecting) {
-          touchTimer = window.setTimeout(decodeAll, hoverable ? 3600 : 2600);
+          touchTimer = window.setTimeout(decodeAll, 2600);
           io?.disconnect();
         }
       });
@@ -119,9 +128,11 @@ export function GlitchRoles() {
       io?.disconnect();
       mo?.disconnect();
       raf.forEach((id) => cancelAnimationFrame(id));
+      dwell.forEach((id) => window.clearTimeout(id));
       window.removeEventListener("keydown", onKey);
-      items.forEach((it) => {
+      targets.forEach((it) => {
         it.removeEventListener("pointerenter", onEnter);
+        it.removeEventListener("pointerleave", onLeave);
         it.removeEventListener("pointerdown", onDown);
       });
     };
@@ -133,8 +144,8 @@ export function GlitchRoles() {
       {roles.map((r) => {
         const word = r.slice(0, -1).toUpperCase();
         return (
-          <span key={r} className="hero-role" data-word={word} data-state="clear" data-cursor="reveal" aria-hidden>
-            <span className="hero-role-inner">
+          <span key={r} className="hero-role" data-word={word} data-state="clear" aria-hidden>
+            <span className="hero-role-inner" data-cursor="reveal">
               <span className="role-real">
                 {word}
                 <span className="hero-role-dot">.</span>

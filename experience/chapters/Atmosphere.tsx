@@ -9,22 +9,24 @@ import { story } from "../director/store";
 // violet haze (closer, softer), Engineering's deep clear blue (farther, crisper).
 // Meet the Human sits between: a warm lavender dusk, softer than the hero.
 const STOPS: [number, string, number, number][] = [
-  [0, "#111528", 14, 46],
-  [0.8, "#2a2342", 13, 48],
-  [1.5, "#2c2449", 13, 50],
-  [2.3, "#2a2156", 9, 52],
-  [2.85, "#231d52", 10, 56],
-  [3.35, "#0a1433", 16, 70],
-  [3.9, "#0d1838", 18, 74],
-  [4.4, "#151344", 16, 74], // Intelligence: indigo, cyan and purple light
-  [5.2, "#2a1840", 14, 70], // Intelligence → Universe transition: warm violet
-  [5.85, "#2d1c42", 16, 82],
-  [6.3, "#121433", 14, 60], // Project Universe: a dark exhibition hall, each artifact its own light
-  [9.2, "#121433", 14, 60],
-  [10.0, "#0b2420", 12, 58], // Timeline Nexus: deep jade night
-  [10.9, "#10302a", 12, 60],
-  [11.6, "#3b2f52", 18, 80], // Next Chapter: airy lavender dawn
-  [12, "#43355a", 18, 84],
+  // 2026-11-25: fog sits close to the ink ground and starts farther away, so
+  // distant objects darken into the room instead of greying out.
+  [0, "#0f0d0b", 20, 60],
+  [0.8, "#17120e", 18, 62],
+  [1.5, "#17120f", 18, 64],
+  [2.3, "#121416", 16, 66],
+  [2.85, "#111315", 16, 70],
+  [3.35, "#0f0d0a", 22, 84],
+  [3.9, "#110f0b", 24, 88],
+  [4.4, "#0f1112", 22, 88], // Intelligence: deep slate, copper pulses
+  [5.2, "#140f0c", 20, 84], // Intelligence → Universe transition: clay
+  [5.85, "#16100d", 22, 92],
+  [6.3, "#0e0c0a", 20, 76], // Project Universe: a dark exhibition hall, each artifact its own light
+  [9.2, "#0e0c0a", 20, 76],
+  [10.0, "#0f100b", 18, 72], // Timeline Nexus: olive night
+  [10.9, "#12140d", 18, 74],
+  [11.6, "#20160f", 22, 92], // Next Chapter: clay dawn
+  [12, "#261a12", 22, 96],
 ];
 
 /** Single owner of scene fog after SceneSetup creates it. */

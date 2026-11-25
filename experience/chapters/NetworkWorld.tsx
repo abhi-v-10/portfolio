@@ -118,8 +118,8 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
         uIntensity: { value: 0 },
         uWidth: { value: 0.014 },
         uWidthFlex: { value: 0.26 },
-        uCold: { value: new Color(0.3, 0.55, 1.0) },
-        uPulse: { value: new Color(0.75, 0.97, 1.0) },
+        uCold: { value: new Color(0.518, 0.58, 0.612) },
+        uPulse: { value: new Color(0.784, 0.475, 0.29) },
       },
       transparent: true,
       depthWrite: false,
@@ -152,7 +152,7 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
     const packetMat = new ShaderMaterial({
       vertexShader: nodeVertex,
       fragmentShader: nodeFragment,
-      uniforms: { uReveal: { value: 1 }, uIntensity: { value: 0 }, uTime: { value: 0 }, uScale: { value: 1 }, uColor: { value: new Color(0.8, 0.97, 1.0) } },
+      uniforms: { uReveal: { value: 1 }, uIntensity: { value: 0 }, uTime: { value: 0 }, uScale: { value: 1 }, uColor: { value: new Color(0.949, 0.931, 0.905) } },
       transparent: true,
       depthWrite: false,
       blending: AdditiveBlending,
@@ -171,7 +171,7 @@ export function NetworkWorld({ lowPower }: { lowPower: boolean }) {
         depthTest: false,
         blending: AdditiveBlending,
       });
-    const intelMats = LABELLED.map((i) => labelMat(NET_NODES[i].label!, new Color(0.62, 0.92, 1.0)));
+    const intelMats = LABELLED.map((i) => labelMat(NET_NODES[i].label!, new Color(0.891, 0.861, 0.816)));
 
     return {
       nodes,

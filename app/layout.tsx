@@ -1,14 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Newsreader, Unbounded } from "next/font/google";
+import { Big_Shoulders, Fraunces, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import { contact, site } from "@/content/site";
 import { EvidenceViewer } from "@/components/evidence/EvidenceViewer";
 import "./globals.css";
 
-const display = Unbounded({ subsets: ["latin"], variable: "--font-display", display: "swap" });
-const sans = Geist({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
-const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
-// Editorial voice for chapter leads and pull lines: a text serif against the wide display face.
-const serif = Newsreader({ subsets: ["latin"], variable: "--font-serif", display: "swap", style: ["normal", "italic"], weight: ["400", "500"] });
+// Type system (2026-11-25). next/font downloads these at build time and serves
+// them from this site, so no request ever goes to Google at runtime.
+// Display: condensed industrial capitals, oversize for the name, 700-800 for titles.
+const display = Big_Shoulders({ subsets: ["latin"], variable: "--font-display", display: "swap", weight: ["700", "800", "900"], fallback: ["Arial Narrow", "sans-serif"], adjustFontFallback: false });
+// Body and interface.
+const sans = IBM_Plex_Sans({ subsets: ["latin"], variable: "--font-sans", display: "swap", weight: ["400", "500", "600"] });
+// Technical metadata only: dates, stacks, counts, status.
+const mono = IBM_Plex_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap", weight: ["400", "500"] });
+// Selective editorial statements: chapter leads, personal asides, the closing line.
+const serif = Fraunces({ subsets: ["latin"], variable: "--font-serif", display: "swap", style: ["italic"], axes: ["opsz", "SOFT"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -35,13 +40,13 @@ const personLd = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#03070E",
+  themeColor: "#080605",
   colorScheme: "dark",
 };
 
 export default function RootLayout({ children, modal }: Readonly<{ children: React.ReactNode; modal: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable} ${serif.variable} is-locked`}>
+    <html lang="en" suppressHydrationWarning className={`${display.variable} ${sans.variable} ${mono.variable} ${serif.variable} is-locked`}>
       <body>
         {/* Watchdog: if the app bundle never boots (blocked/failed JS), release the
             loader so the server-rendered hero and links stay usable. */}

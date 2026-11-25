@@ -6,12 +6,13 @@ import {
   AdditiveBlending,
   BoxGeometry,
   BufferGeometry,
+  CylinderGeometry,
   Color,
   Float32BufferAttribute,
-  Fog,
   Group,
   InstancedBufferAttribute,
   InstancedMesh,
+  LineDashedMaterial,
   Matrix4,
   Mesh,
   PlaneGeometry,
@@ -21,7 +22,9 @@ import {
   Vector3,
 } from "three";
 import { story } from "../director/store";
-import { floorGridFragment, labelFragment, labelVertex, moduleFragment, moduleVertex } from "../shaders/chapters";
+import { floorGridFragment, labelFragment, labelVertex } from "../shaders/chapters";
+import { machinedModuleMaterial } from "../world/machined";
+import { PBR } from "../world/materials";
 import { dataLineFragment, dataLineVertex, holoVertex } from "../shaders/hologram";
 import { additive, HOLO_BLUE, HOLO_CYAN } from "../world/AICore";
 import { createLabelTexture } from "../world/panelText";
@@ -34,26 +37,30 @@ type ModuleSpec = { pos: V3; size: V3; label?: string };
 // A three-tier system, read bottom-up: data, services, interface. The service
 // tier's front row is the Nestafar pattern: agent → tool → internal API, with
 // the API dropping to live data.
-const TIER_Y = [0, 1.55, 3.1];
+// Exploded view (2026-11-25): tiers spread a little further apart and every
+// module floats a small gap above its tray, so the assembly reads as parts
+// that slot together along their dowels.
+const TIER_Y = [0, 1.8, 3.6];
+const GAP = 0.22;
 const MODULES: ModuleSpec[] = [
   // Platforms (assemble first).
   { pos: [0, TIER_Y[0], 0], size: [8.4, 0.08, 5] },
   { pos: [0, TIER_Y[1], 0], size: [8.4, 0.08, 5] },
   { pos: [0, TIER_Y[2], 0], size: [6.2, 0.08, 3.6] },
   // Data tier.
-  { pos: [-2.6, 0.36, 0.2], size: [1.7, 0.62, 1.3] },
-  { pos: [0, 0.36, 0.6], size: [1.7, 0.62, 1.3], label: "Live data" },
-  { pos: [2.6, 0.36, 0.2], size: [1.7, 0.62, 1.3] },
+  { pos: [-2.6, 0.36 + GAP, 0.2], size: [1.7, 0.62, 1.3] },
+  { pos: [0, 0.36 + GAP, 0.6], size: [1.7, 0.62, 1.3], label: "Live data" },
+  { pos: [2.6, 0.36 + GAP, 0.2], size: [1.7, 0.62, 1.3] },
   // Service tier: front row is the agent pattern.
-  { pos: [-2.8, TIER_Y[1] + 0.34, 1.1], size: [1.3, 0.6, 1.0], label: "Agent" },
-  { pos: [-0.95, TIER_Y[1] + 0.34, 1.1], size: [1.3, 0.6, 1.0], label: "Tool" },
-  { pos: [0.95, TIER_Y[1] + 0.34, 1.1], size: [1.3, 0.6, 1.0], label: "API" },
-  { pos: [2.8, TIER_Y[1] + 0.34, 1.1], size: [1.3, 0.6, 1.0], label: "Auth" },
-  { pos: [-1.9, TIER_Y[1] + 0.3, -1.2], size: [1.6, 0.52, 1.0] },
-  { pos: [1.9, TIER_Y[1] + 0.3, -1.2], size: [1.6, 0.52, 1.0] },
+  { pos: [-2.8, TIER_Y[1] + 0.34 + GAP, 1.1], size: [1.3, 0.6, 1.0], label: "Agent" },
+  { pos: [-0.95, TIER_Y[1] + 0.34 + GAP, 1.1], size: [1.3, 0.6, 1.0], label: "Tool" },
+  { pos: [0.95, TIER_Y[1] + 0.34 + GAP, 1.1], size: [1.3, 0.6, 1.0], label: "API" },
+  { pos: [2.8, TIER_Y[1] + 0.34 + GAP, 1.1], size: [1.3, 0.6, 1.0], label: "Auth" },
+  { pos: [-1.9, TIER_Y[1] + 0.3 + GAP, -1.2], size: [1.6, 0.52, 1.0] },
+  { pos: [1.9, TIER_Y[1] + 0.3 + GAP, -1.2], size: [1.6, 0.52, 1.0] },
   // Interface tier.
-  { pos: [-1.3, TIER_Y[2] + 0.22, 0.2], size: [2.0, 0.36, 1.1] },
-  { pos: [1.3, TIER_Y[2] + 0.22, 0.2], size: [2.0, 0.36, 1.1], label: "Client" },
+  { pos: [-1.3, TIER_Y[2] + 0.22 + GAP, 0.2], size: [2.0, 0.36, 1.1] },
+  { pos: [1.3, TIER_Y[2] + 0.22 + GAP, 0.2], size: [2.0, 0.36, 1.1], label: "Client" },
 ];
 const LABEL_AT = MODULES.map((m, i) => (m.label ? i : -1)).filter((i) => i >= 0);
 
@@ -74,11 +81,11 @@ function pathways(): [Vector3, Vector3][] {
   const L: [Vector3, Vector3][] = [
     [side(6, 1), side(7, -1)], // agent → tool
     [side(7, 1), side(8, -1)], // tool → API
-    [bottom(8), new Vector3(0.95, 0.67, 1.1)], // API ↓
-    [new Vector3(0.95, 0.67, 1.1), new Vector3(0.95, 0.67, 0.6)],
-    [new Vector3(0.95, 0.67, 0.6), top(4).setX(0.85)], // → live data
-    [bottom(13), new Vector3(1.3, TIER_Y[1] + 0.64, 0.2)], // client ↓ services
-    [bottom(12), new Vector3(-1.3, TIER_Y[1] + 0.64, 0.2)],
+    [bottom(8), new Vector3(0.95, top(4).y, 1.1)], // API ↓
+    [new Vector3(0.95, top(4).y, 1.1), new Vector3(0.95, top(4).y, 0.6)],
+    [new Vector3(0.95, top(4).y, 0.6), top(4).setX(0.85)], // → live data
+    [bottom(13), new Vector3(1.3, TIER_Y[1] + 0.64 + GAP, 0.2)], // client ↓ services
+    [bottom(12), new Vector3(-1.3, TIER_Y[1] + 0.64 + GAP, 0.2)],
     [side(9, -1), side(8, 1)], // auth guards the API
     [bottom(10), top(3)],
     [bottom(11), top(5)],
@@ -128,9 +135,9 @@ function lineGeometry(segments: [Vector3, Vector3][], delays: number[], phases: 
 export function EngineeringWorld() {
   const root = useRef<Group>(null);
   const modules = useRef<InstancedMesh>(null);
+  const hwGroup = useRef<Group>(null);
   const labels = useRef<(Mesh | null)[]>([]);
   const gl = useThree((s) => s.gl);
-  const scene = useThree((s) => s.scene);
 
   const r = useMemo(() => {
     const n = MODULES.length;
@@ -139,26 +146,12 @@ export function EngineeringWorld() {
     // services are hexagonal prisms (hexagonal architecture), clients stay
     // slim slabs. Same instances, so the assembly and the Intelligence morph
     // are untouched.
-    const box = new BoxGeometry(1, 1, 1, 24, 1, 24);
+    const box = new BoxGeometry(1, 1, 1, 24, 14, 24); // 14 rows: room for the cap chamfer
     const glow = new InstancedBufferAttribute(new Float32Array(n), 1);
     box.setAttribute("aGlow", glow);
     const shapeOf = (i: number) => (i < 3 ? 0 : i < 6 ? 1 : i < 12 ? 2 : 3);
     box.setAttribute("aShape", new InstancedBufferAttribute(new Float32Array(MODULES.map((_, i) => shapeOf(i))), 1));
-    const moduleMat = new ShaderMaterial({
-      vertexShader: moduleVertex,
-      fragmentShader: moduleFragment,
-      uniforms: {
-        uOpacity: { value: 1 },
-        uTime: { value: 0 },
-        // Raw (unencoded) values: this shader writes straight to the screen.
-        uFace: { value: new Color(0.09, 0.16, 0.36) },
-        uEdge: { value: new Color(0.42, 0.86, 1.0) },
-        uFogColor: { value: new Color("#0a1433") },
-        uFogNear: { value: 16 },
-        uFogFar: { value: 70 },
-      },
-      transparent: true,
-    });
+    const moduleMat = machinedModuleMaterial();
 
     // Debris start states: scattered toward the arriving camera, tumbled.
     const rand = mulberry32(2026);
@@ -184,7 +177,7 @@ export function EngineeringWorld() {
     );
     const linkMat = additive(
       dataLineFragment,
-      { uTime: { value: 0 }, uReveal: { value: 0 }, uIntensity: { value: 0 }, uPulse: { value: 1.4 }, uColor: { value: HOLO_BLUE.clone() }, uAccent: { value: new Color(0.8, 0.97, 1.0) } },
+      { uTime: { value: 0 }, uReveal: { value: 0 }, uIntensity: { value: 0 }, uPulse: { value: 1.4 }, uColor: { value: HOLO_BLUE.clone() }, uAccent: { value: new Color(0.949, 0.931, 0.905) } },
       dataLineVertex,
     );
 
@@ -203,7 +196,7 @@ export function EngineeringWorld() {
     const gridGeo = new PlaneGeometry(60, 60);
     const gridMat = additive(
       floorGridFragment,
-      { uIntensity: { value: 0 }, uTime: { value: 0 }, uCentre: { value: new Vector3(E.x, 0, E.z) }, uColor: { value: new Color(0.46, 0.52, 0.62) }, uAccent: { value: new Color(0.9, 0.86, 0.78) } },
+      { uIntensity: { value: 0 }, uTime: { value: 0 }, uCentre: { value: new Vector3(E.x, 0, E.z) }, uColor: { value: new Color(0.54, 0.511, 0.487) }, uAccent: { value: new Color(0.882, 0.859, 0.841) } },
       holoVertex,
     );
 
@@ -214,14 +207,40 @@ export function EngineeringWorld() {
         new ShaderMaterial({
           vertexShader: labelVertex,
           fragmentShader: labelFragment,
-          uniforms: { uText: { value: createLabelTexture(MODULES[i].label!, aniso) }, uColor: { value: new Color(0.9, 0.91, 0.94) }, uIntensity: { value: 0 } },
+          uniforms: { uText: { value: createLabelTexture(MODULES[i].label!, aniso) }, uColor: { value: new Color(0.917, 0.909, 0.902) }, uIntensity: { value: 0 } },
           transparent: true,
           depthWrite: false,
           depthTest: false,
           blending: AdditiveBlending,
         }),
     );
-    return { box, glow, moduleMat, starts, linkGeo, linkMat, traceGeo, traceMat, gridGeo, gridMat, labelGeo, labelMats };
+    // Assembly hardware: corner standoffs between trays, two dowel pins under
+    // every module, and a dashed assembly axis from each pin to its module.
+    const hwMat = PBR.gunmetal({ transparent: true });
+    const collarMat = PBR.aluminium({ transparent: true });
+    const standoffs: { x: number; z: number; y0: number; y1: number }[] = [];
+    for (let t = 0; t < 2; t++) {
+      const upper = MODULES[t + 1];
+      const hx = upper.size[0] / 2 - 0.35, hz = upper.size[2] / 2 - 0.3;
+      for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) standoffs.push({ x: sx * hx, z: sz * hz, y0: TIER_Y[t] + 0.04, y1: TIER_Y[t + 1] - 0.04 });
+    }
+    const pins: Vector3[] = [];
+    MODULES.forEach((m, i) => {
+      if (i < 3) return;
+      const tray = m.pos[1] < TIER_Y[1] ? TIER_Y[0] : m.pos[1] < TIER_Y[2] ? TIER_Y[1] : TIER_Y[2];
+      const dx = m.size[0] * 0.3;
+      pins.push(new Vector3(m.pos[0] - dx, tray + 0.04, m.pos[2]), new Vector3(m.pos[0] + dx, tray + 0.04, m.pos[2]));
+    });
+    const standoffGeo = new CylinderGeometry(0.05, 0.05, 1, 20);
+    const collarGeo = new CylinderGeometry(0.085, 0.085, 0.05, 24);
+    const pinGeo = new CylinderGeometry(0.03, 0.03, GAP * 0.7, 14).translate(0, (GAP * 0.7) / 2, 0);
+    const axisPts: number[] = [];
+    pins.forEach((p) => axisPts.push(p.x, p.y + GAP * 0.7, p.z, p.x, p.y + GAP + 0.02, p.z));
+    const axisGeo = new BufferGeometry();
+    axisGeo.setAttribute("position", new Float32BufferAttribute(axisPts, 3));
+    const axisMat = new LineDashedMaterial({ color: new Color("#a39a8d"), dashSize: 0.03, gapSize: 0.025, transparent: true, opacity: 0, depthWrite: false });
+    const hardware = { hwMat, collarMat, standoffs, pins, standoffGeo, collarGeo, pinGeo, axisGeo, axisMat };
+    return { box, glow, moduleMat, starts, linkGeo, linkMat, traceGeo, traceMat, gridGeo, gridMat, labelGeo, labelMats, hardware };
   }, [gl]);
 
   // Upload label textures up front rather than on the first visible frame.
@@ -297,15 +316,13 @@ export function EngineeringWorld() {
     modules.current.instanceMatrix.needsUpdate = true;
     r.glow.needsUpdate = true;
 
-    const fog = scene.fog as Fog | null;
-    const mu = r.moduleMat.uniforms;
-    mu.uOpacity.value = presence * (1 - smoothstep(0.7, 1, morph));
-    mu.uTime.value = t;
-    if (fog) {
-      (mu.uFogColor.value as Color).copy(fog.color);
-      mu.uFogNear.value = fog.near;
-      mu.uFogFar.value = fog.far;
-    }
+    r.moduleMat.opacity = presence * (1 - smoothstep(0.7, 1, morph));
+    // Hardware appears once the trays have landed and leaves before the morph.
+    const hw = presence * smoothstep(2.05, 2.25, tr) * (1 - smoothstep(0, 0.25, morph));
+    r.hardware.hwMat.opacity = r.hardware.collarMat.opacity = hw;
+    r.hardware.axisMat.opacity = hw * 0.55;
+    if (hwGroup.current) hwGroup.current.visible = hw > 0.001;
+    r.moduleMat.depthWrite = r.moduleMat.opacity > 0.98;
 
     const flow = smoothstep(2.2, 2.55, tr);
     r.linkMat.uniforms.uReveal.value = flow;
@@ -314,7 +331,7 @@ export function EngineeringWorld() {
     r.linkMat.uniforms.uIntensity.value = presence * 1.8 * keep;
     r.traceMat.uniforms.uReveal.value = smoothstep(1.75, 2.3, tr);
     r.traceMat.uniforms.uTime.value = t;
-    r.traceMat.uniforms.uIntensity.value = presence * 0.9 * keep;
+    r.traceMat.uniforms.uIntensity.value = presence * 0.35 * keep;
     // The decorative floor grid is retired; the routed traces carry the meaning.
     r.gridMat.uniforms.uIntensity.value = 0;
     r.gridMat.uniforms.uTime.value = t;
@@ -343,6 +360,19 @@ export function EngineeringWorld() {
         <lineSegments geometry={r.traceGeo} material={r.traceMat} renderOrder={2} frustumCulled={false} />
         <instancedMesh ref={modules} args={[r.box, r.moduleMat, MODULES.length]} frustumCulled={false} renderOrder={3} />
         <lineSegments geometry={r.linkGeo} material={r.linkMat} renderOrder={4} frustumCulled={false} />
+        <group ref={hwGroup} visible={false}>
+          {r.hardware.standoffs.map((st, k) => (
+            <group key={`s${k}`} position={[st.x, 0, st.z]}>
+              <mesh geometry={r.hardware.standoffGeo} material={r.hardware.hwMat} position={[0, (st.y0 + st.y1) / 2, 0]} scale={[1, st.y1 - st.y0, 1]} />
+              <mesh geometry={r.hardware.collarGeo} material={r.hardware.collarMat} position={[0, st.y0 + 0.025, 0]} />
+              <mesh geometry={r.hardware.collarGeo} material={r.hardware.collarMat} position={[0, st.y1 - 0.025, 0]} />
+            </group>
+          ))}
+          {r.hardware.pins.map((p, k) => (
+            <mesh key={`p${k}`} geometry={r.hardware.pinGeo} material={r.hardware.hwMat} position={p} />
+          ))}
+          <lineSegments geometry={r.hardware.axisGeo} material={r.hardware.axisMat} onUpdate={(l) => l.computeLineDistances()} />
+        </group>
         {LABEL_AT.map((mi, k) => (
           <mesh
             key={mi}

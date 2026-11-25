@@ -11,6 +11,7 @@ import {
   WebGLRenderer,
 } from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { markSceneReady, story } from "../director/store";
 import { backdropFragment, backdropVertex } from "../shaders/backdrop";
 
@@ -58,30 +59,43 @@ export function Backdrop() {
   return <mesh ref={ref} geometry={geometry} material={material} renderOrder={-1} frustumCulled={false} />;
 }
 
-/** Lighting for the physical heart: cyan key, blue rim, a controlled violet fill. */
+/** Base lighting: a warm key, a cool rim and a low ambient; the HDRI does the rest. */
 export function Lights() {
   return (
     <>
-      <ambientLight color="#3478F6" intensity={0.2} />
-      <pointLight color="#73DFFF" position={[0.6, 0.5, 1.8]} intensity={14} distance={12} decay={2} />
-      <pointLight color="#8a6cff" position={[-2.5, 2.2, -1.5]} intensity={18} distance={14} decay={2} />
-      <directionalLight color="#3478F6" position={[3, 4, -6]} intensity={2.6} />
-      <directionalLight color="#9fe9ff" position={[-3, -2, 5]} intensity={0.8} />
+      <ambientLight color="#74838B" intensity={0.2} />
+      <pointLight color="#D7CDBD" position={[0.6, 0.5, 1.8]} intensity={14} distance={12} decay={2} />
+      <pointLight color="#b27c67" position={[-2.5, 2.2, -1.5]} intensity={18} distance={14} decay={2} />
+      <directionalLight color="#74838B" position={[3, 4, -6]} intensity={2.6} />
+      <directionalLight color="#e2dbcf" position={[-3, -2, 5]} intensity={0.8} />
     </>
   );
 }
 
-/** Image-based reflections from a procedural room; no downloaded HDRI. */
+/** Image-based reflections: a CC0 photo-studio HDRI, with a procedural room as the first frame. */
 export function SceneSetup() {
   const gl = useThree((s) => s.gl) as WebGLRenderer;
   const scene = useThree((s) => s.scene);
   useLayoutEffect(() => {
     const pmrem = new PMREMGenerator(gl);
-    const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    // Procedural room until the studio HDRI arrives (a few hundred ms), so
+    // physical materials never render black.
+    let env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = env;
-    scene.environmentIntensity = 0.35;
-    scene.fog = new Fog("#111528", 14, 46);
+    scene.environmentIntensity = 0.55;
+    scene.fog = new Fog("#0f0d0b", 20, 60);
+    let alive = true;
+    // Studio Small 09 by Sergej Majboroda, Poly Haven, CC0 (see public/env/README.md).
+    new HDRLoader().loadAsync("/env/studio_small_09_1k.hdr").then((hdr) => {
+      if (!alive) return hdr.dispose();
+      const next = pmrem.fromEquirectangular(hdr).texture;
+      hdr.dispose();
+      env.dispose();
+      env = next;
+      scene.environment = next;
+    }).catch(() => undefined);
     return () => {
+      alive = false;
       env.dispose();
       pmrem.dispose();
       scene.environment = null;

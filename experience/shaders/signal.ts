@@ -34,8 +34,8 @@ export const signalFragment = /* glsl */ `
     float tail = smoothstep(0.0, 0.015, u) * (1.0 - smoothstep(0.82, 1.0, u));
 
     vec3 col = mix(uColA, uColB, smoothstep(0.0, 1.0, u));
-    col = mix(col, vec3(1.0), head * 0.6 + flow * 0.25);
-    float a = facing * (0.38 + 0.85 * flow + 2.2 * head) * tail * uIntensity;
+    col = mix(col, vec3(1.0), head * 0.4 + flow * 0.15);
+    float a = facing * (0.3 + 0.6 * flow + 1.4 * head) * tail * uIntensity * 0.8;
     gl_FragColor = vec4(col * a, a);
   }
 `;
@@ -57,9 +57,11 @@ export const glowFragment = /* glsl */ `
   void main() {
     float d = length(vUv - 0.5) * 2.0;
     float core = exp(-d * d * 28.0);
-    float halo = exp(-d * d * 4.5) * 0.35;
-    float a = (core + halo) * (1.0 - smoothstep(0.85, 1.0, d)) * uIntensity;
-    vec3 col = mix(uColor, vec3(1.0), core * 0.7);
+    // 2026-11-25: a tight light point, not an ambient bloom. The wide halo
+    // that washed nearby surfaces is cut to a trace.
+    float halo = exp(-d * d * 9.0) * 0.08;
+    float a = (core + halo) * (1.0 - smoothstep(0.85, 1.0, d)) * uIntensity * 0.75;
+    vec3 col = mix(uColor, vec3(1.0), core * 0.5);
     gl_FragColor = vec4(col * a, a);
   }
 `;

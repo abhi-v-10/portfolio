@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent, type PointerEvent } from "react";
 import { galleryPhotos } from "@/content/gallery";
 import { human } from "@/content/site";
-import { currentPhoto, galleryDrag, galleryStep, subscribeGallery } from "@/experience/director/gallery";
+import { currentPhoto, galleryDrag, galleryStep, holdAutoplay, subscribeGallery } from "@/experience/director/gallery";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -23,6 +23,12 @@ export function Human({ webgl }: { webgl: boolean }) {
   const drag = useRef({ id: -1, x0: 0, lastX: 0, lastT: 0, v: 0, width: 1 });
   const presses = useRef<number[]>([]);
   const [spam, setSpam] = useState(false);
+  // Visitors can stop the robot's automatic swipes (WCAG 2.2.2 Pause, Stop, Hide).
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    holdAutoplay("user-paused", paused);
+    return () => holdAutoplay("user-paused", false);
+  }, [paused]);
   useEffect(() => {
     if (!spam) return;
     const id = window.setTimeout(() => setSpam(false), 4200);
@@ -148,6 +154,21 @@ export function Human({ webgl }: { webgl: boolean }) {
             <button type="button" className="gallery-btn" aria-label="Next photo" onClick={() => step(1)}>
               <svg viewBox="0 0 24 24" aria-hidden focusable="false">
                 <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="gallery-btn gallery-btn--pause"
+              aria-pressed={paused}
+              aria-label={paused ? "Resume automatic photos" : "Pause automatic photos"}
+              onClick={() => setPaused((v) => !v)}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden focusable="false">
+                {paused ? (
+                  <path d="M8 5.5v13l10-6.5z" fill="currentColor" />
+                ) : (
+                  <path d="M8.5 5.5v13M15.5 5.5v13" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                )}
               </svg>
             </button>
           </div>

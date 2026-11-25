@@ -50,9 +50,9 @@ export function Signal({ segments }: { segments: number }) {
 
   const strands = useMemo(() => {
     const specs: StrandSpec[] = [
-      { curve: signalCurve, radius: 0.03, a: new Color(0.5, 0.92, 1.0), b: new Color(0.42, 0.36, 0.98), speed: 2.4, intensity: 1.15, revealFrom: 0.22 },
-      { curve: strandCurve(new Vector3(0.05, 0.2, 0.14), 0.4), radius: 0.012, a: new Color(0.45, 0.62, 1.0), b: new Color(0.62, 0.46, 1.0), speed: 1.7, intensity: 0.8, revealFrom: 0.36 },
-      { curve: strandCurve(new Vector3(0.16, -0.12, 0.02), 2.1), radius: 0.009, a: new Color(0.3, 0.55, 1.0), b: new Color(0.62, 0.48, 1.0), speed: 1.2, intensity: 0.7, revealFrom: 0.48 },
+      { curve: signalCurve, radius: 0.03, a: new Color(0.82, 0.5, 0.31), b: new Color(0.62, 0.36, 0.27), speed: 2.4, intensity: 1.15, revealFrom: 0.22 },
+      { curve: strandCurve(new Vector3(0.05, 0.2, 0.14), 0.4), radius: 0.012, a: new Color(0.583, 0.646, 0.679), b: new Color(0.74, 0.523, 0.44), speed: 1.7, intensity: 0.8, revealFrom: 0.36 },
+      { curve: strandCurve(new Vector3(0.16, -0.12, 0.02), 2.1), radius: 0.009, a: new Color(0.518, 0.58, 0.612), b: new Color(0.75, 0.533, 0.449), speed: 1.2, intensity: 0.7, revealFrom: 0.48 },
     ];
     return specs.map((spec) => ({
       spec,
@@ -66,7 +66,7 @@ export function Signal({ segments }: { segments: number }) {
       new ShaderMaterial({
         vertexShader: glowVertex,
         fragmentShader: glowFragment,
-        uniforms: { uColor: { value: new Color(0.55, 0.92, 1.0) }, uIntensity: { value: 0 } },
+        uniforms: { uColor: { value: new Color(0.885, 0.849, 0.797) }, uIntensity: { value: 0 } },
         transparent: true,
         depthWrite: false,
         blending: AdditiveBlending,

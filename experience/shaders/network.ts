@@ -9,10 +9,10 @@ const palette = /* glsl */ `
   // Transition palette: violet → pink → coral → cyan → warm ivory (display values).
   vec3 pal(float k) {
     k = fract(k) * 5.0;
-    vec3 c0 = vec3(0.50, 0.38, 0.95);
-    vec3 c1 = vec3(0.95, 0.45, 0.66);
-    vec3 c2 = vec3(1.00, 0.62, 0.44);
-    vec3 c3 = vec3(0.38, 0.86, 0.90);
+    vec3 c0 = vec3(0.654, 0.444, 0.363);
+    vec3 c1 = vec3(0.982, 0.468, 0.364);
+    vec3 c2 = vec3(1.0, 0.62, 0.44);
+    vec3 c3 = vec3(0.812, 0.772, 0.711);
     vec3 c4 = vec3(0.98, 0.88, 0.76);
     vec3 a = k < 1.0 ? c0 : k < 2.0 ? c1 : k < 3.0 ? c2 : k < 4.0 ? c3 : c4;
     vec3 b = k < 1.0 ? c1 : k < 2.0 ? c2 : k < 3.0 ? c3 : k < 4.0 ? c4 : c0;
@@ -123,14 +123,14 @@ export const blobFragment = /* glsl */ `
   void main() {
     float f = pow(1.0 - max(dot(normalize(vN), normalize(vView)), 0.0), 2.2);
     // Intelligence: a bright cyan core with a cool rim (additive, alpha 0).
-    vec3 cold = mix(vec3(0.62, 0.95, 1.0), vec3(0.45, 0.5, 1.0), f) * (0.9 + f * 0.8);
+    vec3 cold = mix(vec3(0.914, 0.882, 0.835), vec3(0.719, 0.504, 0.421), f) * (0.9 + f * 0.8);
     // Result node: a gold core inside a cyan rim, breathing slowly (a nod to Vision, original form).
-    vec3 gold = mix(vec3(1.0, 0.82, 0.38), vec3(0.45, 0.6, 1.0), f) * (1.0 + 0.18 * sin(uTime * 1.6));
+    vec3 gold = mix(vec3(1.0, 0.82, 0.38), vec3(0.57, 0.634, 0.666), f) * (1.0 + 0.18 * sin(uTime * 1.6));
     cold = mix(cold, gold, vWarm);
     // Transition: iridescent palette form with an ivory highlight.
     float k = vSeed + f * 0.35 + uTime * 0.02;
     vec3 warm = mix(pal(k), pal(k + 0.25), f) * (0.65 + 0.5 * f);
-    warm += vec3(1.0, 0.95, 0.88) * pow(max(dot(normalize(vN), normalize(vec3(-0.3, 0.8, 0.5))), 0.0), 18.0) * 0.5;
+    warm += vec3(0.974, 0.953, 0.936) * pow(max(dot(normalize(vN), normalize(vec3(-0.3, 0.8, 0.5))), 0.0), 18.0) * 0.5;
     vec3 col = mix(cold, warm, uFlex);
     float a = mix(0.0, 0.8, uFlex);
     gl_FragColor = vec4(col * uIntensity, a * uIntensity);

@@ -49,27 +49,27 @@ export function Engineering() {
         <MovieLine line={engineering.line} />
       </div>
 
-      <article className="chapter-block chapter-block--end proof" aria-labelledby="nestafar-title">
-        <h3 id="nestafar-title" className="proof-org rv">
+      <article className="chapter-block chapter-block--end proof rv" aria-labelledby="nestafar-title">
+        <h3 id="nestafar-title" className="proof-org">
           {nestafar.org}
         </h3>
-        <p className="chapter-meta rv">Professional proof</p>
-        <p className="proof-role rv">
+        <p className="chapter-meta">Professional proof</p>
+        <p className="proof-role">
           {nestafar.role} <span aria-hidden>·</span> <time>{nestafar.period}</time>
         </p>
-        <div className="proof-cert rv">
+        <div className="proof-cert">
           <p>{nestafar.certificate}</p>
           <EvidenceButton ids={[nestafar.evidence]} label="View internship certificate" />
         </div>
-        <p className="proof-sub rv">{nestafar.contributionsLead}</p>
-        <ol className="flow rv" aria-label="Agent architecture">
+        <p className="proof-sub">{nestafar.contributionsLead}</p>
+        <ol className="flow" aria-label="Agent architecture">
           {nestafar.flow.map((step) => (
             <li key={step} className="flow-step">
               {step}
             </li>
           ))}
         </ol>
-        <ul className="proof-points rv">
+        <ul className="proof-points">
           {nestafar.points.map((p) => (
             <li key={p}>{p}</li>
           ))}
