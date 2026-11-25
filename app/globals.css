@@ -1059,11 +1059,20 @@ html.cursor-visible .cursor-dot {
 
 /* ───────────────────────── Chapter 04: Project Universe (Milestone 005) ───────────────────────── */
 /* One exhibit per artifact. Long gaps between exhibits are the camera's travel. */
+/* Project Universe (2026-11-25): the establishing block and each exhibit are
+   one full-viewport panel; the pager stops on panel tops. */
 .chapter--projects {
-  padding-block: 76svh 40svh;
+  padding-block: 40svh 40svh;
+}
+.chapter--projects > .chapter-block {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(5.5rem, 12svh, 8rem) clamp(2.5rem, 8svh, 5rem);
 }
 .chapter--projects .chapter-block + .chapter-block {
-  margin-top: 72svh;
+  margin-top: 0;
 }
 .exhibit-jump {
   margin-top: 1.5rem;
@@ -1730,10 +1739,10 @@ html.cursor-visible .cursor-dot {
 .topbar::before {
   content: "";
   position: absolute;
-  inset: 0 0 -2.5rem;
+  inset: 0 0 -3.5rem;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(180deg, rgb(13 9 6 / 0.82), rgb(13 9 6 / 0.5) 55%, transparent);
+  background: linear-gradient(180deg, rgb(13 9 6 / 0.96), rgb(13 9 6 / 0.82) 50%, transparent);
   opacity: 0;
   transition: opacity 0.4s ease;
 }
@@ -2253,10 +2262,15 @@ html.has-index {
     margin-top: 45svh;
   }
   .chapter--projects {
-    padding-block: 64svh 30svh;
+    padding-block: 30svh 30svh;
+  }
+  /* Portrait: the artifact owns the top half, the copy sits at the bottom. */
+  .chapter--projects > .chapter-block {
+    justify-content: flex-end;
+    padding-block: 48svh clamp(2rem, 6svh, 3.5rem);
   }
   .chapter--projects .chapter-block + .chapter-block {
-    margin-top: 62svh;
+    margin-top: 0;
   }
   .chapter--timeline {
     padding-block: 62svh 20svh;

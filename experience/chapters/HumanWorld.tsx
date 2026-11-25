@@ -17,6 +17,7 @@ import {
   PointLight,
   Texture,
   RingGeometry,
+  TubeGeometry,
   ShaderMaterial,
   Vector2,
   Vector3,
@@ -129,6 +130,7 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
   const fingerR = useRef<Mesh>(null);
   const robot = useRef<Group>(null);
   const robotKey = useRef<PointLight>(null);
+  const robotRim = useRef<PointLight>(null);
 
   const r = useMemo(() => {
     const planeW = PHOTO_W + MARGIN * 2;
@@ -222,6 +224,12 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
       cam: new RoundedBoxGeometry(0.08, 0.05, 0.05, 2, 0.006),
       lens: alongZ(new CylinderGeometry(0.016, 0.018, 0.012, 32)),
       led: new CylinderGeometry(0.005, 0.005, 0.004, 12).rotateX(Math.PI / 2),
+      // Cable harness: a sagging service loom along each link, held by clips.
+      upperCable: new TubeGeometry(new CatmullRomCurve3([new Vector3(0.1, 0.06, 0.16), new Vector3(0.11, 0.045, L1 * 0.5), new Vector3(0.1, 0.06, L1 - 0.14)]), 24, 0.012, 8, false),
+      foreCable: new TubeGeometry(new CatmullRomCurve3([new Vector3(0.085, 0.05, 0.12), new Vector3(0.095, 0.038, L2 * 0.5), new Vector3(0.085, 0.05, L2 - 0.1)]), 24, 0.01, 8, false),
+      clip: new RoundedBoxGeometry(0.05, 0.03, 0.03, 2, 0.006),
+      seam: alongX(flange(0.172, 0.004, 0.001)),
+      seamS: alongX(flange(0.132, 0.004, 0.001)),
     };
     // Each print casts a soft rectangular shadow on the air behind it, offset
     // down and right from the key light: paper with weight, not a projection.
@@ -332,11 +340,15 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
   };
 
   const pathAt = (p: Plan, u: number, out: Vector3) => {
+    // 2026-11-25: one continuous warp along the whole path. Waypoint timing is
+    // piecewise linear (no stop at every waypoint), and the overall move eases
+    // in and out with a minimum-jerk profile, like a servo-driven arm.
+    const w = u <= 0 ? 0 : u >= 1 ? 1 : u * u * u * (u * (u * 6 - 15) + 10);
     const n = p.times.length - 1;
     let i = 0;
-    while (i < n - 1 && u > p.times[i + 1]) i++;
-    const s = (u - p.times[i]) / (p.times[i + 1] - p.times[i]);
-    return p.curve.getPoint(Math.min(1, (i + smooth(Math.min(1, Math.max(0, s)))) / n), out);
+    while (i < n - 1 && w > p.times[i + 1]) i++;
+    const s = Math.min(1, Math.max(0, (w - p.times[i]) / (p.times[i + 1] - p.times[i])));
+    return p.curve.getPoint(Math.min(1, (i + s) / n), out);
   };
 
   useFrame((state, dtRaw) => {
@@ -470,17 +482,17 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
     while (S.acc >= H && steps < 48) {
       S.acc -= H;
       steps++;
-      stepSpring(S.yaw, yawRaw, 18 * k + 4, 0.86);
-      stepSpring(S.e1, e1Raw, 21 * k + 4, 0.85);
-      stepSpring(S.e2, e2Raw, 25 * k + 4, 0.84);
-      stepSpring(S.ew, pitchT, 26, 0.8);
-      stepSpring(S.roll, rollT, 18, 0.75);
+      stepSpring(S.yaw, yawRaw, 16 * k + 4, 0.96);
+      stepSpring(S.e1, e1Raw, 19 * k + 4, 0.95);
+      stepSpring(S.e2, e2Raw, 23 * k + 4, 0.94);
+      stepSpring(S.ew, pitchT, 24, 0.9);
+      stepSpring(S.roll, rollT, 16, 0.88);
       stepSpring(S.look, lookT, 9, 0.8);
       stepSpring(S.grip, gripT, 22, 0.9);
       if (cardMode === "spring") {
         // Glide to the committed photo with momentum and a slight overshoot.
         if (reduced) stepSpring(S.card, cardTarget, 9, 1);
-        else stepSpring(S.card, cardTarget, 10, 0.7);
+        else stepSpring(S.card, cardTarget, 9, 0.86);
       }
     }
     if (steps === 48) S.acc = 0;
@@ -509,6 +521,7 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
     if (keyLight.current) keyLight.current.intensity = 10 * lightOn;
     if (fillLight.current) fillLight.current.intensity = 9 * lightOn;
     if (robotKey.current) robotKey.current.intensity = 22 * lightOn;
+    if (robotRim.current) robotRim.current.intensity = 12 * lightOn;
 
     if (!visible || !root.current) return;
 
@@ -570,6 +583,7 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
       {/* A warm key above and in front of the arm, so its anodised housings and
           brushed links read against the dark room. */}
       <pointLight ref={robotKey} color="#fff1e2" position={[2.2, 1.6, 4.2]} intensity={0} distance={8} decay={2} />
+      <pointLight ref={robotRim} color="#d6dde2" position={[3.6, 2.4, -1.2]} intensity={0} distance={7} decay={2} />
     </group>
     <group ref={root} position={GALLERY.toArray() as [number, number, number]} visible={false}>
 
@@ -606,6 +620,11 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
             <mesh geometry={r.geo.shoulderCap} material={r.mat.alu} position={[-0.242, 0, 0]} />
             <mesh geometry={r.geo.upperFlange} material={r.mat.ano} position={[0, 0, 0.13]} />
             <mesh geometry={r.geo.upperTube} material={r.mat.alu} />
+            <mesh geometry={r.geo.upperCable} material={r.mat.rubber} />
+            {[0.35, 0.7].map((f) => (
+              <mesh key={f} geometry={r.geo.clip} material={r.mat.steel} position={[0.09, 0.05, L1 * f]} />
+            ))}
+            <mesh geometry={r.geo.seam} material={r.mat.steel} position={[-0.11, 0, 0]} />
             <mesh geometry={r.geo.upperFlange} material={r.mat.ano} position={[0, 0, L1 - 0.165]} />
             <group ref={elbow} position={[0, 0, L1]}>
               <mesh geometry={r.geo.elbow} material={r.mat.ano} position={[-0.17, 0, 0]} />
@@ -614,6 +633,9 @@ export function HumanWorld({ lowPower }: { lowPower: boolean }) {
               <mesh geometry={r.geo.elbowCap} material={r.mat.alu} position={[-0.192, 0, 0]} />
               <mesh geometry={r.geo.foreFlange} material={r.mat.ano} position={[0, 0, 0.1]} />
               <mesh geometry={r.geo.foreTube} material={r.mat.alu} />
+              <mesh geometry={r.geo.foreCable} material={r.mat.rubber} />
+              <mesh geometry={r.geo.clip} material={r.mat.steel} position={[0.08, 0.042, L2 * 0.5]} scale={0.85} />
+              <mesh geometry={r.geo.seamS} material={r.mat.steel} position={[-0.085, 0, 0]} />
               <mesh geometry={r.geo.foreFlange} material={r.mat.ano} position={[0, 0, L2 - 0.13]} />
               <group ref={wrist} position={[0, 0, L2]}>
                 <mesh geometry={r.geo.wrist} material={r.mat.ano} position={[-0.12, 0, 0]} />

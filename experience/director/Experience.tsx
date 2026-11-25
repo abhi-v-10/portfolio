@@ -33,24 +33,19 @@ function layoutTop(el: HTMLElement) {
 }
 
 /**
- * Showcase position of one exhibit: its title at 30% of the viewport (50% on
- * portrait screens, where the artifact owns the top half), lowered just enough
- * that the exhibit's actions are on screen, never so far that the title leaves.
- * Shared by the 3D track anchors and the Project Universe stops.
+ * Project Universe panels (2026-11-25): the establishing block and every
+ * exhibit are each one full-viewport panel. A panel's stop is its top, so it
+ * fills the screen exactly; a panel taller than the screen (long copy on a
+ * phone) stops with its bottom edge on the screen's, so its actions show.
+ * Shared by the 3D track anchors and the Project Universe pager.
  */
-function exhibitStop(id: string) {
+function panelStop(el: HTMLElement | null) {
+  if (!el) return 0;
   const vh = window.innerHeight;
-  const title = document.querySelector<HTMLElement>(`#project-${id}-title`);
-  if (!title) return 0;
-  const tTop = layoutTop(title);
-  let y = tTop - vh * (window.innerWidth / vh < 0.8 ? 0.5 : 0.3);
-  const actions = document.querySelector<HTMLElement>(`#project-${id} .exhibit-actions`);
-  if (actions) {
-    const need = layoutTop(actions) + actions.offsetHeight - vh + 24;
-    y = Math.max(y, Math.min(need, tTop - 72));
-  }
-  return y;
+  return layoutTop(el) + Math.max(0, el.offsetHeight - vh);
 }
+const exhibitStop = (id: string) => panelStop(document.getElementById(`project-${id}`));
+const universeStop = () => panelStop(document.querySelector<HTMLElement>("#projects > .chapter-block"));
 
 const WorldCanvas = dynamic(() => import("@/experience/world/WorldCanvas"), { ssr: false });
 
@@ -324,7 +319,7 @@ export function Experience() {
           [bottom("#intelligence") - window.innerHeight * 0.75, 4.75],
           // Project Universe: overview on its title, then one artifact per
           // half unit, each arriving with its exhibit title.
-          [top("#projects-title") - window.innerHeight * 0.3, 6],
+          [universeStop(), 6],
           // Portrait screens hold each exhibit title lower (50%), so the artifact
           // owns the top half of the screen instead of sitting behind the copy.
           ...projectStories.map((p, i) => [exhibitStop(p.id), 6.5 + i * 0.5] as [number, number]),
@@ -368,18 +363,12 @@ export function Experience() {
         },
       });
 
-      // Project Universe stops (corrective pass 2026-11-15): manual scrolling
-      // with deliberate stops, not snapping. See projectGate.ts. The stops are
-      // the establishing shot and each exhibit's showcase framing, measured
-      // like the 3D track anchors so text, actions and artifact compose.
-      // Reduced motion: no gate, plain native scrolling.
-      if (!reduced) {
-        const measureStops = () => {
-          const vh = window.innerHeight;
-          const title = document.querySelector<HTMLElement>("#projects-title");
-          return [title ? layoutTop(title) - vh * 0.3 : 0, ...projectStories.map((p) => exhibitStop(p.id))].map(Math.round);
-        };
-        const gate = installProjectGate(measureStops);
+      // Project Universe pager (2026-11-25): one panel per gesture, see
+      // projectGate.ts. Stops are the panel tops, the same positions the 3D
+      // track anchors use. Reduced motion keeps the steps without the glide.
+      {
+        const measureStops = () => [universeStop(), ...projectStories.map((p) => exhibitStop(p.id))].map(Math.round);
+        const gate = installProjectGate(measureStops, { reduced });
         ScrollTrigger.addEventListener("refresh", gate.refresh);
         cleanups.push(() => {
           ScrollTrigger.removeEventListener("refresh", gate.refresh);
@@ -402,14 +391,41 @@ export function Experience() {
       // Chapter copy: each line owns one scrubbed timeline (enter, read, leave),
       // so no two tweens ever touch the same property.
       if (!reduced) {
+        // Project Universe panels and the Nestafar proof reveal as whole units
+        // (below); every other line keeps its own timeline. Lines finish fading
+        // before they reach the navigation band at the top of the screen.
         gsap.utils.toArray<HTMLElement>(".chapter .rv, #next .rv").forEach((el) => {
+          if (el.closest("#projects") || el.classList.contains("proof")) return;
           // Opacity, not autoAlpha: copy that has not been revealed yet must stay
           // focusable, so keyboard users can Tab to it (focus scrolls it in).
           gsap
-            .timeline({ scrollTrigger: { trigger: el, start: "top 96%", end: "bottom 14%", scrub: 0.5 } })
+            .timeline({ scrollTrigger: { trigger: el, start: "top 96%", end: "bottom 22%", scrub: 0.5 } })
             .fromTo(el, { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.22, ease: "power2.out" }, 0)
             .to(el, { opacity: 1, duration: 0.6 }, 0.22)
             .to(el, { opacity: 0, y: -24, duration: 0.18, ease: "power1.in" }, 0.82);
+        });
+
+        // Universe panels: fully composed whenever a panel rests on screen.
+        // Copy arrives as the panel's top passes 55% of the screen and leaves
+        // only once less than a quarter of the panel remains in view, so a
+        // settled panel is never mid-fade.
+        gsap.utils.toArray<HTMLElement>("#projects > .chapter-block").forEach((panel) => {
+          const lines = panel.querySelectorAll<HTMLElement>(".rv");
+          gsap
+            .timeline({ scrollTrigger: { trigger: panel, start: "top 55%", end: "bottom 25%", scrub: 0.4 } })
+            .fromTo(lines, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.25, stagger: 0.02, ease: "power2.out" }, 0)
+            .to(lines, { opacity: 1, duration: 0.5 }, 0.3)
+            .to(lines, { opacity: 0, y: -20, duration: 0.18, ease: "power1.in" }, 0.82);
+        });
+
+        // Nestafar proof: one unit that is gone before its heading reaches the
+        // navigation band (its top passes 16% of the screen).
+        gsap.utils.toArray<HTMLElement>(".proof.rv").forEach((el) => {
+          gsap
+            .timeline({ scrollTrigger: { trigger: el, start: "top 92%", end: "top 16%", scrub: 0.5 } })
+            .fromTo(el, { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, 0)
+            .to(el, { opacity: 1, duration: 0.62 }, 0.2)
+            .to(el, { opacity: 0, y: -20, duration: 0.18, ease: "power1.in" }, 0.82);
         });
       }
 
