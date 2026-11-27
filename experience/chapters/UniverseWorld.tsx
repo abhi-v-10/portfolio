@@ -237,7 +237,11 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     const root = new Group();
     const key = new PointLight("#fff1e2", 0, 18, 2);
     const rim = new PointLight("#d6dde2", 0, 14, 2);
-    root.add(key, rim);
+    // Lights live outside the gated root: a light that toggles visibility
+    // changes the light count, and every lit shader in the scene recompiles
+    // (a ~1s stall the first time each chapter appears).
+    const lights = new Group();
+    lights.add(key, rim);
     const sprite = new PlaneGeometry(1, 1);
     const groups: Group[] = [];
     const lit: Lit[][] = [];
@@ -610,6 +614,7 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     return {
       key,
       rim,
+      lights,
       root, groups, lit, projectors,
       // WiniOS
       laptop, phone, pcScreen, phScreen, pcIdle, pcSending, pcReceived, phIdle, phSending, phReceived,
@@ -651,7 +656,11 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     const tr = story.view.track;
     const inside = tr > WINDOW.universe[0] && tr < WINDOW.universe[1];
     r.root.visible = inside;
-    if (!inside) return;
+    if (!inside) {
+      r.key.intensity = 0;
+      r.rim.intensity = 0;
+      return;
+    }
     const reduced = story.reducedMotion;
     const t = reduced ? 0 : state.clock.elapsedTime;
     const presence = smoothstep(5.7, 6.15, tr) * (1 - smoothstep(9.35, 9.9, tr));
@@ -882,5 +891,10 @@ export function UniverseWorld({ lowPower }: { lowPower: boolean }) {
     }
   });
 
-  return <primitive object={r.root} />;
+  return (
+    <>
+      <primitive object={r.lights} />
+      <primitive object={r.root} />
+    </>
+  );
 }

@@ -87,6 +87,8 @@ export function galleryTexture(photo: GalleryPhoto, onCrop: (crop: [number, numb
     t.minFilter = LinearMipmapLinearFilter;
     t.magFilter = LinearFilter;
     t.generateMipmaps = true;
+    // Prints sit at an angle in the gallery: anisotropic filtering keeps them sharp.
+    t.anisotropy = 8;
     return t;
   };
   if (!photo.src) {

@@ -91,16 +91,15 @@ export function onSceneReady(fn: Listener) {
 
 let webglSupport: boolean | null = null;
 
-/** Feature probe used before mounting the canvas (cached; runs once). */
 export function hasWebGL(): boolean {
   if (webglSupport !== null) return webglSupport;
   // QA hook: `?webgl=0` exercises the no-WebGL route on any device.
   if (new URLSearchParams(window.location.search).get("webgl") === "0") return (webglSupport = false);
   try {
     const c = document.createElement("canvas");
-    const ctx = c.getContext("webgl2") || c.getContext("webgl");
+    const ctx = (c.getContext("webgl2") || c.getContext("webgl")) as WebGLRenderingContext | null;
     webglSupport = !!ctx;
-    (ctx as WebGLRenderingContext | null)?.getExtension("WEBGL_lose_context")?.loseContext();
+    ctx?.getExtension("WEBGL_lose_context")?.loseContext();
   } catch {
     webglSupport = false;
   }

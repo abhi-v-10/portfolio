@@ -1,11 +1,13 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { useMemo, useRef, type ReactNode } from "react";
-import { Color, Fog, Group } from "three";
+import { useRef, type ReactNode } from "react";
+import { Fog, Group, SRGBColorSpace } from "three";
+import { paletteAt, withFinale } from "../director/palette";
 import { story } from "../director/store";
 
-// Fog per chapter: [track, colour, near, far]. The hero's navy, Curiosity's
+// Fog per chapter: [track, colour (historical; the colour now comes from
+// palette.ts), near, far]. The hero's navy, Curiosity's
 // violet haze (closer, softer), Engineering's deep clear blue (farther, crisper).
 // Meet the Human sits between: a warm lavender dusk, softer than the hero.
 const STOPS: [number, string, number, number][] = [
@@ -32,7 +34,6 @@ const STOPS: [number, string, number, number][] = [
 /** Single owner of scene fog after SceneSetup creates it. */
 export function Atmosphere() {
   const scene = useThree((s) => s.scene);
-  const cols = useMemo(() => STOPS.map((s) => new Color(s[1])), []);
   useFrame(() => {
     const fog = scene.fog as Fog | null;
     if (!fog) return;
@@ -41,7 +42,10 @@ export function Atmosphere() {
     while (i < STOPS.length - 2 && tr > STOPS[i + 1][0]) i++;
     const u = Math.min(1, Math.max(0, (tr - STOPS[i][0]) / (STOPS[i + 1][0] - STOPS[i][0])));
     const e = u * u * (3 - 2 * u);
-    fog.color.copy(cols[i]).lerp(cols[i + 1], e);
+    // Fog colour is the chapter ground (palette.ts), so distant objects fade
+    // into the same sky the DOM sits on; by day they fade into the light.
+    const g = withFinale(paletteAt(tr), story.finale).ground;
+    fog.color.setRGB(g[0], g[1], g[2], SRGBColorSpace);
     fog.near = STOPS[i][2] + (STOPS[i + 1][2] - STOPS[i][2]) * e;
     fog.far = STOPS[i][3] + (STOPS[i + 1][3] - STOPS[i][3]) * e;
   });

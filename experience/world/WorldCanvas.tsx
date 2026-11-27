@@ -1,11 +1,9 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useRef } from "react";
+import { Canvas } from "@react-three/fiber";
 import { ACESFilmicToneMapping, SRGBColorSpace } from "three";
-import { story } from "../director/store";
 import { CameraDirector } from "./CameraDirector";
-import { Backdrop, Lights, ReadySignal, SceneSetup } from "./Environment";
+import { Backdrop, DaylightBlending, Lights, ReadySignal, SceneSetup, SkipHiddenMatrices } from "./Environment";
 import { CAMERA_FOV } from "./paths";
 import { Atmosphere } from "../chapters/Atmosphere";
 import { CuriosityWorld } from "../chapters/CuriosityWorld";
@@ -15,48 +13,17 @@ import { NexusWorld } from "../chapters/NexusWorld";
 import { UniverseWorld } from "../chapters/UniverseWorld";
 import { EngineeringWorld } from "../chapters/EngineeringWorld";
 
-/**
- * QualityController (tiers, 2026-11-14): starts at the device's native
- * resolution up to 2x on capable desktops, then measures real frame times in
- * rolling windows once the entrance has settled. If a window cannot hold
- * ~45 fps it steps down one tier (2 → 1.5 → 1.25 → 1); it never steps back
- * up, so the image does not pump. No user-agent sniffing.
- */
-const TIERS = [2, 1.5, 1.25, 1];
-function QualityController() {
-  const setDpr = useThree((s) => s.setDpr);
-  const dpr = useThree((s) => s.viewport.dpr);
-  const st = useRef({ n: 0, total: 0, settled: 0 });
-  useFrame((_, dt) => {
-    const w = st.current;
-    if (story.intro < 1 || w.settled >= 3) return;
-    w.n += 1;
-    if (w.n < 20) return; // skip warm-up frames after each change
-    w.total += Math.min(dt, 0.1);
-    if (w.n < 140) return;
-    const avg = w.total / (w.n - 20);
-    w.n = 0;
-    w.total = 0;
-    if (avg > 1 / 45 && dpr > 1) {
-      const next = TIERS.find((t) => t < dpr - 0.01) ?? 1;
-      setDpr(next);
-      if (next <= 1.25) story.quality = 0;
-    } else {
-      w.settled += 1; // three good windows in a row: stop measuring
-    }
-  });
-  return null;
-}
-
 export default function WorldCanvas({ lowPower }: { lowPower: boolean }) {
   // Sharp on high-density desktops without rendering above what the screen shows.
   const native = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
+  // Always full quality (2026-11-27): the device's native resolution up to 2x,
+  // never stepped down at runtime. Phones and tablets cap at 1.5x.
   const maxDpr = Math.min(native, lowPower ? 1.5 : 2);
   return (
     <Canvas
       className="world-canvas"
       aria-hidden
-      dpr={[1, maxDpr]}
+      dpr={maxDpr}
       gl={{ antialias: !lowPower, powerPreference: "high-performance", alpha: false }}
       camera={{ fov: CAMERA_FOV, near: 0.1, far: 200, position: [0, 0, 22] }}
       onCreated={({ gl }) => {
@@ -80,8 +47,9 @@ export default function WorldCanvas({ lowPower }: { lowPower: boolean }) {
       <NetworkWorld lowPower={lowPower} />
       <UniverseWorld lowPower={lowPower} />
       <NexusWorld lowPower={lowPower} />
-      <QualityController />
+      <DaylightBlending />
       <ReadySignal />
+      <SkipHiddenMatrices />
     </Canvas>
   );
 }

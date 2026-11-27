@@ -98,7 +98,7 @@ components:
 
 ## Art direction (corrected 2026-11-15; palette replaced 2026-11-25)
 
-> **Palette note (2026-11-25).** The chapter colours named in this section (navy, holographic cyan, violet haze, cobalt, indigo, jade, lavender dawn) were retired on 2026-11-25 because they read as generated. Each chapter keeps its own identity in the Ink and Signal palette; see Colors. The structural decisions below still hold.
+> **Palette note (2026-11-27).** Superseded by the Dark/Light Rhythm in Colors. **Earlier note (2026-11-25).** The chapter colours named in this section (navy, holographic cyan, violet haze, cobalt, indigo, jade, lavender dawn) were retired on 2026-11-25 because they read as generated. Each chapter keeps its own identity in the Ink and Signal palette; see Colors. The structural decisions below still hold.
 
 The 2026-11-14 overhaul misread "less AI-generated" as "darker and more neutral". That is reverted: each chapter keeps its original colour identity and atmosphere (navy and holographic cyan for the hero, violet haze for Curiosity, cobalt for Engineering, indigo with cyan and violet currents for Intelligence, the violet-navy exhibition hall for Project Universe, jade for Timeline, the dawn for the close). Backdrop, fog, ink tokens and readability veils are back to their pre-overhaul values.
 
@@ -109,9 +109,13 @@ The 2026-11-14 overhaul misread "less AI-generated" as "darker and more neutral"
 3. **Bordered chips, ruled tables and HUD rows.** Nestafar's agent chain is a sentence of serif-italic steps joined by the drawn signal; Engineering's identity table is label-over-text with a single bone hairline; Intelligence's request walk-through runs down one glowing signal line, node by node; Curiosity's questions are asked aloud in serif italic, in a staggered column. All information is kept.
 4. **Outline rectangles standing in for objects.** IRIS's structured record is a physical olive card the extracted fields land on.
 
-**Kept from the overhaul:** the editorial serif (now Fraunces italic) for leads and personal lines, sentence-case actions, satin device bodies with smoother bevels, supersampled screen textures, DPR tiers, the Index scroll lock and centred credits.
+**Kept from the overhaul:** the editorial serif (now Fraunces italic) for leads and personal lines, sentence-case actions, satin device bodies with smoother bevels, supersampled screen textures, the Index scroll lock and centred credits.
 
-**Project Universe pager (2026-11-26, replaces the gesture gate).** The establishing block and every exhibit are one full-viewport panel; stops are panel tops (a taller portrait panel stops with its bottom on the screen's). Inside the universe one gesture moves exactly one panel: the page glides there (eased, 0.56–0.9s), settles, and the rest of that gesture is discarded, including trackpad momentum (a root overflow lock ends native inertia and a hold snaps back any residual scroll until the gesture falls silent). A new gesture is a reversal, a long pause, or a stronger push after a pause; a decaying tail never counts. Entering from either side settles on the first panel reached; at either end a fresh outward gesture leaves with native scrolling. Touch: one swipe, one panel. Keyboard: PageDown/Space/ArrowDown and PageUp/ArrowUp, one press one panel. Reduced motion: the same steps without the glide. Index links, anchors, history and case-study returns bypass it. Panel copy reveals as a unit, so a settled panel is never mid-fade. Verified on an RTX 4060 in hardware-accelerated Chrome: 16/16 desktop checks (trackpad, wheel bursts, reverse, keyboard, leaving upward), 7/7 touch checks. Code: `experience/director/projectGate.ts`.
+**Scroll director (2026-11-27, replaces the Project Universe pager).** One owner for wheel scrolling across the page. Everywhere, wheel and trackpad input move a target and the page eases toward it (exponential approach, about 0.3s), so a notched mouse glides. In Project Universe scrolling stays manual and smooth, but a gesture that would cross a stop (the establishing panel's top or a project panel's top; a taller portrait panel stops with its bottom on the screen's) ends exactly on it, and the rest of that gesture, including trackpad momentum, is discarded. The next gesture (a reversal, a pause, or a stronger push after a decaying tail) continues; nothing moves on its own. Touch keeps native scrolling; a drag or fling across a stop is caught on it. Keys ease by a step outside the universe and to the next stop inside it. Index links, anchors, history, case-study returns, Home/End and the scrollbar are followed, never smoothed or stopped; elements that scroll on their own keep native wheel handling. Reduced motion: no easing, stops kept. Verified in hardware-accelerated headless Chrome (RTX 4060): wheel bursts stop once on each of the 7 stops and leave freely past the last; a decaying trackpad fling from a stop ends on the next one. Code: `experience/director/smoothScroll.ts`.
+
+**Always full quality (2026-11-27).** The world renders at the device's native resolution up to 2x (phones and tablets cap at 1.5x), antialiased, and is never stepped down at runtime: the DPR tiers and the QualityController are retired, as is a short-lived lite mode for software WebGL (it rendered at 60% and looked blurry). Measured on an RTX 4060 at 1.25x and at 2x: 95th-percentile frame time 8.2ms or less in every chapter, no long tasks while scrolling. A browser that renders WebGL on the CPU (GPU acceleration off or blocklisted: "Microsoft Basic Render Driver", SwiftShader) cannot reach 60 fps with this world; the fix is on that machine, not in the page.
+
+**No first-view stalls (2026-11-27).** A light that toggles visibility changes the light count, and three.js recompiles every lit shader. Project Universe's key and rim lights sat inside its gated root, so the Human and Curiosity worlds recompiled on first view (a 1.0s and a 0.2s stall). Every chapter light now lives outside its gate and fades by intensity; a scroll through the whole page links no new shader programs.
 
 **Index lock.** Opening the Index adds `html.has-index` (overflow hidden on the root, so scrollY never changes); the panel scrolls on its own with contained overscroll; closing releases synchronously so links navigate from the unlocked page.
 
@@ -132,34 +136,38 @@ The mood is cinematic, precise and human: title-sequence staging and engineered 
 
 ## Colors
 
-Warm ink and bone, like a printed page at night, with a single copper signal and a few muted chapter tones. Token names in `app/globals.css` are historical (`--core-energy` holds the copper, `--space-navy` the ink ground); the values are normative.
+**Dark/Light Rhythm (2026-11-27, replaces the warm-neutral-only palette).** The 2026-11-25 palette made every chapter a near-black warm neutral, so the journey read as one long dark gradient. Each chapter now owns one distinct, stable ground. Two chapters are full daylight (Engineering and the closing Next Chapter), so the story alternates night and day. The hero keeps its warm ink and the copper signal stays the identity. Token names in `app/globals.css` are historical; the values below are normative and live in one place, `experience/director/palette.ts`.
 
-### Primary
-- **Signal Copper** (`signal-copper`): the only saturated colour. Focus rings, text selection, the caret, progress at ready, the dot of the signature's i, the loader seam, the hero's living current, network pulses, active list markers, the cursor's caret and centre point, the primary pill hover fill. Never a large flat field, never body text.
+| Chapter | Ground | Accent | Text / secondary / quiet | Tone |
+|---|---|---|---|---|
+| Hero | Ink `#15120F` | Copper `#C8794A` | Bone `#F4EFE6` / `#DDD5C8` / `#A39A8D` | night |
+| Meet the Human | Terracotta `#2B1712` | `#E07A5A` | Bone / `#E6D6CC` / `#BBA59A` | night |
+| Curiosity | Petrol `#0F2529` | Sea glass `#8CC7BB` | Bone / `#D3DFDB` / `#9DB4AF` | night |
+| Engineering | Daylight `#ECE5D8` | Cobalt ink `#2F4B7A` | Ink `#1A1714` / `#3B352E` / `#5B5248` | day |
+| Intelligence | Midnight `#131B29` | Amber `#F2B35B` | Bone / `#D6DAE1` / `#9EA7B5` | night |
+| Project Universe | Charcoal `#161616` | Copper (exhibits keep their own) | Bone / `#DBD7D1` / `#A39E97` | night |
+| Timeline Nexus | Forest `#0F1E17` | Gold `#C9B458` | Bone / `#D4DDD4` / `#9EAB9F` | night |
+| Next Chapter | Dawn `#F3D9C4` (apricot horizon `#E9A27E`) | Burnt clay `#A55330` | Ink / `#3E3128` / `#57463A` | day |
 
-### Secondary
-- **Clay** (`clay`): Meet the Human's dusk, the Intelligence to Universe transition, the Next Chapter dawn, the hologram shell's accent.
-- **Slate** (`slate`): Curiosity's haze, Intelligence's depth, cool structural lines. A grey with a breath of blue, never a blue.
-
-### Tertiary
-- **Brass** (`brass`): Engineering's machined edges, JobSeek's accent, warm highlights in the Universe hall.
-- **Olive** (`olive`): Timeline Nexus night, IRIS's accent, acknowledgement states.
-
-### Neutral
-- **Ink** (`ink`): page, loader sheet, canvas clear colour.
-- **Ink Ground** (`ink-ground`): hero atmosphere and fog.
-- **Panel** (`panel`): solid DOM surfaces such as the Index panel.
-- **Bone** (`bone`): the signature, the primary pill, primary light in the 3D world.
-- **Paper** (`paper`): display and primary text.
-- **Ink Tinted** (`ink-tinted`): secondary copy (identity stack, scroll cue, work lines).
-- **Ink Muted** (`ink-muted`): quiet controls and inactive states (Skip intro, Close, upcoming chapters, metadata).
+Every pair passes WCAG AA: primary text 13.2 to 16.3:1, secondary 9.3:1 or more, quiet text 5.5:1 or more, accents 4.0:1 or more (used for large text, markers and controls). The signal (focus rings, selection, the caret) is copper by night and a deeper copper (`#9C4F27`, `#A55330`) by day, so focus keeps 3:1 on light grounds.
 
 ### Named Rules
-**The One Signal Rule.** Copper is the only saturated colour on any screen, and it marks signal or interaction: focus, selection, live state, the current. Never a field, never prose.
+**The Stable Ground Rule.** A settled chapter is one colour. The sky's texture is a whisper (a few percent), never a gradient wash.
 
-**The Warm Neutral Rule.** Chapter identity comes from low-chroma warm neutrals (clay, slate, brass, olive, OKLCH chroma at most 0.08). Violet, lavender, electric or cobalt blue and cyan glows are retired everywhere: CSS, shaders, lights, canvas textures, favicon and social card.
+**The Gap Rule.** Colours blend only inside short transition windows that sit in the scroll gaps between chapters' copy. The windows are measured from the live layout on every refresh (resize, fonts): each starts once the last line of one chapter has faded (by that line's own reveal trigger, including the Nestafar proof's) and ends before the next chapter's first line appears, so they hold on any viewport. Where a viewport leaves no gap, the blend is a short handover centred between the two (`Experience.tsx`, `measureWindows`; defaults in `palette.ts`). Grounds blend in OKLab. Night-to-day windows use a steep curve so the mid-greys last a few frames of scroll, and the text flips at the luminance crossover, where both inks are equally legible.
 
-**The Tinted Ink Rule.** Secondary text is tinted from the warm ground (Ink Tinted, Ink Muted), never a neutral or cool gray.
+**The One Source Rule.** `paletteAt(track)` feeds everything that carries colour: the WebGL sky (`backdrop.ts`), fog (`Atmosphere`), the studio lights (`Lights`), and the DOM through CSS custom properties (`--pal-ground`, `--pal-text`, `--pal-text-2`, `--pal-muted`, `--pal-accent`, `--pal-signal`, `--pal-glow`). The story, the navigation and the cursor map the historical tokens (`--soft-white`, `--ink-tinted`, `--ink-muted`, `--accent`, `--core-energy`, `--panel`) onto them; veils and hairlines use `rgb(var(--pal-ground) / a)` and `rgb(var(--pal-text) / a)`. The Index, evidence viewer and case studies keep their own dark ground. Never hard-code a light or dark text colour in story CSS.
+
+**The Daylight Studio Rule.** By day the studio opens up rather than the backdrop simply turning pale: a hemisphere sky fill and a little more ambient lift the shadow side, the key cools toward daylight, the warm rim drops and reflections brighten (environment 0.55 to 0.8), so metal still reads as metal. Lines and motes drawn with additive light would vanish on a light ground, so by day they are subtracted from the sky at 70% instead and read as ink (a copper trace on bone becomes a blue-grey line). Blending is GL state, so the switch never recompiles a shader; destination alpha is preserved so the canvas never turns see-through.
+
+**The Finale Rule.** The post-credits finale lowers the light whatever chapter it follows: ground, fog and studio fade to near-black `#0B0908` and the text returns to bone.
+
+**The One Signal Rule (kept).** Copper is the identity: the dot of the i, the loader seam, focus, selection and live state. Chapter accents mark that chapter's links and markers only.
+
+### Neutral (dialogs and loader)
+- **Ink** (`#0F0E0C`): loader sheet, canvas clear colour.
+- **Panel** (`#1A1815`): the Index panel and dark controls inside dialogs.
+- **Bone** (`#ECE6DA`) and **Paper** (`#F4EFE6`): the signature and text on dark grounds.
 
 ## Typography
 
@@ -232,9 +240,9 @@ On fine pointers only, never on touch: an 8px Bone dot sitting exactly on the ho
 - **Index panel:** native modal dialog sliding from the right, Panel, in three sections: Work (WiniOS featured in copper, five projects and the Nestafar internship, each with one verified line and a mono stack), Contact (email first, then LinkedIn, GitHub, Instagram) and Story (live chapters as links, upcoming chapters as one line). No unfinished project pages.
 
 ### Signature Loader (signature)
-The name "Abhishyanth" writes itself on warm ink, one pen stroke after another: the main line (950ms), the t and A crossbars (180ms, 200ms), then the dot of the i in copper. Since 2026-11-26 the strokes are drawn by a Web Worker on two OffscreenCanvases (one per loader half), from points sampled once from the SVG paths, with the same pen easing and a slight pressure taper; the worker owns its own frame loop, so the pen stays smooth while the main thread hydrates and the 3D scene compiles. The loader enters when the worker reports the last stroke has landed. The SVG version remains as the fallback (no OffscreenCanvas) and as the reduced-motion still; its per-frame displacement filter is gone. They live in `components/loader/signature.ts` as centre-line SVG paths with per-stroke timing, so real handwriting can replace the stand-in without touching anything else.
+The name "Abhishyanth" writes itself on warm ink, one pen stroke after another: the main line (950ms), the t and A crossbars (180ms, 200ms), then the dot of the i in copper. Since 2026-11-27 an inline script rendered right after the loader's markup starts the pen while the HTML is still parsing (`components/loader/signatureBoot.ts`): it hands both loader halves' canvases to a Web Worker through OffscreenCanvas, and the worker flattens the paths itself and draws them with the same pen easing and a slight pressure taper on its own frame loop. The signature is writing from the first painted frame (about 0.4s into a load, previously a blank sheet for over a second while the bundle hydrated) and stays smooth while the 3D scene compiles. The loader enters when the worker reports the last stroke has landed. The SVG version is the fallback (no OffscreenCanvas, client-side renders, no JavaScript) and the reduced-motion still. They live in `components/loader/signature.ts` as centre-line SVG paths with per-stroke timing, so real handwriting can replace the stand-in without touching anything else.
 - **Readout:** below the signature, one full-width hairline that advances only when a real check completes (interface, typefaces, scene) and turns copper when everything is ready; a status word on the left ("Entering" once ready) and an IBM Plex Mono counter (`02/03`) on the right. "Abhishyanth Vemula, portfolio" sits top left, Skip intro bottom right. There is no Explore button.
-- **Timing (2026-11-25):** the full signature plays on every full page load, cached or not (`SIGNATURE_MS`, about 1.65s, plus a 280ms beat). The loader then enters on its own as soon as the signature has landed and every asset is ready. The scene check gives up after 7s and enters with a static scene. Internal navigation (case-study returns, deep links after the first load) never replays it. Reduced motion shows the signature already written and enters as soon as assets are ready. Skip intro is always available.
+- **Timing (2026-11-25):** the full signature plays on every full page load, cached or not (`SIGNATURE_MS`, about 1.65s, plus a 280ms beat). The loader then enters on its own as soon as the signature has landed and every asset is ready. The scene check gives up after 4.5s and enters with a static scene. Internal navigation (case-study returns, deep links after the first load) never replays it. Reduced motion shows the signature already written and enters as soon as assets are ready. Skip intro is always available.
 - **Entrance:** a copper seam draws across the signature's baseline (0.45s) and the sheet splits into two halves that carry the signature away (1.0s). The hero is released at 1.3s; the name lands as the halves clear.
 
 ### Hero (typography-led, 2026-11-25)

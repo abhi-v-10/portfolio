@@ -23,6 +23,16 @@
   --ink-muted: #a39a8d;
   --hairline: rgb(244 239 230 / 0.14);
   --panel: #1a1815;
+  /* Chapter palette (2026-11-27), written per frame by
+     experience/director/palette.ts as space-separated sRGB channels. These are
+     the hero's values, so the first paint is right before any script runs. */
+  --pal-ground: 21 18 15;
+  --pal-glow: 42 31 23;
+  --pal-accent: 200 121 74;
+  --pal-signal: 200 121 74;
+  --pal-text: 244 239 230;
+  --pal-text-2: 221 213 200;
+  --pal-muted: 163 154 141;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --gutter: clamp(1rem, 5vw, 6.5rem);
@@ -175,35 +185,11 @@ html.cursor-visible .cursor-dot {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  /* No-WebGL route: the same chapter palette as the 3D sky. */
   background:
-    radial-gradient(60% 55% at 72% 38%, rgb(142 90 70 / 0.6), transparent 70%),
-    radial-gradient(45% 40% at 88% 78%, rgb(243 131 107 / 0.24), transparent 70%),
-    radial-gradient(70% 60% at 18% 82%, rgb(116 131 139 / 0.38), transparent 70%),
-    radial-gradient(40% 28% at 62% 98%, rgb(255 170 106 / 0.2), transparent 70%),
-    linear-gradient(180deg, #15100b 0%, var(--space-navy) 55%, #231e19 100%);
-}
-/* No-WebGL route: the colour story still changes per chapter, in CSS. */
-.world-fallback::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 1.2s ease, background 1.2s ease;
-}
-.experience[data-chapter="curiosity"] .world-fallback::after {
-  opacity: 1;
-  background:
-    radial-gradient(70% 60% at 70% 40%, rgb(215 203 193 / 0.28), transparent 70%),
-    radial-gradient(80% 70% at 30% 70%, rgb(142 90 70 / 0.7), transparent 75%),
-    linear-gradient(180deg, #2a2420, #47261a);
-}
-.experience[data-chapter="engineering"] .world-fallback::after {
-  opacity: 1;
-  background:
-    repeating-linear-gradient(0deg, rgb(116 131 139 / 0.1) 0 1px, transparent 1px 48px),
-    repeating-linear-gradient(90deg, rgb(116 131 139 / 0.1) 0 1px, transparent 1px 48px),
-    radial-gradient(60% 50% at 30% 45%, rgb(116 131 139 / 0.3), transparent 70%),
-    linear-gradient(180deg, #17120e, #1e1915);
+    radial-gradient(60% 55% at 72% 38%, rgb(var(--pal-glow) / 0.7), transparent 70%),
+    radial-gradient(70% 60% at 18% 82%, rgb(var(--pal-glow) / 0.35), transparent 70%),
+    rgb(var(--pal-ground));
 }
 .world-canvas-wrap {
   position: absolute;
@@ -220,14 +206,47 @@ html.cursor-visible .cursor-dot {
   inset: 0;
   opacity: var(--hero-scrim, 1);
   background:
-    linear-gradient(90deg, rgb(10 7 5 / 0.55) 0%, rgb(10 7 5 / 0.22) 40%, transparent 60%),
-    radial-gradient(120% 90% at 50% 50%, transparent 55%, rgb(8 6 4 / 0.55) 100%);
+    linear-gradient(90deg, rgb(var(--pal-ground) / 0.55) 0%, rgb(var(--pal-ground) / 0.22) 40%, transparent 60%),
+    radial-gradient(120% 90% at 50% 50%, transparent 55%, rgb(var(--pal-ground) / 0.55) 100%);
 }
 
 /* ───────────────────────── Story (DOM layer) ───────────────────────── */
 .story {
   position: relative;
   z-index: 1;
+}
+/* The chapter palette drives the story's type, the navigation and the cursor.
+   Dialogs (Index, evidence viewer, case studies) keep their own dark ground. */
+.story,
+.topbar,
+.cursor-layer {
+  --soft-white: rgb(var(--pal-text));
+  --warm-ivory: rgb(var(--pal-text));
+  --ink-tinted: rgb(var(--pal-text-2));
+  --ink-muted: rgb(var(--pal-muted));
+  --accent: rgb(var(--pal-accent));
+  --core-energy: rgb(var(--pal-signal));
+  --hairline: rgb(var(--pal-text) / 0.16);
+  /* Solid controls (the Menu pill, secondary pills): a step off the ground. */
+  --panel: color-mix(in srgb, rgb(var(--pal-ground)) 90%, rgb(var(--pal-text)));
+  color: var(--soft-white);
+}
+.index-panel,
+.viewer,
+.case-layer {
+  --soft-white: #f4efe6;
+  --warm-ivory: #ece6da;
+  --ink-tinted: #ddd5c8;
+  --ink-muted: #a39a8d;
+  --accent: #c8794a;
+  --core-energy: #c8794a;
+  --hairline: rgb(244 239 230 / 0.14);
+  --panel: #1a1815;
+  --pal-ground: 21 18 15;
+  --pal-text: 244 239 230;
+}
+html {
+  background: rgb(var(--pal-ground));
 }
 /* Typography-led hero (2026-11-25). Everything fits one viewport: the name is
    sized by the smaller of the viewport's width and height, and the padding
@@ -442,7 +461,7 @@ html.cursor-visible .cursor-dot {
   border: 0;
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-decoration-color: rgb(246 245 243 / 0.32);
+  text-decoration-color: rgb(var(--pal-text) / 0.32);
   text-underline-offset: 0.35em;
   cursor: pointer;
   transition: color 0.2s ease, text-decoration-color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
@@ -454,13 +473,13 @@ html.cursor-visible .cursor-dot {
   padding: 0.7rem 1.25rem;
   font-weight: 600;
   text-decoration: none;
-  color: #0d0c0b;
+  color: rgb(var(--pal-ground));
   background: var(--soft-white);
   border: 1px solid var(--soft-white);
   border-radius: 999px;
 }
 .action--primary:hover {
-  background: #fff;
+  background: color-mix(in srgb, var(--soft-white) 88%, var(--core-energy));
   transform: translateY(-1px);
 }
 
@@ -483,7 +502,7 @@ html.cursor-visible .cursor-dot {
   overflow: hidden;
 }
 .human-copy::before {
-  background: radial-gradient(closest-side, rgb(24 18 14 / 0.62), rgb(24 18 14 / 0.28) 62%, transparent);
+  background: radial-gradient(closest-side, rgb(var(--pal-ground) / 0.62), rgb(var(--pal-ground) / 0.28) 62%, transparent);
 }
 .human-title {
   margin: 0;
@@ -557,7 +576,7 @@ html.cursor-visible .cursor-dot {
   cursor: grabbing;
 }
 .gallery-stage:focus-visible {
-  outline: 1px dashed rgb(215 205 189 / 0.6);
+  outline: 1px dashed rgb(var(--pal-text) / 0.6);
   outline-offset: -1px;
 }
 .gallery-bar {
@@ -572,7 +591,7 @@ html.cursor-visible .cursor-dot {
   height: 44px;
   padding: 0;
   color: var(--soft-white);
-  background: rgb(25 20 15 / 0.55);
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
   border: 1px solid rgb(225 217 210 / 0.28);
   border-radius: 999px;
   cursor: pointer;
@@ -585,7 +604,7 @@ html.cursor-visible .cursor-dot {
 .gallery-btn:hover {
   color: #ffcfb8;
   border-color: #ffcfb8;
-  background: rgb(25 20 15 / 0.8);
+  background: var(--panel);
 }
 .gallery-count {
   margin: 0;
@@ -630,7 +649,7 @@ html.cursor-visible .cursor-dot {
   overflow: hidden;
   padding-top: 0.6rem;
   border-top: 1px solid transparent;
-  border-image: linear-gradient(90deg, transparent, rgb(196 178 163 / 0.35), transparent) 1;
+  border-image: linear-gradient(90deg, transparent, rgb(var(--pal-text) / 0.35), transparent) 1;
   text-align: center;
   font-size: 0.9375rem;
   line-height: 1.45;
@@ -658,7 +677,7 @@ html.cursor-visible .cursor-dot {
   aspect-ratio: 4 / 5;
   display: grid;
   place-items: center;
-  border: 1px solid rgb(215 205 189 / 0.45);
+  border: 1px solid rgb(var(--pal-text) / 0.45);
   border-radius: 6px;
   background: linear-gradient(160deg, var(--tone-a, #a16f5c), var(--tone-b, #302a26));
 }
@@ -710,7 +729,7 @@ html.cursor-visible .cursor-dot {
   inset: -5rem -6rem;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(closest-side, rgb(13 9 6 / 0.66), rgb(13 9 6 / 0.32) 62%, transparent);
+  background: radial-gradient(closest-side, rgb(var(--pal-ground) / 0.66), rgb(var(--pal-ground) / 0.32) 62%, transparent);
 }
 .chapter-block--end {
   margin-left: auto;
@@ -834,7 +853,7 @@ html.cursor-visible .cursor-dot {
   grid-template-columns: 10.5rem 1fr;
   gap: 0.35rem 1.25rem;
   padding: 0.85rem 0;
-  border-top: 1px solid rgb(215 205 189 / 0.16);
+  border-top: 1px solid rgb(var(--pal-text) / 0.16);
 }
 .spec-row dt {
   font-family: var(--font-mono), monospace;
@@ -879,14 +898,14 @@ html.cursor-visible .cursor-dot {
 .flow-step {
   position: relative;
   padding: 0.55rem 0.8rem;
-  border: 1px solid rgb(215 205 189 / 0.45);
+  border: 1px solid rgb(var(--pal-text) / 0.45);
   border-radius: 2px;
   font-family: var(--font-mono), monospace;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #f5efea;
-  background: rgb(215 205 189 / 0.05);
+  color: var(--soft-white);
+  background: rgb(var(--pal-text) / 0.05);
 }
 /* Drawn connector: a hairline with a chevron head, between steps only. */
 .flow-step:not(:last-child)::after {
@@ -942,7 +961,7 @@ html.cursor-visible .cursor-dot {
   align-items: center;
   gap: 0.75rem 1.2rem;
   padding: 0.9rem 0 0.95rem;
-  border-block: 1px solid rgb(215 205 189 / 0.18);
+  border-block: 1px solid rgb(var(--pal-text) / 0.18);
 }
 .proof-cert p {
   flex: 1 1 18rem;
@@ -997,7 +1016,7 @@ html.cursor-visible .cursor-dot {
   content: counter(req, decimal-leading-zero);
   font-family: var(--font-mono), monospace;
   font-size: 0.75rem;
-  color: rgb(196 178 163 / 0.9);
+  color: rgb(var(--pal-text) / 0.9);
   font-variant-numeric: tabular-nums;
 }
 .request-step {
@@ -1025,7 +1044,7 @@ html.cursor-visible .cursor-dot {
 .movie-line {
   margin: 1.6rem 0 0;
   padding-left: 1rem;
-  border-left: 1px solid rgb(215 205 189 / 0.45);
+  border-left: 1px solid rgb(var(--pal-text) / 0.45);
 }
 .movie-line-lead {
   margin: 0;
@@ -1289,7 +1308,7 @@ html.cursor-visible .cursor-dot {
   color: #f8f2ed;
 }
 .chapter--timeline .chapter-block::before {
-  background: radial-gradient(closest-side, rgb(15 12 10 / 0.7), rgb(15 12 10 / 0.34) 62%, transparent);
+  background: radial-gradient(closest-side, rgb(var(--pal-ground) / 0.7), rgb(var(--pal-ground) / 0.34) 62%, transparent);
 }
 .chapter--timeline .timeline-block {
   margin-top: 36svh;
@@ -1426,7 +1445,7 @@ html.cursor-visible .cursor-dot {
   padding-block: clamp(5rem, 11svh, 7.5rem) clamp(1.5rem, 4svh, 2.5rem);
 }
 .closing-card::before {
-  background: radial-gradient(closest-side, rgb(32 26 22 / 0.6), rgb(32 26 22 / 0.28) 62%, transparent);
+  background: radial-gradient(closest-side, rgb(var(--pal-ground) / 0.6), rgb(var(--pal-ground) / 0.28) 62%, transparent);
 }
 .closing-title {
   margin: 0.5rem 0 0;
@@ -1508,11 +1527,11 @@ html.cursor-visible .cursor-dot {
   text-transform: uppercase;
   color: var(--soft-white);
   text-decoration: underline;
-  text-decoration-color: rgb(255 214 194 / 0.4);
+  text-decoration-color: rgb(var(--pal-accent) / 0.5);
   text-underline-offset: 0.45em;
 }
 .closing-links a:hover {
-  text-decoration-color: #ffd6c2;
+  text-decoration-color: var(--accent);
 }
 .placeholder-inline {
   font-style: italic;
@@ -1702,28 +1721,6 @@ html.cursor-visible .cursor-dot {
   }
 }
 
-/* No-WebGL colour story for the new chapters. */
-.experience[data-chapter="projects"] .world-fallback::after {
-  opacity: 1;
-  background:
-    radial-gradient(40% 35% at 75% 40%, rgb(215 205 189 / 0.16), transparent 70%),
-    radial-gradient(35% 30% at 65% 75%, rgb(255 170 106 / 0.12), transparent 70%),
-    linear-gradient(180deg, #130e09, #1c1713);
-}
-.experience[data-chapter="timeline"] .world-fallback::after {
-  opacity: 1;
-  background:
-    radial-gradient(50% 45% at 72% 45%, rgb(214 223 183 / 0.2), transparent 70%),
-    linear-gradient(180deg, #110e0c, #221e1a);
-}
-.experience[data-chapter="next"] .world-fallback::after {
-  opacity: 1;
-  background:
-    radial-gradient(70% 45% at 50% 22%, rgb(228 220 213 / 0.4), transparent 70%),
-    radial-gradient(60% 40% at 70% 40%, rgb(255 170 106 / 0.22), transparent 70%),
-    linear-gradient(180deg, #543e36, #2c2722 70%);
-}
-
 /* Skip links: invisible until focused, then a clear pill at the top left. */
 .skip-link {
   position: fixed;
@@ -1768,7 +1765,7 @@ html.cursor-visible .cursor-dot {
   inset: 0 0 -3.5rem;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(180deg, rgb(13 9 6 / 0.96), rgb(13 9 6 / 0.82) 50%, transparent);
+  background: linear-gradient(180deg, rgb(var(--pal-ground) / 0.96), rgb(var(--pal-ground) / 0.82) 50%, transparent);
   opacity: 0;
   transition: opacity 0.4s ease;
 }
@@ -2100,9 +2097,11 @@ html.has-index {
   height: auto;
   overflow: visible;
 }
-/* The signature is drawn by a worker on a canvas (smooth while the page
-   loads). The SVG stays hidden unless the loader falls back to it
-   (data-sig="svg"), or shows it whole under reduced motion ("still"). */
+/* The signature is drawn by a worker on a canvas, started by an inline script
+   while the HTML parses (components/loader/signatureBoot.ts), so it writes
+   smoothly from the first frame. data-sig: "canvas" (worker), "svg" (fallback
+   or client render) or "still" (reduced motion). With no data-sig at all (no
+   JavaScript) the SVG writes itself. */
 .signature-canvas {
   position: absolute;
   inset: 0;
@@ -2113,7 +2112,7 @@ html.has-index {
   position: relative;
   aspect-ratio: 420 / 150;
 }
-.loader:not([data-sig="svg"]):not([data-sig="still"]) .signature {
+.loader[data-sig="canvas"] .signature {
   visibility: hidden;
 }
 .sig-stroke {
@@ -2121,7 +2120,7 @@ html.has-index {
   stroke-dasharray: 1 1;
   stroke-dashoffset: 1;
 }
-.loader[data-sig="svg"] .sig-stroke {
+.loader:not([data-sig="canvas"]):not([data-sig="still"]) .sig-stroke {
   animation: sig-write var(--sig-dur) cubic-bezier(0.5, 0.05, 0.3, 1) var(--sig-delay) forwards;
 }
 .loader[data-sig="still"] .sig-stroke {
@@ -2242,8 +2241,8 @@ html.has-index {
   }
   .world-scrim {
     background:
-      linear-gradient(0deg, rgb(10 7 5 / 0.78) 0%, rgb(10 7 5 / 0.4) 36%, transparent 58%),
-      radial-gradient(120% 90% at 50% 40%, transparent 55%, rgb(8 6 4 / 0.5) 100%);
+      linear-gradient(0deg, rgb(var(--pal-ground) / 0.78) 0%, rgb(var(--pal-ground) / 0.4) 36%, transparent 58%),
+      radial-gradient(120% 90% at 50% 40%, transparent 55%, rgb(var(--pal-ground) / 0.5) 100%);
   }
   .chapter--curiosity {
     padding-block: 40svh 45svh;
@@ -2344,7 +2343,7 @@ html.has-index {
   /* Portrait: the world sits in the upper frame; copy owns the lower frame. */
   .chapter-block::before {
     inset: -3rem -2rem;
-    background: linear-gradient(180deg, transparent, rgb(13 9 6 / 0.72) 18%, rgb(13 9 6 / 0.72) 82%, transparent);
+    background: linear-gradient(180deg, transparent, rgb(var(--pal-ground) / 0.72) 18%, rgb(var(--pal-ground) / 0.72) 82%, transparent);
   }
   .spec-row {
     grid-template-columns: 1fr;
@@ -2410,9 +2409,9 @@ html.has-index {
   gap: 0.65rem;
   min-height: 44px;
   padding: 0.3rem 0.85rem 0.3rem 0.3rem;
-  border: 1px solid rgb(246 245 243 / 0.22);
+  border: 1px solid rgb(var(--pal-text) / 0.22);
   border-radius: 4px;
-  background: rgb(19 14 11 / 0.55);
+  background: var(--panel);
   color: var(--soft-white);
   font: inherit;
   font-size: 0.8125rem;
@@ -2438,8 +2437,8 @@ html.has-index {
   opacity: 0.75;
 }
 .evidence-btn:hover {
-  border-color: rgb(246 245 243 / 0.5);
-  background: rgb(19 14 11 / 0.8);
+  border-color: rgb(var(--pal-text) / 0.5);
+  background: color-mix(in srgb, var(--panel) 80%, rgb(var(--pal-text)));
   transform: translateY(-1px);
 }
 html.has-viewer {
@@ -3254,7 +3253,7 @@ html[data-case] .topbar {
   font-size: clamp(1.15rem, 1rem + 0.5vw, 1.4rem);
   letter-spacing: 0;
   text-transform: none;
-  color: #f9f6f3;
+  color: var(--soft-white);
 }
 
 /* Engineering identity: label over text, no ruled table. */
@@ -3266,7 +3265,7 @@ html[data-case] .topbar {
   gap: 0.2rem;
   padding: 0 0 0 1rem;
   border-top: 0;
-  border-left: 1px solid rgb(215 205 189 / 0.35);
+  border-left: 1px solid rgb(var(--pal-text) / 0.35);
 }
 .spec-row dt {
   padding-top: 0;
@@ -3274,7 +3273,7 @@ html[data-case] .topbar {
   font-size: 1.05rem;
   letter-spacing: 0;
   text-transform: none;
-  color: #eae5dd;
+  color: var(--soft-white);
 }
 
 /* Intelligence: the request travels down one signal line, node by node. */
@@ -3292,7 +3291,7 @@ html[data-case] .topbar {
   height: 0.55rem;
   margin-top: 0.45rem;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 0 18%, var(--core-energy) 38%, rgb(196 178 163 / 0.9) 75%);
+  background: radial-gradient(circle, #fff 0 18%, var(--core-energy) 38%, rgb(var(--pal-text) / 0.9) 75%);
 }
 .request-flow li::after {
   content: "";
@@ -3301,7 +3300,7 @@ html[data-case] .topbar {
   top: 1.25rem;
   bottom: -0.15rem;
   width: 1px;
-  background: linear-gradient(180deg, rgb(215 205 189 / 0.6), rgb(196 178 163 / 0.25));
+  background: linear-gradient(180deg, rgb(var(--pal-text) / 0.6), rgb(var(--pal-text) / 0.25));
 }
 .request-flow li:last-child::after {
   display: none;

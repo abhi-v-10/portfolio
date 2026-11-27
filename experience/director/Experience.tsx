@@ -3,7 +3,8 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { installProjectGate } from "./projectGate";
+import { installSmoothScroll } from "./smoothScroll";
+import { DEFAULT_WINDOWS, installPalette, setWindows } from "./palette";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Hero } from "@/components/hero/Hero";
@@ -55,7 +56,7 @@ const WorldCanvas = dynamic(() => import("@/experience/world/WorldCanvas"), { ss
  */
 const MIN_PRESENTATION_MS = SIGNATURE_MS + 280;
 /** If the scene is not ready by then, offer entry with the static scene. */
-const SCENE_TIMEOUT_MS = 7000;
+const SCENE_TIMEOUT_MS = 4500;
 
 type Stage = "pre" | "entering" | "entered";
 
@@ -102,6 +103,8 @@ export function Experience() {
   // Boot: every full document load starts here, so the loader always plays.
   useEffect(() => {
     (window as Window & { __originBooted?: boolean }).__originBooted = true;
+    // Test hook (read-only): automated walkthroughs read the story state.
+    (window as Window & { __story?: typeof story }).__story = story;
     setStory({
       intro: 0,
       build: 0,
@@ -147,6 +150,14 @@ export function Experience() {
       offScene();
     };
   }, []);
+
+  // Chapter palette → CSS custom properties, from the same damped track the
+  // world renders with (the raw track when there is no WebGL world).
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    return installPalette(root, () => (webgl ? story.view.track : story.track), () => story.finale);
+  }, [webgl]);
 
   // Pointer parallax input, desktop fine pointers only.
   useEffect(() => {
@@ -340,6 +351,83 @@ export function Experience() {
         }
         return 0;
       };
+      const scrimEl = rootRef.current?.querySelector<HTMLElement>(".world-scrim") ?? null;
+      let lastScrim = "";
+      let lastPast: boolean | null = null;
+      // Palette transition windows from the live layout (see palette.ts): each
+      // blend sits between the moment one chapter's last line has faded and
+      // the moment the next chapter's first line appears, on any viewport.
+      // Thresholds mirror the reveal timelines below.
+      const measureWindows = () => {
+        const vh = window.innerHeight;
+        const sec = (id: string) => document.getElementById(id);
+        // Per line: when it has fully faded (its own reveal timeline's end) and
+        // when it starts to appear.
+        const lines = (id: string) => {
+          const el = sec(id);
+          return el ? Array.from(el.querySelectorAll<HTMLElement>(".rv, .hv")) : [];
+        };
+        const gone = (id: string) => {
+          const el = sec(id);
+          if (!el) return 0;
+          if (id === "origin") return layoutTop(el) + el.offsetHeight * 0.55;
+          const top = layoutTop(el);
+          if (id === "human") return top - vh * 0.85 + (top + el.offsetHeight - (top - vh * 0.85)) * 0.71;
+          let y = -Infinity;
+          lines(id).forEach((l) => {
+            const t = layoutTop(l);
+            if (l.classList.contains("proof")) y = Math.max(y, t - vh * 0.16);
+            else if (id === "projects") {
+              const panel = l.closest<HTMLElement>(".chapter-block") ?? l;
+              y = Math.max(y, layoutTop(panel) + panel.offsetHeight - vh * 0.25);
+            } else y = Math.max(y, t + l.offsetHeight - vh * 0.22);
+          });
+          return Number.isFinite(y) ? y : top;
+        };
+        const arrives = (id: string) => {
+          const el = sec(id);
+          if (!el) return 0;
+          if (id === "human") return layoutTop(el) - vh * 0.85;
+          let y = Infinity;
+          lines(id).forEach((l) => {
+            const t = layoutTop(l);
+            if (l.classList.contains("proof")) y = Math.min(y, t - vh * 0.92);
+            else if (id === "projects") {
+              const panel = l.closest<HTMLElement>(".chapter-block") ?? l;
+              y = Math.min(y, layoutTop(panel) - vh * 0.55);
+            } else y = Math.min(y, t - vh * 0.96);
+          });
+          return Number.isFinite(y) ? y : layoutTop(el);
+        };
+        const order = ["origin", "human", "curiosity", "engineering", "intelligence", "projects", "timeline", "next"];
+        const next: [number, number][] = [];
+        let floor = 0;
+        for (let i = 0; i < order.length - 1; i++) {
+          let a = trackAt(gone(order[i]));
+          let b = trackAt(arrives(order[i + 1]));
+          if (!(b - a >= 0.06)) {
+            // No clean gap on this viewport: a short blend centred on the handover.
+            const c = (a + b) / 2;
+            a = c - 0.04;
+            b = c + 0.04;
+          } else {
+            const pad = (b - a) * 0.08;
+            a += pad;
+            b -= pad;
+            if (b - a > 0.35) {
+              const c = (a + b) / 2;
+              a = c - 0.175;
+              b = c + 0.175;
+            }
+          }
+          a = Math.max(a, floor);
+          b = Math.max(b, a + 0.02);
+          floor = b;
+          next.push([a, b]);
+        }
+        setWindows(next.every((w) => Number.isFinite(w[0]) && Number.isFinite(w[1])) ? next : DEFAULT_WINDOWS);
+        (window as Window & { __windows?: [number, number][] }).__windows = next;
+      };
       const write = () => {
         const y = window.scrollY;
         // Hero exit keeps its original tuning: 1.5 viewports of travel.
@@ -347,8 +435,18 @@ export function Experience() {
         story.track = trackAt(y);
         // The hero's left readability scrim relaxes once the story leaves it.
         const relax = Math.min(1, Math.max(0, (story.track - 0.4) / 0.5));
-        rootRef.current?.style.setProperty("--hero-scrim", (1 - 0.7 * relax).toFixed(3));
-        rootRef.current?.toggleAttribute("data-past-hero", story.track > 0.6);
+        // Written only on change, and to the scrim itself: a custom property on
+        // the root restyles the whole page every scroll frame.
+        const scrim = (1 - 0.7 * relax).toFixed(2);
+        if (scrim !== lastScrim) {
+          lastScrim = scrim;
+          scrimEl?.style.setProperty("opacity", scrim);
+        }
+        const past = story.track > 0.6;
+        if (past !== lastPast) {
+          lastPast = past;
+          rootRef.current?.toggleAttribute("data-past-hero", past);
+        }
         // Coarse chapter for CSS-only layers (the no-WebGL fallback colour story).
         const chapter = story.track < 0.6 ? "origin" : story.track < 1.8 ? "human" : story.track < 2.85 ? "curiosity" : story.track < 3.85 ? "engineering" : story.track < 5.2 ? "intelligence" : story.track < 9.6 ? "projects" : story.track < 11.05 ? "timeline" : "next";
         if (rootRef.current && rootRef.current.dataset.chapter !== chapter) rootRef.current.dataset.chapter = chapter;
@@ -360,20 +458,22 @@ export function Experience() {
         onUpdate: write,
         onRefresh: () => {
           measure();
+          measureWindows();
           write();
         },
       });
 
-      // Project Universe pager (2026-11-25): one panel per gesture, see
-      // projectGate.ts. Stops are the panel tops, the same positions the 3D
-      // track anchors use. Reduced motion keeps the steps without the glide.
+      // Scroll director (2026-11-27): smooth wheel scrolling everywhere, and
+      // in Project Universe a manual scroll that halts once on each panel (see
+      // smoothScroll.ts). Stops are the panel tops, the same positions the 3D
+      // track anchors use.
       {
         const measureStops = () => [universeStop(), ...projectStories.map((p) => exhibitStop(p.id))].map(Math.round);
-        const gate = installProjectGate(measureStops, { reduced });
-        ScrollTrigger.addEventListener("refresh", gate.refresh);
+        const director = installSmoothScroll(measureStops, { reduced });
+        ScrollTrigger.addEventListener("refresh", director.refresh);
         cleanups.push(() => {
-          ScrollTrigger.removeEventListener("refresh", gate.refresh);
-          gate.destroy();
+          ScrollTrigger.removeEventListener("refresh", director.refresh);
+          director.destroy();
         });
       }
 
