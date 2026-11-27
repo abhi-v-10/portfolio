@@ -2100,11 +2100,32 @@ html.has-index {
   height: auto;
   overflow: visible;
 }
+/* The signature is drawn by a worker on a canvas (smooth while the page
+   loads). The SVG stays hidden unless the loader falls back to it
+   (data-sig="svg"), or shows it whole under reduced motion ("still"). */
+.signature-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.loader-sig-wrap {
+  position: relative;
+  aspect-ratio: 420 / 150;
+}
+.loader:not([data-sig="svg"]):not([data-sig="still"]) .signature {
+  visibility: hidden;
+}
 .sig-stroke {
   stroke: var(--warm-ivory);
   stroke-dasharray: 1 1;
   stroke-dashoffset: 1;
+}
+.loader[data-sig="svg"] .sig-stroke {
   animation: sig-write var(--sig-dur) cubic-bezier(0.5, 0.05, 0.3, 1) var(--sig-delay) forwards;
+}
+.loader[data-sig="still"] .sig-stroke {
+  stroke-dashoffset: 0;
 }
 .sig-stroke--accent {
   stroke: var(--core-energy);

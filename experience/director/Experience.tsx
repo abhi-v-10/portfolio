@@ -130,8 +130,9 @@ export function Experience() {
     document.fonts.ready.then(measureText);
     window.addEventListener("resize", measureText);
 
-    const wait = story.reducedMotion ? 0 : Math.max(0, MIN_PRESENTATION_MS - performance.now());
-    const minTimer = window.setTimeout(() => setMinElapsed(true), wait);
+    // The signature reports when its last stroke lands (onSignatureDone);
+    // this timer is only the ceiling if that never arrives.
+    const minTimer = window.setTimeout(() => setMinElapsed(true), story.reducedMotion ? 0 : MIN_PRESENTATION_MS + 4000);
     const sceneTimer = window.setTimeout(() => setSceneTimedOut(true), SCENE_TIMEOUT_MS);
     const offScene = onSceneReady(() => setSceneReady(true));
     let alive = true;
@@ -482,6 +483,7 @@ export function Experience() {
           steps={steps}
           degraded={degraded}
           onSkip={onSkip}
+          onSignatureDone={() => window.setTimeout(() => setMinElapsed(true), 280)}
           rootRef={loaderRef}
         />
       )}

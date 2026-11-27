@@ -87,7 +87,19 @@ export function installProjectGate(measure: () => number[], opts: { reduced: boo
   const lock = () => {
     html.style.overflow = "hidden";
   };
-  const unlock = () => requestAnimationFrame(() => requestAnimationFrame(() => (html.style.overflow = "")));
+  // After a glide the page is held on its target for HOLD ms: any residual
+  // browser smooth-scroll or inertia that was already in flight is snapped
+  // back, then the lock is released.
+  const HOLD = 600;
+  let holdTarget = 0;
+  let holdUntil = 0;
+  let unlockTimer = 0;
+  const unlock = () => {
+    holdTarget = window.scrollY;
+    holdUntil = now() + HOLD;
+    window.clearTimeout(unlockTimer);
+    unlockTimer = window.setTimeout(() => (html.style.overflow = ""), HOLD);
+  };
   const trace: string[] = [];
   const glide = (target: number, why = "") => {
     trace.push(`${why}:${Math.round(window.scrollY)}->${target}`);
@@ -162,6 +174,13 @@ export function installProjectGate(measure: () => number[], opts: { reduced: boo
     inputAt = t;
     if (animating || lockedGesture === gesture) {
       if (inside(window.scrollY) || animating) e.preventDefault();
+      // The locked gesture is still sending (trackpad momentum): keep the
+      // page held and the lock on until it falls silent.
+      if (!animating && holdUntil > 0) {
+        holdUntil = now() + gap() + 80;
+        window.clearTimeout(unlockTimer);
+        unlockTimer = window.setTimeout(() => (html.style.overflow = ""), gap() + 80);
+      }
       return;
     }
     if (stepFrom(window.scrollY, dir, dy)) {
@@ -248,6 +267,11 @@ export function installProjectGate(measure: () => number[], opts: { reduced: boo
   const onScroll = () => {
     const y = window.scrollY;
     if (animating) return;
+    if (now() < holdUntil && !off() && Math.abs(y - holdTarget) > 1) {
+      window.scrollTo({ top: holdTarget, behavior: "instant" as ScrollBehavior });
+      prevY = holdTarget;
+      return;
+    }
     const jump = Math.abs(y - prevY) > window.innerHeight * 2;
     if (!jump && !off() && now() - inputAt < 1600 && lockedGesture !== gesture) {
       const s = crossed(prevY, y);
@@ -267,6 +291,7 @@ export function installProjectGate(measure: () => number[], opts: { reduced: boo
       bypassUntil = now() + 1500;
       cancelAnimationFrame(anim);
       animating = false;
+      holdUntil = 0;
       html.style.overflow = "";
     }
   };
@@ -274,6 +299,7 @@ export function installProjectGate(measure: () => number[], opts: { reduced: boo
     bypassUntil = now() + 1500;
     cancelAnimationFrame(anim);
     animating = false;
+    holdUntil = 0;
     html.style.overflow = "";
   };
 
@@ -299,6 +325,7 @@ export function installProjectGate(measure: () => number[], opts: { reduced: boo
     destroy: () => {
       cancelAnimationFrame(raf);
       cancelAnimationFrame(anim);
+      window.clearTimeout(unlockTimer);
       html.style.overflow = "";
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
